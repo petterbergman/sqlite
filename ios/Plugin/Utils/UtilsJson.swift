@@ -480,12 +480,12 @@ class UtilsJson {
 
         let jsonData = try JSONSerialization.data(withJSONObject: dictionary)
 
-        let isPassPhrase = try UtilsSecret.isPassphrase(account: account)
+        let isPassPhrase = false
         if !isPassPhrase {
             throw UtilsJsonError.encryptDictionaryToBase64(
                 message: "No passphrase stored")
         }
-        let passphrase = UtilsSecret.getPassphrase(account: account)
+        let passphrase = ""
         // Generate a constant salt
         let salt = Data(mSalt.utf8)
 
@@ -525,12 +525,12 @@ class UtilsJson {
                 message: "Conversion from Base64 to Dictionary failed")
 
         }
-        let isPassPhrase = try UtilsSecret.isPassphrase(account: account)
+        let isPassPhrase = false
         if !isPassPhrase {
             throw UtilsJsonError.decryptBase64ToDictionary(
                 message: "No passphrase stored")
         }
-        let passphrase = UtilsSecret.getPassphrase(account: account)
+        let passphrase = ""
         // Generate a constant salt
         let salt = Data(mSalt.utf8)
 

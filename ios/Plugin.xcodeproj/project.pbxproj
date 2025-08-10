@@ -18,7 +18,7 @@
 		2C3AF30A25B5932B00C5EF2F /* UtilsEncryption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C3AF30925B5932B00C5EF2F /* UtilsEncryption.swift */; };
 		2C3AF30E25B5935B00C5EF2F /* UtilsFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C3AF30D25B5935B00C5EF2F /* UtilsFile.swift */; };
 		2C3AF31225B5938500C5EF2F /* UtilsJson.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C3AF31125B5938500C5EF2F /* UtilsJson.swift */; };
-		2C3AF31625B593B600C5EF2F /* UtilsSQLCipher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C3AF31525B593B600C5EF2F /* UtilsSQLCipher.swift */; };
+        
 		2C3AF31A25B593E500C5EF2F /* UtilsUpgrade.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C3AF31925B593E500C5EF2F /* UtilsUpgrade.swift */; };
 		2C479B9225BD874C009B1A49 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C479B9125BD874C009B1A49 /* Security.framework */; };
 		2C772263262FF971000C65E9 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C772262262FF971000C65E9 /* String.swift */; };
@@ -34,7 +34,7 @@
 		2CB9B9362601EEE500743730 /* ExportToJson.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CB9B9332601EEE500743730 /* ExportToJson.swift */; };
 		2CB9B93A2601EF3700743730 /* UtilsMigrate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CB9B9392601EF3700743730 /* UtilsMigrate.swift */; };
 		2CBB5E0426333DD2000FA0A6 /* Notification.Name.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CBB5E0326333DD2000FA0A6 /* Notification.Name.swift */; };
-		2CC9CBC226413B9F002028BF /* UtilsSecret.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CC9CBC126413B9F002028BF /* UtilsSecret.swift */; };
+        
 		2CC9CBD8264142FF002028BF /* KeychainServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CC9CBD7264142FF002028BF /* KeychainServices.swift */; };
 		2CDB5FF227822D7B0040BBA3 /* SqliteConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CDB5FF127822D7B0040BBA3 /* SqliteConfig.swift */; };
 		2F98D68224C9AAE500613A4C /* CapacitorSQLite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F98D68124C9AAE400613A4C /* CapacitorSQLite.swift */; };
@@ -66,7 +66,7 @@
 		2C3AF30925B5932B00C5EF2F /* UtilsEncryption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UtilsEncryption.swift; sourceTree = "<group>"; };
 		2C3AF30D25B5935B00C5EF2F /* UtilsFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UtilsFile.swift; sourceTree = "<group>"; };
 		2C3AF31125B5938500C5EF2F /* UtilsJson.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UtilsJson.swift; sourceTree = "<group>"; };
-		2C3AF31525B593B600C5EF2F /* UtilsSQLCipher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UtilsSQLCipher.swift; sourceTree = "<group>"; };
+        
 		2C3AF31925B593E500C5EF2F /* UtilsUpgrade.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UtilsUpgrade.swift; sourceTree = "<group>"; };
 		2C479B9125BD874C009B1A49 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk/System/Library/Frameworks/Security.framework; sourceTree = DEVELOPER_DIR; };
 		2C772262262FF971000C65E9 /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
@@ -82,7 +82,7 @@
 		2CB9B9332601EEE500743730 /* ExportToJson.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExportToJson.swift; sourceTree = "<group>"; };
 		2CB9B9392601EF3700743730 /* UtilsMigrate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UtilsMigrate.swift; sourceTree = "<group>"; };
 		2CBB5E0326333DD2000FA0A6 /* Notification.Name.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Notification.Name.swift; sourceTree = "<group>"; };
-		2CC9CBC126413B9F002028BF /* UtilsSecret.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UtilsSecret.swift; sourceTree = "<group>"; };
+        
 		2CC9CBD7264142FF002028BF /* KeychainServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainServices.swift; sourceTree = "<group>"; };
 		2CDB5FF127822D7B0040BBA3 /* SqliteConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SqliteConfig.swift; sourceTree = "<group>"; };
 		2F98D68124C9AAE400613A4C /* CapacitorSQLite.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CapacitorSQLite.swift; sourceTree = "<group>"; };
@@ -138,8 +138,8 @@
 				2C3AF31125B5938500C5EF2F /* UtilsJson.swift */,
 				2CB9B9392601EF3700743730 /* UtilsMigrate.swift */,
 				2C2352C3276C8195003978B4 /* UtilsNCDatabase.swift */,
-				2CC9CBC126413B9F002028BF /* UtilsSecret.swift */,
-				2C3AF31525B593B600C5EF2F /* UtilsSQLCipher.swift */,
+                
+                
 				2C8C860A2A84373F001F9CB2 /* UtilsSQLStatement.swift */,
 				2C3AF31925B593E500C5EF2F /* UtilsUpgrade.swift */,
 			);
@@ -387,14 +387,12 @@
 				"${PODS_ROOT}/Target Support Files/Pods-PluginTests/Pods-PluginTests-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Capacitor/Capacitor.framework",
 				"${BUILT_PRODUCTS_DIR}/CapacitorCordova/Cordova.framework",
-				"${BUILT_PRODUCTS_DIR}/SQLCipher/SQLCipher.framework",
 				"${BUILT_PRODUCTS_DIR}/ZIPFoundation/ZIPFoundation.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Capacitor.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Cordova.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SQLCipher.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ZIPFoundation.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -442,8 +440,8 @@
 				2CC9CBD8264142FF002028BF /* KeychainServices.swift in Sources */,
 				2C97B3FF2A6E999800A979E8 /* ImportData.swift in Sources */,
 				2C3AF2F925B591ED00C5EF2F /* UtilsBinding.swift in Sources */,
-				2C3AF31625B593B600C5EF2F /* UtilsSQLCipher.swift in Sources */,
-				2CC9CBC226413B9F002028BF /* UtilsSecret.swift in Sources */,
+                
+                
 				2C7E57212A38655600C04517 /* Data.swift in Sources */,
 				2C3AF30A25B5932B00C5EF2F /* UtilsEncryption.swift in Sources */,
 				2F98D68224C9AAE500613A4C /* CapacitorSQLite.swift in Sources */,
@@ -638,7 +636,7 @@
 					"-DSQLITE_ENABLE_UNLOCK_NOTIFY",
 					"-DSQLITE_ENABLE_JSON1",
 					"-DSQLITE_ENABLE_FTS5",
-					"-DSQLCIPHER_CRYPTO_CC",
+                    
 					"-DHAVE_USLEEP=1",
 					"-DSQLITE_MAX_VARIABLE_NUMBER=99999",
 					"-DHAVE_GETHOSTUUID=0",
@@ -691,7 +689,7 @@
 					"-DSQLITE_ENABLE_UNLOCK_NOTIFY",
 					"-DSQLITE_ENABLE_JSON1",
 					"-DSQLITE_ENABLE_FTS5",
-					"-DSQLCIPHER_CRYPTO_CC",
+                    
 					"-DHAVE_USLEEP=1",
 					"-DSQLITE_MAX_VARIABLE_NUMBER=99999",
 					"-DHAVE_GETHOSTUUID=0",
