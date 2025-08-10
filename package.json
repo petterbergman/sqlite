@@ -1,7 +1,7 @@
 {
   "name": "@capacitor-community/sqlite",
-  "version": "7.0.2",
-  "description": "Community plugin for native & electron SQLite databases",
+  "version": "7.1.0",
+  "description": "Community plugin for native SQLite databases",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
@@ -12,7 +12,6 @@
     "dist/",
     "src/",
     "ios/Plugin/",
-    "electron/",
     "CapacitorCommunitySqlite.podspec"
   ],
   "author": "Robin Genz <mail@robingenz.dev>",
@@ -31,17 +30,15 @@
     "capacitor",
     "plugin",
     "native",
-    "electron",
     "browser",
     "database",
     "sqlite"
   ],
   "scripts": {
-    "verify": "npm run verify:ios && npm run verify:android && npm run verify:web && npm run verify:electron",
+    "verify": "npm run verify:ios && npm run verify:android && npm run verify:web",
     "verify:ios": "cd ios && pod install && xcodebuild -workspace Plugin.xcworkspace -scheme Plugin OTHER_CFLAGS='-DHAVE_GETHOSTUUID=0' && cd ..",
     "verify:android": "cd android && ./gradlew clean build test && cd ..",
     "verify:web": "npm run build",
-    "verify:electron": "npm run build-electron",
     "lint": "npm run eslint && npm run prettier -- --check && npm run swiftlint -- lint",
     "fmt": "npm run eslint -- --fix && npm run prettier -- --write && npm run swiftlint -- --fix --format",
     "eslint": "eslint . --ext ts",
@@ -52,11 +49,10 @@
     "docgenConnection": "docgen --api ISQLiteConnection --output-readme docs/APIConnection.md",
     "docgenDBConnection": "docgen --api ISQLiteDBConnection --output-readme docs/APIDBConnection.md",
     "build": "npm run clean && npm run docgen && tsc && rollup -c rollup.config.mjs",
-    "build-electron": "tsc --project electron/tsconfig.json && rollup -c electron/rollup.config.mjs && rimraf ./electron/build",
     "clean": "rimraf ./dist",
     "watch": "tsc --watch",
     "test": "echo \"No test specified\"",
-    "prepublishOnly": "npm run build && npm run build-electron && npm run docgen",
+    "prepublishOnly": "npm run build && npm run docgen",
     "release": "standard-version"
   },
   "devDependencies": {
@@ -93,9 +89,6 @@
     },
     "android": {
       "src": "android"
-    },
-    "electron": {
-      "src": "electron"
     }
   },
   "dependencies": {
