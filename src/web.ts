@@ -4,14 +4,12 @@ import type {
   CapacitorSQLitePlugin,
   capConnectionOptions,
   capAllConnectionsOptions,
-  capChangeSecretOptions,
   capEchoOptions,
   capEchoResult,
   capNCConnectionOptions,
   capNCDatabasePathOptions,
   capNCDatabasePathResult,
   capNCOptions,
-  capSetSecretOptions,
   capSQLiteChanges,
   capSQLiteExecuteOptions,
   capSQLiteExportOptions,
@@ -522,29 +520,7 @@ export class CapacitorSQLiteWeb extends WebPlugin implements CapacitorSQLitePlug
     throw this.unimplemented('Not implemented on web.');
   }
 
-  async isSecretStored(): Promise<capSQLiteResult> {
-    throw this.unimplemented('Not implemented on web.');
-  }
-
-  async setEncryptionSecret(options: capSetSecretOptions): Promise<void> {
-    console.log('setEncryptionSecret', options);
-    throw this.unimplemented('Not implemented on web.');
-  }
-
-  async changeEncryptionSecret(options: capChangeSecretOptions): Promise<void> {
-    console.log('changeEncryptionSecret', options);
-    throw this.unimplemented('Not implemented on web.');
-  }
-
-  async clearEncryptionSecret(): Promise<void> {
-    console.log('clearEncryptionSecret');
-    throw this.unimplemented('Not implemented on web.');
-  }
-
-  async checkEncryptionSecret(options: capSetSecretOptions): Promise<capSQLiteResult> {
-    console.log('checkEncryptionPassPhrase', options);
-    throw this.unimplemented('Not implemented on web.');
-  }
+  // Encryption APIs removed on web
 
   async getNCDatabasePath(options: capNCDatabasePathOptions): Promise<capNCDatabasePathResult> {
     console.log('getNCDatabasePath', options);
@@ -566,18 +542,7 @@ export class CapacitorSQLiteWeb extends WebPlugin implements CapacitorSQLitePlug
     throw this.unimplemented('Not implemented on web.');
   }
 
-  async isDatabaseEncrypted(options: capSQLiteOptions): Promise<capSQLiteResult> {
-    console.log('isDatabaseEncrypted', options);
-    throw this.unimplemented('Not implemented on web.');
-  }
-
-  async isInConfigEncryption(): Promise<capSQLiteResult> {
-    throw this.unimplemented('Not implemented on web.');
-  }
-
-  async isInConfigBiometricAuth(): Promise<capSQLiteResult> {
-    throw this.unimplemented('Not implemented on web.');
-  }
+  // Encryption/config APIs removed on web
   async loadExtension(options: capSQLiteExtensionPath): Promise<void> {
     console.log('loadExtension', options);
     throw this.unimplemented('Not implemented on web.');

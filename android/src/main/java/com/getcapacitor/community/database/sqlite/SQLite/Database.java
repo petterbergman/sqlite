@@ -17,7 +17,9 @@ import android.os.Build;
 import android.util.Log;
 import androidx.sqlite.db.SimpleSQLiteQuery;
 import androidx.sqlite.db.SupportSQLiteDatabase;
+import androidx.sqlite.db.SupportSQLiteOpenHelper;
 import androidx.sqlite.db.SupportSQLiteStatement;
+import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory;
 import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.community.database.sqlite.SQLite.ImportExportJson.ExportToJson;
@@ -36,8 +38,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import net.zetetic.database.sqlcipher.SQLiteCursor;
-import net.zetetic.database.sqlcipher.SQLiteDatabase;
+import android.database.Cursor;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,19 +50,16 @@ public class Database {
     private final String _dbName;
     private final Context _context;
     private final String _mode;
-    private final Boolean _encrypted;
-    private final Boolean _isEncryption;
     private final Boolean _readOnly;
     private final File _file;
     private final int _version;
     private SupportSQLiteDatabase _db = null;
     private final UtilsSQLite _uSqlite;
-    private final UtilsSQLCipher _uCipher;
     private final UtilsFile _uFile;
     private final UtilsJson _uJson;
     private final UtilsUpgrade _uUpg;
     private final UtilsDrop _uDrop;
-    private final UtilsSecret _uSecret;
+    private final UtilsSecret _uSecret = null;
     private final Dictionary<Integer, JSONObject> _vUpgObject;
     private final ImportFromJson fromJson = new ImportFromJson();
     private final ExportToJson toJson = new ExportToJson();
@@ -71,19 +69,12 @@ public class Database {
     public Database(
         Context context,
         String dbName,
-        Boolean encrypted,
-        String mode,
         int version,
-        Boolean isEncryption,
         Dictionary<Integer, JSONObject> vUpgObject,
-        SharedPreferences sharedPreferences,
         Boolean readonly
     ) {
         this._context = context;
         this._dbName = dbName;
-        this._mode = mode;
-        this._encrypted = encrypted;
-        this._isEncryption = isEncryption;
         this._version = version;
         this._vUpgObject = vUpgObject;
         this._readOnly = readonly;
@@ -94,13 +85,10 @@ public class Database {
             this._file = this._context.getDatabasePath(dbName);
         }
         this._uSqlite = new UtilsSQLite();
-        this._uCipher = new UtilsSQLCipher();
         this._uFile = new UtilsFile();
         this._uJson = new UtilsJson();
         this._uUpg = new UtilsUpgrade();
         this._uDrop = new UtilsDrop();
-        this._uSecret = isEncryption ? new UtilsSecret(context, sharedPreferences) : null;
-        InitializeSQLCipher();
         if (!Objects.requireNonNull(this._file.getParentFile()).exists()) {
             boolean dirCreated = this._file.getParentFile().mkdirs();
             if (!dirCreated) {
@@ -108,14 +96,6 @@ public class Database {
             }
         }
         Log.v(TAG, "&&& file path " + this._file.getAbsolutePath());
-    }
-
-    /**
-     * InitializeSQLCipher Method
-     * Initialize the SQLCipher Libraries
-     */
-    private void InitializeSQLCipher() {
-        System.loadLibrary("sqlcipher");
     }
 
     public SupportSQLiteDatabase getDb() {
@@ -236,47 +216,20 @@ public class Database {
      */
     public void open() throws Exception {
         int curVersion;
-
-        String password = "";
-        if (_encrypted && (_mode.equals("secret") || _mode.equals("encryption") || _mode.equals("decryption"))) {
-            if (!_uSecret.isPassphrase()) {
-                throw new Exception("No Passphrase stored");
-            }
-            password = _uSecret.getPassphrase();
-        }
-        if (_mode.equals("encryption")) {
-            if (_isEncryption) {
-                try {
-                    _uCipher.encrypt(_context, _file, password.getBytes(StandardCharsets.UTF_8));
-                } catch (Exception e) {
-                    String msg = "Failed in encryption " + e.getMessage();
-                    Log.v(TAG, msg);
-                    throw new Exception(msg);
-                }
-            } else {
-                throw new Exception("No Encryption set in capacitor.config");
-            }
-        }
-        if (_mode.equals("decryption")) {
-            if (_isEncryption) {
-                try {
-                    _uCipher.decrypt(_context, _file, password.getBytes());
-                    password = "";
-                } catch (Exception e) {
-                    String msg = "Failed in decryption " + e.getMessage();
-                    Log.v(TAG, msg);
-                    throw new Exception(msg);
-                }
-            } else {
-                throw new Exception("No Encryption set in capacitor.config");
-            }
-        }
         try {
-            if (!isNCDB() && !this._readOnly) {
-                _db = SQLiteDatabase.openOrCreateDatabase(_file, password, null, null);
-            } else {
-                _db = SQLiteDatabase.openDatabase(String.valueOf(_file), password, null, SQLiteDatabase.OPEN_READONLY, null);
-            }
+            SupportSQLiteOpenHelper.Configuration cfg = SupportSQLiteOpenHelper.Configuration
+                .builder(_context)
+                .name(isNCDB() ? _file.getName() : _dbName)
+                .callback(new SupportSQLiteOpenHelper.Callback(_version) {
+                    @Override
+                    public void onCreate(SupportSQLiteDatabase db) {}
+
+                    @Override
+                    public void onUpgrade(SupportSQLiteDatabase db, int oldVersion, int newVersion) {}
+                })
+                .build();
+            SupportSQLiteOpenHelper helper = new FrameworkSQLiteOpenHelperFactory().create(cfg);
+            _db = _readOnly ? helper.getReadableDatabase() : helper.getWritableDatabase();
             if (_db != null) {
                 if (_db.isOpen()) {
                     // set the Foreign Key Pragma ON
@@ -967,12 +920,12 @@ public class Database {
      */
     public JSArray selectSQL(String statement, ArrayList<Object> values) throws Exception {
         JSArray retArray = new JSArray();
-        SQLiteCursor c = null;
+        Cursor c = null;
         if (_db == null) {
             return retArray;
         }
         try {
-            c = (SQLiteCursor) _db.query(statement, values.toArray(new Object[0]));
+            c = _db.query(statement, values.toArray(new Object[0]));
             while (c.moveToNext()) {
                 JSObject row = new JSObject();
                 for (int i = 0; i < c.getColumnCount(); i++) {

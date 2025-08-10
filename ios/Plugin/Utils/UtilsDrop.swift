@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import SQLCipher
+import SQLite3
 
 enum UtilsDropError: Error {
     case getTablesNamesFailed(message: String)

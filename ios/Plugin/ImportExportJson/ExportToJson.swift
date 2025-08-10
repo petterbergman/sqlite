@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import SQLCipher
+import SQLite3
 
 // swiftlint:disable type_body_length
 // swiftlint:disable file_length

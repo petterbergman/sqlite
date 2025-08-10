@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import SQLCipher
+import SQLite3
 
 enum UtilsSQLCipherError: Error {
     case openOrCreateDatabase(message: String)
@@ -32,8 +32,6 @@ enum UtilsSQLCipherError: Error {
     case restoreDB(message: String)
     case deleteBackupDB(message: String)
     case openDBNoPassword(message: String)
-    case openDBStoredPassword(message: String)
-    case openDBGlobalPassword(message: String)
     case returningWorkAround(message: String)
 }
 enum State: String {

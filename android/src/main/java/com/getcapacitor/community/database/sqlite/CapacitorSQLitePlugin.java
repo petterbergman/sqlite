@@ -27,12 +27,7 @@ public class CapacitorSQLitePlugin extends Plugin {
     private CapacitorSQLite implementation;
     private final Dictionary<String, Dictionary<Integer, JSONObject>> versionUpgrades = new Hashtable<>();
     private final RetHandler rHandler = new RetHandler();
-    private String passphrase = null;
-    private String oldpassphrase = null;
     private String loadMessage = "";
-    private final ArrayList<String> modeList = new ArrayList<>(
-        Arrays.asList("no-encryption", "encryption", "secret", "decryption", "wrongsecret")
-    );
 
     /**
      * Load Method
@@ -79,20 +74,7 @@ public class CapacitorSQLitePlugin extends Plugin {
      *
      * @param call PluginCall
      */
-    @PluginMethod
-    public void isSecretStored(PluginCall call) {
-        if (implementation != null) {
-            try {
-                Boolean res = implementation.isSecretStored();
-                rHandler.retResult(call, res, null);
-            } catch (Exception e) {
-                String msg = "IsSecretStored: " + e.getMessage();
-                rHandler.retResult(call, null, msg);
-            }
-        } else {
-            rHandler.retResult(call, null, loadMessage);
-        }
-    }
+    // Encryption APIs removed
 
     /**
      * SetEncryptionSecret
@@ -100,27 +82,7 @@ public class CapacitorSQLitePlugin extends Plugin {
      *
      * @param call PluginCall
      */
-    @PluginMethod
-    public void setEncryptionSecret(PluginCall call) {
-        String passphrase;
-        if (!call.getData().has("passphrase")) {
-            String msg = "SetEncryptionSecret: Must provide a passphrase";
-            rHandler.retResult(call, null, msg);
-            return;
-        }
-        passphrase = call.getString("passphrase");
-        if (implementation != null) {
-            try {
-                implementation.setEncryptionSecret(passphrase);
-                rHandler.retResult(call, null, null);
-            } catch (Exception e) {
-                String msg = "SetEncryptionSecret: " + e.getMessage();
-                rHandler.retResult(call, null, msg);
-            }
-        } else {
-            rHandler.retResult(call, null, loadMessage);
-        }
-    }
+    //
 
     /**
      * ChangeEncryptionSecret
@@ -129,36 +91,7 @@ public class CapacitorSQLitePlugin extends Plugin {
      *
      * @param call PluginCall
      */
-    @PluginMethod
-    public void changeEncryptionSecret(PluginCall call) {
-        if (!call.getData().has("passphrase")) {
-            String msg = "SetEncryptionSecret: Must provide a passphrase";
-            rHandler.retResult(call, null, msg);
-            return;
-        }
-        passphrase = call.getString("passphrase");
-
-        if (!call.getData().has("oldpassphrase")) {
-            String msg = "SetEncryptionSecret: Must provide a oldpassphrase";
-            rHandler.retResult(call, null, msg);
-            return;
-        }
-        oldpassphrase = call.getString("oldpassphrase");
-        if (implementation != null) {
-            getActivity()
-                .runOnUiThread(() -> {
-                    try {
-                        implementation.changeEncryptionSecret(call, passphrase, oldpassphrase);
-                        rHandler.retResult(call, null, null);
-                    } catch (Exception e) {
-                        String msg = "ChangeEncryptionSecret: " + e.getMessage();
-                        rHandler.retResult(call, null, msg);
-                    }
-                });
-        } else {
-            rHandler.retResult(call, null, loadMessage);
-        }
-    }
+    //
 
     /**
      * ClearEncryptionSecret
@@ -166,20 +99,7 @@ public class CapacitorSQLitePlugin extends Plugin {
      *
      * @param call PluginCall
      */
-    @PluginMethod
-    public void clearEncryptionSecret(PluginCall call) {
-        if (implementation != null) {
-            try {
-                implementation.clearEncryptionSecret();
-                rHandler.retResult(call, null, null);
-            } catch (Exception e) {
-                String msg = "ClearEncryptionSecret: " + e.getMessage();
-                rHandler.retResult(call, null, msg);
-            }
-        } else {
-            rHandler.retResult(call, null, loadMessage);
-        }
-    }
+    //
 
     /**
      * checkEncryptionSecret
@@ -187,27 +107,7 @@ public class CapacitorSQLitePlugin extends Plugin {
      *
      * @param call PluginCall
      */
-    @PluginMethod
-    public void checkEncryptionSecret(PluginCall call) {
-        String passphrase;
-        if (!call.getData().has("passphrase")) {
-            String msg = "checkEncryptionSecret: Must provide a passphrase";
-            rHandler.retResult(call, null, msg);
-            return;
-        }
-        passphrase = call.getString("passphrase");
-        if (implementation != null) {
-            try {
-                Boolean res = implementation.checkEncryptionSecret(passphrase);
-                rHandler.retResult(call, res, null);
-            } catch (Exception e) {
-                String msg = "CheckEncryptionSecret: " + e.getMessage();
-                rHandler.retResult(call, null, msg);
-            }
-        } else {
-            rHandler.retResult(call, null, loadMessage);
-        }
-    }
+    //
 
     @PluginMethod
     public void getNCDatabasePath(PluginCall call) {
@@ -278,7 +178,6 @@ public class CapacitorSQLitePlugin extends Plugin {
     public void createConnection(PluginCall call) {
         String dbName;
         int dbVersion;
-        String inMode;
         if (!call.getData().has("database")) {
             String msg = "CreateConnection: Must provide a database name";
             rHandler.retResult(call, null, msg);
@@ -287,23 +186,12 @@ public class CapacitorSQLitePlugin extends Plugin {
         dbName = call.getString("database");
         dbVersion = call.getInt("version", 1);
 
-        Boolean encrypted = call.getBoolean("encrypted", false);
-        if (encrypted) {
-            inMode = call.getString("mode", "no-encryption");
-            if (!modeList.contains(inMode)) {
-                String msg = "CreateConnection: inMode must ";
-                msg += "be in ['encryption','secret', 'decryption'] ";
-                rHandler.retResult(call, null, msg);
-                return;
-            }
-        } else {
-            inMode = "no-encryption";
-        }
+        // encryption parameters removed
         boolean readOnly = call.getBoolean("readonly", false);
         Dictionary<Integer, JSONObject> upgDict = versionUpgrades.get(dbName);
         if (implementation != null) {
             try {
-                implementation.createConnection(dbName, encrypted, inMode, dbVersion, upgDict, readOnly);
+                implementation.createConnection(dbName, dbVersion, upgDict, readOnly);
                 rHandler.retResult(call, null, null);
             } catch (Exception e) {
                 String msg = "CreateConnection: " + e.getMessage();
@@ -667,25 +555,7 @@ public class CapacitorSQLitePlugin extends Plugin {
      *
      * @param call PluginCall
      */
-    @PluginMethod
-    public void isDatabaseEncrypted(PluginCall call) {
-        if (!call.getData().has("database")) {
-            rHandler.retResult(call, null, "Must provide a database name");
-            return;
-        }
-        String dbName = call.getString("database");
-        if (implementation != null) {
-            try {
-                Boolean res = implementation.isDatabaseEncrypted(dbName);
-                rHandler.retResult(call, res, null);
-            } catch (Exception e) {
-                String msg = "isDatabaseEncrypted: " + e.getMessage();
-                rHandler.retResult(call, null, msg);
-            }
-        } else {
-            rHandler.retResult(call, null, loadMessage);
-        }
-    }
+    // Encryption state API removed
 
     /**
      * isInConfigEncryption
@@ -693,11 +563,7 @@ public class CapacitorSQLitePlugin extends Plugin {
      *
      * @param call PluginCall
      */
-    @PluginMethod
-    public void isInConfigEncryption(PluginCall call) {
-        Boolean res = this.config.getIsEncryption();
-        rHandler.retResult(call, res, null);
-    }
+    // isInConfigEncryption removed
 
     /**
      * isInConfigBiometricAuth
@@ -705,11 +571,7 @@ public class CapacitorSQLitePlugin extends Plugin {
      *
      * @param call PluginCall
      */
-    @PluginMethod
-    public void isInConfigBiometricAuth(PluginCall call) {
-        Boolean res = this.config.getBiometricAuth();
-        rHandler.retResult(call, res, null);
-    }
+    // isInConfigBiometricAuth removed
 
     /**
      * IsNCDatabase Method

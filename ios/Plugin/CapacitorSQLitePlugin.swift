@@ -6,8 +6,7 @@ import Capacitor
 // swiftlint:disable type_body_length
 public class CapacitorSQLitePlugin: CAPPlugin {
     private var implementation: CapacitorSQLite?
-    private let modeList: [String] = ["no-encryption", "encryption", "secret",
-                                      "decryption", "newsecret", "wrongsecret"]
+    private let modeList: [String] = ["no-encryption"]
     private let retHandler: ReturnHandler = ReturnHandler()
     private var versionUpgrades: [String: [Int: [String: Any]]] = [:]
     var importObserver: Any?
@@ -66,163 +65,37 @@ public class CapacitorSQLitePlugin: CAPPlugin {
     // MARK: - IsDatabaseEncrypted
 
     @objc func isDatabaseEncrypted(_ call: CAPPluginCall) {
-        guard let dbName = call.options["database"] as? String else {
-            retHandler.rResult(
-                call: call, ret: false,
-                message: "isDatabaseEncrypted: Must provide a database name")
-            return
-        }
-        do {
-            let res = try implementation?.isDatabaseEncrypted(dbName)
-            var bRes: Bool = false
-            if res == 1 {
-                bRes = true
-            }
-            retHandler.rResult(call: call, ret: bRes)
-        } catch CapacitorSQLiteError.failed(let message) {
-            let msg = "isDatabaseEncrypted: \(message)"
-            retHandler.rResult(call: call, message: msg)
-            return
-        } catch let error {
-            retHandler.rResult(
-                call: call,
-                message: "isDatabaseEncrypted: \(error)")
-            return
-        }
-
+        retHandler.rResult(call: call, ret: false)
     }
 
     // MARK: - IsSecretStored
 
     @objc func isSecretStored(_ call: CAPPluginCall) {
-        do {
-            let res = try implementation?.isSecretStored()
-            var bRes: Bool = false
-            if res == 1 {
-                bRes = true
-            }
-            retHandler.rResult(call: call, ret: bRes)
-            return
-        } catch CapacitorSQLiteError.failed(let message) {
-            let msg = "IsSecretStored: \(message)"
-            retHandler.rResult(call: call, message: msg)
-            return
-        } catch let error {
-            retHandler.rResult(
-                call: call,
-                message: "IsSecretStored: \(error)")
-            return
-        }
-
+        retHandler.rResult(call: call, ret: false)
     }
 
     // MARK: - SetEncryptionSecret
 
     @objc func setEncryptionSecret(_ call: CAPPluginCall) {
-
-        guard let passphrase = call.options["passphrase"] as? String else {
-            retHandler.rResult(
-                call: call,
-                message: "SetEncryptionSecret: Must provide a passphrase")
-            return
-        }
-        do {
-            try implementation?.setEncryptionSecret(passphrase: passphrase)
-            retHandler.rResult(call: call)
-            return
-        } catch CapacitorSQLiteError.failed(let message) {
-            let msg = "SetEncryptionSecret: \(message)"
-            retHandler.rResult(call: call, message: msg)
-            return
-        } catch let error {
-            retHandler.rResult(
-                call: call,
-                message: "SetEncryptionSecret: \(error)")
-            return
-        }
+        retHandler.rResult(call: call, message: "Encryption not supported")
     }
 
     // MARK: - ChangeEncryptionSecret
 
     @objc func changeEncryptionSecret(_ call: CAPPluginCall) {
-
-        guard let passphrase = call.options["passphrase"] as? String else {
-            retHandler.rResult(
-                call: call,
-                message: "ChangeEncryptionSecret: Must provide a passphrase")
-            return
-        }
-        guard let oldPassphrase = call.options["oldpassphrase"] as? String else {
-            retHandler.rResult(
-                call: call,
-                message: "ChangeEncryptionSecret: Must provide the old passphrase")
-            return
-        }
-        do {
-            try implementation?.changeEncryptionSecret(call: call, passphrase: passphrase, oldPassphrase: oldPassphrase)
-            retHandler.rResult(call: call)
-            return
-        } catch CapacitorSQLiteError.failed(let message) {
-            let msg = "ChangeEncryptionSecret: \(message)"
-            retHandler.rResult(call: call, message: msg)
-            return
-        } catch let error {
-            retHandler.rResult(
-                call: call,
-                message: "ChangeEncryptionSecret: \(error)")
-            return
-        }
+        retHandler.rResult(call: call, message: "Encryption not supported")
     }
 
     // MARK: - ClearEncryptionSecret
 
     @objc func clearEncryptionSecret(_ call: CAPPluginCall) {
-
-        do {
-            try implementation?.clearEncryptionSecret()
-            retHandler.rResult(call: call)
-            return
-        } catch CapacitorSQLiteError.failed(let message) {
-            let msg = "ClearEncryptionSecret: \(message)"
-            retHandler.rResult(call: call, message: msg)
-            return
-        } catch let error {
-            retHandler.rResult(
-                call: call,
-                message: "ClearEncryptionSecret: \(error)")
-            return
-        }
+        retHandler.rResult(call: call, message: "Encryption not supported")
     }
 
     // MARK: - CheckEncryptionSecret
 
     @objc func checkEncryptionSecret(_ call: CAPPluginCall) {
-
-        guard let passphrase = call.options["passphrase"] as? String else {
-            retHandler.rResult(
-                call: call,
-                message: "CheckEncryptionSecret: Must provide a passphrase")
-            return
-        }
-        do {
-            let res = try implementation?
-                .checkEncryptionSecret(passphrase: passphrase)
-            var bRes: Bool = false
-            if res == 1 {
-                bRes = true
-            }
-            retHandler.rResult(call: call, ret: bRes)
-            return
-        } catch CapacitorSQLiteError.failed(let message) {
-            let msg = "CheckEncryptionSecret: \(message)"
-            retHandler.rResult(call: call, message: msg)
-            return
-        } catch let error {
-            retHandler.rResult(
-                call: call,
-                message: "CheckEncryptionSecret: \(error)")
-            return
-        }
+        retHandler.rResult(call: call, message: "Encryption not supported")
     }
 
     // MARK: - CreateConnection

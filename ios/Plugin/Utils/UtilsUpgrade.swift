@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import SQLCipher
+import SQLite3
 
 enum UtilsUpgradeError: Error {
     case onUpgradeFailed(message: String)

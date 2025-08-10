@@ -5,8 +5,8 @@ import android.content.SharedPreferences;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import net.zetetic.database.sqlcipher.SQLiteDatabase;
-import net.zetetic.database.sqlcipher.SQLiteStatement;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteStatement;
 
 public class UtilsSQLCipher {
 
@@ -35,7 +35,7 @@ public class UtilsSQLCipher {
      * @return the detected state of the database
      */
     public State getDatabaseState(Context ctxt, File dbPath, SharedPreferences sharedPreferences, GlobalSQLite globVar) {
-        System.loadLibrary("sqlcipher");
+        // sqlcipher removed
         if (dbPath.exists()) {
             SQLiteDatabase db = null;
 
@@ -97,7 +97,7 @@ public class UtilsSQLCipher {
      * @throws IOException
      */
     public void encrypt(Context ctxt, File originalFile, byte[] passphrase) throws IOException {
-        System.loadLibrary("sqlcipher");
+        // sqlcipher removed
 
         if (originalFile.exists()) {
             File newFile = File.createTempFile("sqlcipherutils", "tmp", ctxt.getCacheDir());
@@ -140,7 +140,7 @@ public class UtilsSQLCipher {
     }
 
     public void decrypt(Context ctxt, File originalFile, byte[] passphrase) throws IOException {
-        System.loadLibrary("sqlcipher");
+        // sqlcipher removed
 
         if (originalFile.exists()) {
             // Create a temporary file for the decrypted database in the cache directory

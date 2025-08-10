@@ -45,42 +45,7 @@ export interface CapacitorSQLitePlugin {
    * @return Promise<capSQLiteResult>
    * @since 3.0.0-beta.13
    */
-  isSecretStored(): Promise<capSQLiteResult>;
-  /**
-   * Store a passphrase in a secure store
-   * Update the secret of previous encrypted databases with GlobalSQLite
-   * !!! Only to be used once if you wish to encrypt database !!!
-   *
-   * @param options capSetSecretOptions
-   * @return Promise<void>
-   * @since 3.0.0-beta.13
-   */
-  setEncryptionSecret(options: capSetSecretOptions): Promise<void>;
-  /**
-   * Change the passphrase in a secure store
-   * Update the secret of previous encrypted databases with passphrase
-   * in secure store
-   *
-   * @param options capChangeSecretOptions
-   * @return Promise<void>
-   * @since 3.0.0-beta.13
-   */
-  changeEncryptionSecret(options: capChangeSecretOptions): Promise<void>;
-  /**
-   * Clear the passphrase in the secure store
-   *
-   * @return Promise<void>
-   * @since 3.5.1
-   */
-  clearEncryptionSecret(): Promise<void>;
-  /**
-   * Check encryption passphrase
-   *
-   * @return Promise<capSQLiteResult>
-   * @since 4.6.1
-   */
-
-  checkEncryptionSecret(options: capSetSecretOptions): Promise<capSQLiteResult>;
+  // Encryption APIs removed
 
   /**
    * create a database connection
@@ -224,19 +189,7 @@ export interface CapacitorSQLitePlugin {
    * @returns Promise<capSQLiteResult>
    * @since 4.6.2-2
    */
-  isDatabaseEncrypted(options: capSQLiteOptions): Promise<capSQLiteResult>;
-  /**
-   * Check encryption value in capacitor.config
-   * @returns Promise<capSQLiteResult>
-   * @since 4.6.2-2
-   */
-  isInConfigEncryption(): Promise<capSQLiteResult>;
-  /**
-   * Check encryption value in capacitor.config
-   * @returns Promise<capSQLiteResult>
-   * @since 4.6.2-2
-   */
-  isInConfigBiometricAuth(): Promise<capSQLiteResult>;
+  // Encryption/config APIs removed
   /**
    * Check if a SQLite database exists without connection
    * @param options: capSQLiteOptions
@@ -406,24 +359,6 @@ export interface CapacitorSQLitePlugin {
    */
   isNCDatabase(options: capNCOptions): Promise<capSQLiteResult>;
 }
-
-export interface capSetSecretOptions {
-  /**
-   * The passphrase for Encrypted Databases
-   */
-  passphrase?: string;
-}
-
-export interface capChangeSecretOptions {
-  /**
-   * The new passphrase for Encrypted Databases
-   */
-  passphrase?: string;
-  /**
-   * The old passphrase for Encrypted Databases
-   */
-  oldpassphrase?: string;
-}
 export interface capEchoOptions {
   /**
    *  String to be echoed
@@ -471,15 +406,6 @@ export interface capConnectionOptions {
    * The database  version
    */
   version?: number;
-  /**
-   * Set to true (database encryption) / false
-   */
-  encrypted?: boolean;
-  /**
-   * Set the mode for database encryption
-   * ["encryption", "secret", "newsecret"]
-   */
-  mode?: string;
   /**
    * Set to true (database in read-only mode) / false
    */
@@ -1384,52 +1310,7 @@ export class SQLiteConnection implements ISQLiteConnection {
       return Promise.reject(err);
     }
   }
-  async isSecretStored(): Promise<capSQLiteResult> {
-    try {
-      const res: capSQLiteResult = await this.sqlite.isSecretStored();
-      return Promise.resolve(res);
-    } catch (err) {
-      return Promise.reject(err);
-    }
-  }
-
-  async setEncryptionSecret(passphrase: string): Promise<void> {
-    try {
-      await this.sqlite.setEncryptionSecret({ passphrase: passphrase });
-      return Promise.resolve();
-    } catch (err) {
-      return Promise.reject(err);
-    }
-  }
-  async changeEncryptionSecret(passphrase: string, oldpassphrase: string): Promise<void> {
-    try {
-      await this.sqlite.changeEncryptionSecret({
-        passphrase: passphrase,
-        oldpassphrase: oldpassphrase,
-      });
-      return Promise.resolve();
-    } catch (err) {
-      return Promise.reject(err);
-    }
-  }
-  async clearEncryptionSecret(): Promise<void> {
-    try {
-      await this.sqlite.clearEncryptionSecret();
-      return Promise.resolve();
-    } catch (err) {
-      return Promise.reject(err);
-    }
-  }
-  async checkEncryptionSecret(passphrase: string): Promise<capSQLiteResult> {
-    try {
-      const res: capSQLiteResult = await this.sqlite.checkEncryptionSecret({
-        passphrase: passphrase,
-      });
-      return Promise.resolve(res);
-    } catch (err) {
-      return Promise.reject(err);
-    }
-  }
+  // Encryption APIs removed
   async addUpgradeStatement(database: string, upgrade: capSQLiteVersionUpgrade[]): Promise<void> {
     try {
       if (database.endsWith('.db')) database = database.slice(0, -3);
@@ -1444,20 +1325,12 @@ export class SQLiteConnection implements ISQLiteConnection {
   }
   async createConnection(
     database: string,
-    encrypted: boolean,
-    mode: string,
     version: number,
     readonly: boolean,
   ): Promise<SQLiteDBConnection> {
     try {
       if (database.endsWith('.db')) database = database.slice(0, -3);
-      await this.sqlite.createConnection({
-        database,
-        encrypted,
-        mode,
-        version,
-        readonly,
-      });
+      await this.sqlite.createConnection({ database, version, readonly });
       const conn = new SQLiteDBConnection(database, readonly, this.sqlite);
       const connName = readonly ? `RO_${database}` : `RW_${database}`;
       this._connectionDict.set(connName, conn);
@@ -1651,31 +1524,7 @@ export class SQLiteConnection implements ISQLiteConnection {
       return Promise.reject(err);
     }
   }
-  async isDatabaseEncrypted(database: string): Promise<capSQLiteResult> {
-    if (database.endsWith('.db')) database = database.slice(0, -3);
-    try {
-      const res = await this.sqlite.isDatabaseEncrypted({ database: database });
-      return Promise.resolve(res);
-    } catch (err) {
-      return Promise.reject(err);
-    }
-  }
-  async isInConfigEncryption(): Promise<capSQLiteResult> {
-    try {
-      const res = await this.sqlite.isInConfigEncryption();
-      return Promise.resolve(res);
-    } catch (err) {
-      return Promise.reject(err);
-    }
-  }
-  async isInConfigBiometricAuth(): Promise<capSQLiteResult> {
-    try {
-      const res = await this.sqlite.isInConfigBiometricAuth();
-      return Promise.resolve(res);
-    } catch (err) {
-      return Promise.reject(err);
-    }
-  }
+  // Encryption/config methods removed
   async isDatabase(database: string): Promise<capSQLiteResult> {
     if (database.endsWith('.db')) database = database.slice(0, -3);
     try {
