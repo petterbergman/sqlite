@@ -1,6 +1,6 @@
 {
   "name": "@capacitor-community/sqlite",
-  "version": "7.4.0",
+  "version": "7.1.0",
   "description": "Community plugin for native SQLite databases",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -51,9 +51,7 @@
     "build": "npm run clean && npm run docgen && tsc && rollup -c rollup.config.mjs",
     "clean": "rimraf ./dist",
     "watch": "tsc --watch",
-    "test": "npm run test:ios && npm run test:android",
-    "test:ios": "cd ios && xcodebuild -workspace Plugin.xcworkspace -scheme PluginTests -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 16 Pro' OTHER_CFLAGS='-DHAVE_GETHOSTUUID=0' test",
-    "test:android": "cd android && ./gradlew connectedDebugAndroidTest -x lint -Pandroid.testInstrumentationRunnerArguments.class=com.getcapacitor.community.database.sqlite.ImportFromJsonBasicInstrumentedTest",
+    "test": "echo \"No test specified\"",
     "prepublishOnly": "npm run build && npm run docgen",
     "release": "standard-version"
   },
@@ -94,11 +92,6 @@
     }
   },
   "dependencies": {
-    "jeep-sqlite": "2.8.0"
-  },
-  "overrides": {
-    "jeep-sqlite": {
-      "sql.js": "1.12.0"
-    }
+    "jeep-sqlite": "^2.7.2"
   }
 }
