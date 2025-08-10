@@ -92,6 +92,11 @@
     }
   },
   "dependencies": {
-    "jeep-sqlite": "2.7.2"
+    "jeep-sqlite": "2.8.0"
+  },
+  "overrides": {
+    "jeep-sqlite": {
+      "sql.js": "1.12.0"
+    }
   }
 }
