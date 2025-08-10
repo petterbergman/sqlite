@@ -44,6 +44,7 @@ class Database {
     var account: String
     var path: String = ""
     var mDb: OpaquePointer?
+    let globalData: GlobalSQLite = GlobalSQLite()
     let uUpg: UtilsUpgrade = UtilsUpgrade()
     var readOnly: Bool = false
     var ncDB: Bool = false
@@ -739,14 +740,10 @@ enum UtilsSQLCipherError: Error {
     case querySQL(message: String)
     case prepareSQL(message: String)
     case execute(message: String)
-    case setForeignKeyConstraintsEnabled(message: String)
     case setVersion(message: String)
     case getVersion(message: String)
     case restoreDB(message: String)
     case deleteBackupDB(message: String)
-    case deleteDB(message: String)
-    case executeSet(message: String)
-    case bindFailed
 }
 
 class UtilsSQLCipher {
@@ -783,7 +780,7 @@ class UtilsSQLCipher {
         let key = toggle ? "ON" : "OFF"
         let sql = "PRAGMA foreign_keys = \(key);"
         if sqlite3_exec(mDB.mDb, sql, nil, nil, nil) != SQLITE_OK {
-            throw UtilsSQLCipherError.setForeignKeyConstraintsEnabled(message: "set foreign_keys failed")
+            throw UtilsSQLCipherError.execute(message: "set foreign_keys failed")
         }
     }
 
@@ -955,58 +952,4 @@ class UtilsSQLCipher {
     }
     class func deleteBackupDB(databaseLocation: String, databaseName: String) throws { /* no-op */ }
     class func parse(mVar: Any) -> Bool { return mVar is NSArray }
-
-    // Minimal state to satisfy callers expecting encryption state
-}
-
-// Minimal upgrade helper to satisfy calls formerly in UtilsUpgrade.swift
-enum UtilsUpgradeError: Error {
-    case onUpgradeFailed(message: String)
-}
-
-class UtilsUpgrade {
-    @discardableResult
-    func onUpgrade(
-        mDB: Database,
-        upgDict: [Int: [String: Any]],
-        currentVersion: Int,
-        targetVersion: Int,
-        databaseLocation: String
-    ) throws -> Int {
-        do {
-            try UtilsSQLCipher.setVersion(mDB: mDB, version: targetVersion)
-            return 0
-        } catch UtilsSQLCipherError.setVersion(let message) {
-            throw UtilsUpgradeError.onUpgradeFailed(message: message)
-        } catch {
-            throw UtilsUpgradeError.onUpgradeFailed(message: "Unknown error")
-        }
-    }
-}
-
-// Provide a minimal State enum for getDatabaseState compatibility
-enum State: String {
-    case ENCRYPTEDGLOBALSECRET
-    case ENCRYPTEDSECRET
-    case UNENCRYPTED
-}
-
-extension UtilsSQLCipher {
-    class func deleteDB(databaseLocation: String, databaseName: String) throws {
-        do {
-            let dbPath = try UtilsFile.getFilePath(databaseLocation: databaseLocation, fileName: databaseName)
-            if UtilsFile.isFileExist(filePath: dbPath) {
-                _ = try UtilsFile.deleteFile(filePath: dbPath)
-            }
-        } catch UtilsFileError.getFilePathFailed {
-            throw UtilsSQLCipherError.deleteDB(message: "getFilePath failed")
-        } catch UtilsFileError.deleteFileFailed {
-            throw UtilsSQLCipherError.deleteDB(message: "deleteFile failed")
-        }
-    }
-
-    // Always report unencrypted in the non-encrypted shim
-    class func getDatabaseState(databaseLocation: String, databaseName: String, account: String) -> State {
-        return .UNENCRYPTED
-    }
 }
