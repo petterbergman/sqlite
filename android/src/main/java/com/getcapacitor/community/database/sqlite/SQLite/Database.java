@@ -12,7 +12,6 @@ import static com.getcapacitor.community.database.sqlite.SQLite.UtilsSQLStatemen
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.os.Build;
 import android.util.Log;
@@ -26,6 +25,7 @@ import com.getcapacitor.JSObject;
 import com.getcapacitor.community.database.sqlite.SQLite.ImportExportJson.ExportToJson;
 import com.getcapacitor.community.database.sqlite.SQLite.ImportExportJson.ImportFromJson;
 import com.getcapacitor.community.database.sqlite.SQLite.ImportExportJson.JsonSQLite;
+import com.getcapacitor.community.database.sqlite.SQLite.ImportExportJson.UtilsEncryption;
 import com.getcapacitor.community.database.sqlite.SQLite.ImportExportJson.UtilsJson;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import android.database.Cursor;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -48,6 +49,7 @@ public class Database {
     private Boolean _isOpen = false;
     private final String _dbName;
     private final Context _context;
+    private final String _mode;
     private final Boolean _readOnly;
     private final File _file;
     private final int _version;
@@ -57,13 +59,20 @@ public class Database {
     private final UtilsJson _uJson;
     private final UtilsUpgrade _uUpg;
     private final UtilsDrop _uDrop;
+    private final UtilsSecret _uSecret = null;
     private final Dictionary<Integer, JSONObject> _vUpgObject;
     private final ImportFromJson fromJson = new ImportFromJson();
     private final ExportToJson toJson = new ExportToJson();
     private Boolean ncDB = false;
     private boolean isAvailableTransaction = false;
 
-    public Database(Context context, String dbName, int version, Dictionary<Integer, JSONObject> vUpgObject, Boolean readonly) {
+    public Database(
+        Context context,
+        String dbName,
+        int version,
+        Dictionary<Integer, JSONObject> vUpgObject,
+        Boolean readonly
+    ) {
         this._context = context;
         this._dbName = dbName;
         this._version = version;
@@ -208,17 +217,16 @@ public class Database {
     public void open() throws Exception {
         int curVersion;
         try {
-            SupportSQLiteOpenHelper.Configuration cfg = SupportSQLiteOpenHelper.Configuration.builder(_context)
+            SupportSQLiteOpenHelper.Configuration cfg = SupportSQLiteOpenHelper.Configuration
+                .builder(_context)
                 .name(isNCDB() ? _file.getName() : _dbName)
-                .callback(
-                    new SupportSQLiteOpenHelper.Callback(_version) {
-                        @Override
-                        public void onCreate(SupportSQLiteDatabase db) {}
+                .callback(new SupportSQLiteOpenHelper.Callback(_version) {
+                    @Override
+                    public void onCreate(SupportSQLiteDatabase db) {}
 
-                        @Override
-                        public void onUpgrade(SupportSQLiteDatabase db, int oldVersion, int newVersion) {}
-                    }
-                )
+                    @Override
+                    public void onUpgrade(SupportSQLiteDatabase db, int oldVersion, int newVersion) {}
+                })
                 .build();
             SupportSQLiteOpenHelper helper = new FrameworkSQLiteOpenHelperFactory().create(cfg);
             _db = _readOnly ? helper.getReadableDatabase() : helper.getWritableDatabase();
@@ -1144,7 +1152,7 @@ public class Database {
         JSObject retObj = new JSObject();
         inJson.setDatabase(_dbName.substring(0, _dbName.length() - 9));
         inJson.setVersion(_version);
-        inJson.setEncrypted(false);
+        inJson.setEncrypted(_encrypted);
         inJson.setMode(mode);
         try {
             boolean isSyncTable = _uJson.isTableExists(this, "sync_table");
@@ -1174,6 +1182,14 @@ public class Database {
                     }
                 }
             }
+            if (this._encrypted && this._isEncryption && isEncrypted) {
+                retObj.put("encrypted", true);
+                retObj.put("overwrite", true);
+                String base64Str = UtilsEncryption.encryptJSONObject(this._context, retObj);
+                retObj = new JSObject();
+                retObj.put("expData", base64Str);
+            }
+
             return retObj;
         } catch (Exception e) {
             Log.e(TAG, "Error: exportToJson " + e.getMessage());
