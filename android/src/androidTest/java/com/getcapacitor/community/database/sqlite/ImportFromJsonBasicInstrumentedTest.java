@@ -3,19 +3,12 @@ package com.getcapacitor.community.database.sqlite;
 import static org.junit.Assert.*;
 
 import android.content.Context;
-
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
-
 import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.community.database.sqlite.SQLite.Database;
 import com.getcapacitor.community.database.sqlite.SQLite.SqliteConfig;
-
-import org.json.JSONObject;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -49,7 +42,8 @@ public class ImportFromJsonBasicInstrumentedTest {
         // Validate JSON
         assertTrue(cap.isJsonValid(json));
 
-        // Import
+        // Import with timing
+        long startMs = android.os.SystemClock.elapsedRealtime();
         JSObject res = cap.importFromJson(json);
         assertNotNull(res);
         assertTrue(res.getInteger("changes") >= 0);
@@ -63,5 +57,8 @@ public class ImportFromJsonBasicInstrumentedTest {
         int cnt = rows.getJSONObject(rows.length() - 1).getInt("cnt");
         assertEquals(2, cnt);
         db.close();
+        long elapsedMs = android.os.SystemClock.elapsedRealtime() - startMs;
+        System.out.println("[TEST] importFromJson took " + elapsedMs + "ms");
+        assertTrue("importFromJson_basic exceeded 100ms, elapsed=" + elapsedMs + "ms", elapsedMs <= 100);
     }
 }
