@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import ZIPFoundation
 
 enum UtilsDownloadError: Error {
     case downloadFromHTTPFailed(message: String)
@@ -52,21 +51,8 @@ class UtilsDownloadFromHTTP {
     }
 
     class func handleZipFile(cachedFile: URL, dbUrl: URL, completion: @escaping (Result<Bool, UtilsDownloadError>) -> Void) {
-        extractDBFiles(from: cachedFile) { dbFiles, error in
-            if let error = error {
-                let msg = "\(error.localizedDescription)"
-                completion(.failure(UtilsDownloadError.downloadFromHTTPFailed(message: msg)))
-            } else {
-                for file in dbFiles {
-                    if let moveError = moveAndRenameFile(from: file, to: dbUrl) {
-                        let msg = "Failed to move file: \(moveError.localizedDescription)"
-                        completion(.failure(UtilsDownloadError.downloadFromHTTPFailed(message: msg)))
-                        return
-                    }
-                }
-                completion(.success(true))
-            }
-        }
+        let msg = "ZIP extraction not supported on iOS"
+        completion(.failure(UtilsDownloadError.fileExtractionFailed(message: msg)))
     }
 
     class func handleNonZipFile(cachedFile: URL, dbUrl: URL, completion: @escaping (Result<Bool, UtilsDownloadError>) -> Void) {
@@ -158,35 +144,7 @@ class UtilsDownloadFromHTTP {
     }
 
     class func extractDBFiles(from zipFile: URL, completion: @escaping ([URL], Error?) -> Void) {
-        DispatchQueue.global().async(execute: {
-            var dbFiles: [URL] = []
-
-            do {
-                let destinationURL = zipFile.deletingLastPathComponent()
-
-                guard let archive = Archive(url: zipFile, accessMode: .read) else {
-                    let msg = "Failed in reading Archive"
-                    completion([], UtilsDownloadError.invalidArchive(message: msg))
-                    return
-                }
-
-                for entry in archive where entry.type == .file {
-                    let fileURL = destinationURL.appendingPathComponent(entry.path)
-                    let fileExtension = URL(fileURLWithPath: entry.path).pathExtension
-
-                    if fileExtension == "db" {
-                        _ = try archive.extract(entry, to: fileURL)
-                        dbFiles.append(fileURL)
-                    }
-                }
-                // Delete the zip file
-                try FileManager.default.removeItem(at: zipFile)
-
-                completion(dbFiles, nil)
-            } catch {
-                completion([], error)
-            }
-        })
-
+        let msg = "ZIP extraction not supported on iOS"
+        completion([], UtilsDownloadError.fileExtractionFailed(message: msg))
     }
 }

@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import ZIPFoundation
 
 enum UtilsFileError: Error {
     case getFilePathFailed
@@ -423,40 +422,8 @@ class UtilsFile {
 
     class func unzipToDatabase(fromURL: URL, databaseLocation: String, zip: String,
                                overwrite: Bool) throws {
-        do {
-            let zipAsset: URL = fromURL.appendingPathComponent(zip)
-            guard let archive = Archive(url: zipAsset, accessMode: .read) else {
-                let msg = "Error: Read Archive: \(zipAsset) failed"
-                print("\(msg)")
-                throw UtilsFileError.unzipToDatabaseFailed(message: msg)
-            }
-            let uDb: URL = try getFolderURL(folderPath: databaseLocation)
-            for entry in archive {
-                let dbEntry = setPathSuffix(sDb: entry.path)
-                let zipCopy: URL = uDb.appendingPathComponent(dbEntry)
-                do {
-                    let isExist: Bool = isFileExist(filePath: zipCopy.path)
-                    if !isExist || overwrite {
-                        if overwrite && isExist {
-                            _ = try deleteFile(filePath: zipCopy.path)
-                        }
-                        _ = try archive.extract(entry, to: zipCopy)
-                    }
-
-                } catch {
-                    let msg = "Error: Extracting \(entry.path) from archive failed \(error.localizedDescription)"
-                    print("\(msg)")
-                    throw UtilsFileError.unzipToDatabaseFailed(message: msg)
-                }
-            }
-        } catch UtilsFileError.getFolderURLFailed(let message) {
-            print("Error: getFolderUrl Failed \(message)")
-            throw UtilsFileError.unzipToDatabaseFailed(message: message)
-        } catch let error {
-            let msg = "Error: \(error)"
-            print("\(msg)")
-            throw UtilsFileError.unzipToDatabaseFailed(message: msg)
-        }
+        let msg = "ZIP extraction not supported on iOS"
+        throw UtilsFileError.unzipToDatabaseFailed(message: msg)
     }
 
     // MARK: - MoveFile

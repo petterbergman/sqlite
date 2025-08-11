@@ -355,7 +355,7 @@ npm install --save-dev electron-builder@24.6.4
 ## Dependencies
 
 The iOS and Android codes are using `SQLCipher` allowing for database encryption.
-The iOS code is using `ZIPFoundation` for unzipping assets files
+ZIP extraction on iOS is not supported.
 The Electron code is using `better-sqlite3-multiple-ciphers` , `electron-json-storage` and `node-fetch`  from 5.0.4.
 The Web code is using the Stencil component `jeep-sqlite` based on `sql.js`, `localforage`. and `jszip`  
 
