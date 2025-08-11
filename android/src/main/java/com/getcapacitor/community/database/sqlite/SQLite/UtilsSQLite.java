@@ -1,12 +1,12 @@
 package com.getcapacitor.community.database.sqlite.SQLite;
 
+import android.database.Cursor;
 import android.util.Log;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 import com.getcapacitor.JSArray;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import android.database.Cursor;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
