@@ -5,25 +5,20 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 import android.widget.Toast;
-import androidx.biometric.BiometricManager;
-import androidx.biometric.BiometricPrompt;
 import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
-import com.getcapacitor.community.database.sqlite.SQLite.BiometricListener;
 import com.getcapacitor.community.database.sqlite.SQLite.Database;
 import com.getcapacitor.community.database.sqlite.SQLite.GlobalSQLite;
 import com.getcapacitor.community.database.sqlite.SQLite.ImportExportJson.JsonSQLite;
 import com.getcapacitor.community.database.sqlite.SQLite.ImportExportJson.UtilsEncryption;
 import com.getcapacitor.community.database.sqlite.SQLite.ImportExportJson.UtilsJson;
 import com.getcapacitor.community.database.sqlite.SQLite.SqliteConfig;
-import com.getcapacitor.community.database.sqlite.SQLite.UtilsBiometric;
 import com.getcapacitor.community.database.sqlite.SQLite.UtilsDownloadFromHTTP;
 import com.getcapacitor.community.database.sqlite.SQLite.UtilsFile;
 import com.getcapacitor.community.database.sqlite.SQLite.UtilsMigrate;
 import com.getcapacitor.community.database.sqlite.SQLite.UtilsNCDatabase;
 import com.getcapacitor.community.database.sqlite.SQLite.UtilsSQLite;
-import com.getcapacitor.community.database.sqlite.SQLite.UtilsSecret;
 import java.io.File;
 import java.security.KeyStore;
 import java.util.ArrayList;
@@ -62,10 +57,7 @@ public class CapacitorSQLite {
     public CapacitorSQLite(Context context, SqliteConfig config) throws Exception {
         this.context = context;
         this.call = call;
-        this.isEncryption = false;
-        this.biometricAuth = false;
-        this.biometricTitle = "";
-        this.biometricSubTitle = "";
+        // encryption and biometric flags fixed via field defaults
     }
 
     private void notifyBiometricEvent(Boolean ret, String msg) {
@@ -1024,9 +1016,7 @@ public class CapacitorSQLite {
                 context,
                 dbName,
                 dbVersion,
-                false,
-                dbVersion,
-                new Hashtable<>(),
+                new Hashtable<Integer, JSONObject>(),
                 false
             );
             if (overwrite && mode.equals("full")) {

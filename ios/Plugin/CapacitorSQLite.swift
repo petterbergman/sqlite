@@ -22,7 +22,7 @@ enum CapacitorSQLiteError: Error {
     private var internalBiometricObserver: Any?
     private var intBioMessage: String = ""
     private var call: CAPPluginCall?
-    private var account: String = oldAccount
+    private var account: String = ""
     private var prefixKeychain: String = ""
 
     // swiftlint:disable function_body_length

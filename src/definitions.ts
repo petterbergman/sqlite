@@ -40,14 +40,6 @@ export interface CapacitorSQLitePlugin {
 
   saveToLocalDisk(options: capSQLiteOptions): Promise<void>;
   /**
-   * Check if a passphrase exists in a secure store
-   *
-   * @return Promise<capSQLiteResult>
-   * @since 3.0.0-beta.13
-   */
-  // Encryption APIs removed
-
-  /**
    * create a database connection
    * @param options capConnectionOptions
    * @return Promise<void>
@@ -184,13 +176,6 @@ export interface CapacitorSQLitePlugin {
    */
   isDBOpen(options: capSQLiteOptions): Promise<capSQLiteResult>;
   /**
-   * Check if a SQLite database is encrypted
-   * @param options: capSQLiteOptions
-   * @returns Promise<capSQLiteResult>
-   * @since 4.6.2-2
-   */
-  // Encryption/config APIs removed
-  /**
    * Check if a SQLite database exists without connection
    * @param options: capSQLiteOptions
    * @returns Promise<capSQLiteResult>
@@ -233,40 +218,12 @@ export interface CapacitorSQLitePlugin {
    */
   exportToJson(options: capSQLiteExportOptions): Promise<capSQLiteJson>;
   /**
-   * Create a synchronization table
-   * @param options: capSQLiteOptions
-   * @returns Promise<capSQLiteChanges>
-   * @since 2.0.1-1
-   */
-  createSyncTable(options: capSQLiteOptions): Promise<capSQLiteChanges>;
-  /**
-   * Set the synchronization date
-   * @param options: capSQLiteSyncDateOptions
-   * @returns Promise<void>
-   * @since 2.0.1-1
-   */
-  setSyncDate(options: capSQLiteSyncDateOptions): Promise<void>;
-  /**
-   * Get the synchronization date
-   * @param options: capSQLiteOptions
-   * @returns Promise<capSQLiteSyncDate>
-   * @since 2.9.0
-   */
-  getSyncDate(options: capSQLiteOptions): Promise<capSQLiteSyncDate>;
-  /**
    * Remove rows with sql_deleted = 1 after an export
    * @param options
    * @returns Promise<void>
    * @since 3.4.3-2
    */
   deleteExportedRows(options: capSQLiteOptions): Promise<void>;
-  /**
-   * Add the upgrade Statement for database version upgrading
-   * @param options: capSQLiteUpgradeOptions
-   * @returns Promise<void>
-   * @since 2.4.2-6 iOS & Electron 2.4.2-7 Android
-   */
-  addUpgradeStatement(options: capSQLiteUpgradeOptions): Promise<void>;
   /**
    * Copy databases from public/assets/databases folder to application databases folder
    * @param options: capSQLiteFromAssets  since 3.2.5-2
@@ -294,13 +251,6 @@ export interface CapacitorSQLitePlugin {
    * @since 3.4.2-3
    */
   getTableList(options: capSQLiteOptions): Promise<capSQLiteValues>;
-  /**
-   * Get the Migratable database list
-   * @param options: capSQLitePathOptions // only iOS & Android since 3.2.4-2
-   * @returns Promise<capSQLiteValues>
-   * @since 3.0.0-beta.5
-   */
-  getMigratableDbList(options: capSQLitePathOptions): Promise<capSQLiteValues>;
   /**
    * Add SQLIte Suffix to existing databases
    * @param options: capSQLitePathOptions
@@ -482,13 +432,6 @@ export interface capSQLiteExecuteOptions {
    * @since 4.1.0-7
    */
   readonly?: boolean;
-  /**
-   * Compatibility SQL92
-   * !!! ELECTRON ONLY
-   * default (true)
-   * @since 5.0.7
-   */
-  isSQL92?: boolean;
 }
 export interface capSQLiteSetOptions {
   /**
@@ -519,13 +462,6 @@ export interface capSQLiteSetOptions {
    * @since 5.0.5-3
    */
   returnMode?: string;
-  /**
-   * Compatibility SQL92
-   * !!! ELECTRON ONLY
-   * default (true)
-   * @since 5.0.7
-   */
-  isSQL92?: boolean;
 }
 export interface capSQLiteRunOptions {
   /**
@@ -560,13 +496,6 @@ export interface capSQLiteRunOptions {
    * @since 5.0.5-3
    */
   returnMode?: string;
-  /**
-   * Compatibility SQL92
-   * !!! ELECTRON ONLY
-   * default (true)
-   * @since 5.0.7
-   */
-  isSQL92?: boolean;
 }
 export interface capSQLiteQueryOptions {
   /**
@@ -589,13 +518,6 @@ export interface capSQLiteQueryOptions {
    * @since 4.1.0-7
    */
   readonly?: boolean;
-  /**
-   * Compatibility SQL92
-   * !!! ELECTRON ONLY
-   * default (true)
-   * @since 5.0.7
-   */
-  isSQL92?: boolean;
 }
 export interface capTask {
   /**
@@ -635,15 +557,6 @@ export interface capSQLiteExportOptions {
    * @since 4.1.0-7
    */
   readonly?: boolean;
-  /**
-   * Encrypted
-   * When your database is encrypted
-   * Choose the export Json Object
-   * Encrypted (true) / Unencrypted (false)
-   * default false
-   * @since 5.0.8
-   */
-  encrypted?: boolean;
 }
 export interface capSQLiteFromAssetsOptions {
   /**
@@ -817,13 +730,6 @@ export interface capSQLiteSyncDate {
   syncDate?: number;
 }
 
-/* JSON Types */
-export interface EncryptJson {
-  /**
-   * The encrypted JsonSQLite base64 string
-   */
-  expData: string;
-}
 export interface JsonSQLite {
   /**
    * The database name
@@ -837,15 +743,6 @@ export interface JsonSQLite {
    * Delete the database prior to import (default false)
    */
   overwrite?: boolean;
-  /**
-   * Set to true (database encryption) / false
-   */
-  encrypted: boolean;
-  /***
-   * Set the mode
-   * ["full", "partial"]
-   */
-  mode: string;
   /***
    * Array of Table (JsonTable)
    */
@@ -944,13 +841,6 @@ export interface JsonView {
    */
   value: string;
 }
-export interface capBiometricListener {
-  /**
-   * Biometric ready
-   */
-  result: boolean;
-  message: string;
-}
 export interface capJsonProgressListener {
   /**
    * Progress message
@@ -1019,53 +909,8 @@ export interface ISQLiteConnection {
    */
   echo(value: string): Promise<capEchoResult>;
   /**
-   * Check if a secret is stored
-   * @returns Promise<capSQLiteResult>
-   * @since 3.0.0-beta.13
-   */
-  isSecretStored(): Promise<capSQLiteResult>;
-
-  /**
-   * Set a passphrase in a secure store
-   * @param passphrase
-   * @returns Promise<void>
-   * @since 3.0.0-beta.13
-   */
-  setEncryptionSecret(passphrase: string): Promise<void>;
-  /**
-   * Change the passphrase in a secure store
-   * @param passphrase
-   * @param oldpassphrase
-   * @returns Promise<void>
-   * @since 3.0.0-beta.13
-   */
-  changeEncryptionSecret(passphrase: string, oldpassphrase: string): Promise<void>;
-  /**
-   * Clear the passphrase in a secure store
-   * @returns Promise<void>
-   * @since 3.5.1
-   */
-  clearEncryptionSecret(): Promise<void>;
-  /**
-   * Check the passphrase stored in a secure store
-   * @param oldPassphrase
-   * @returns Promise<capSQLiteResult>
-   * @since 4.6.1
-   */
-  checkEncryptionSecret(passphrase: string): Promise<capSQLiteResult>;
-  /**
-   * Add the upgrade Statement for database version upgrading
-   * @param database
-   * @param upgrade @since 5.6.4
-   * @returns Promise<void>
-   * @since 2.9.0 refactor
-   */
-  addUpgradeStatement(database: string, upgrade: capSQLiteVersionUpgrade[]): Promise<void>;
-  /**
    * Create a connection to a database
    * @param database
-   * @param encrypted
-   * @param mode
    * @param version
    * @param readonly
    * @returns Promise<SQLiteDBConnection>
@@ -1073,8 +918,6 @@ export interface ISQLiteConnection {
    */
   createConnection(
     database: string,
-    encrypted: boolean,
-    mode: string,
     version: number,
     readonly: boolean,
   ): Promise<SQLiteDBConnection>;
@@ -1190,25 +1033,6 @@ export interface ISQLiteConnection {
    */
   getFromHTTPRequest(url?: string, overwrite?: boolean): Promise<void>;
   /**
-   * Check if a SQLite database is encrypted
-   * @param options: capSQLiteOptions
-   * @returns Promise<capSQLiteResult>
-   * @since 4.6.2-2
-   */
-  isDatabaseEncrypted(database: string): Promise<capSQLiteResult>;
-  /**
-   * Check encryption value in capacitor.config
-   * @returns Promise<capSQLiteResult>
-   * @since 4.6.2-2
-   */
-  isInConfigEncryption(): Promise<capSQLiteResult>;
-  /**
-   * Check encryption value in capacitor.config
-   * @returns Promise<capSQLiteResult>
-   * @since 4.6.2-2
-   */
-  isInConfigBiometricAuth(): Promise<capSQLiteResult>;
-  /**
    * Check if a database exists
    * @param database
    * @returns Promise<capSQLiteResult>
@@ -1228,14 +1052,6 @@ export interface ISQLiteConnection {
    * @since 3.0.0-beta.5
    */
   getDatabaseList(): Promise<capSQLiteValues>;
-  /**
-   * Get the Migratable database list
-   * @param folderPath: string // only iOS & Android since 3.2.4-2
-   * @returns Promise<capSQLiteValues>
-   * @since 3.0.0-beta.5
-   */
-  getMigratableDbList(folderPath?: string): Promise<capSQLiteValues>;
-
   /**
    * Add SQLIte Suffix to existing databases
    * @param folderPath
@@ -1306,19 +1122,6 @@ export class SQLiteConnection implements ISQLiteConnection {
     try {
       const res = await this.sqlite.echo({ value });
       return Promise.resolve(res);
-    } catch (err) {
-      return Promise.reject(err);
-    }
-  }
-  // Encryption APIs removed
-  async addUpgradeStatement(database: string, upgrade: capSQLiteVersionUpgrade[]): Promise<void> {
-    try {
-      if (database.endsWith('.db')) database = database.slice(0, -3);
-      await this.sqlite.addUpgradeStatement({
-        database,
-        upgrade,
-      });
-      return Promise.resolve();
     } catch (err) {
       return Promise.reject(err);
     }
@@ -1524,7 +1327,6 @@ export class SQLiteConnection implements ISQLiteConnection {
       return Promise.reject(err);
     }
   }
-  // Encryption/config methods removed
   async isDatabase(database: string): Promise<capSQLiteResult> {
     if (database.endsWith('.db')) database = database.slice(0, -3);
     try {
@@ -1541,17 +1343,6 @@ export class SQLiteConnection implements ISQLiteConnection {
       values.sort();
       const ret = { values: values };
       return Promise.resolve(ret);
-    } catch (err) {
-      return Promise.reject(err);
-    }
-  }
-  async getMigratableDbList(folderPath?: string): Promise<capSQLiteValues> {
-    const path: string = folderPath ? folderPath : 'default';
-    try {
-      const res = await this.sqlite.getMigratableDbList({
-        folderPath: path,
-      });
-      return Promise.resolve(res);
     } catch (err) {
       return Promise.reject(err);
     }
@@ -1677,27 +1468,24 @@ export interface ISQLiteDBConnection {
    * Execute SQLite DB Connection Statements
    * @param statements
    * @param transaction (optional)
-   * @param isSQL92 (optional)
    * @returns Promise<capSQLiteChanges>
    * @since 2.9.0 refactor
    */
-  execute(statements: string, transaction?: boolean, isSQL92?: boolean): Promise<capSQLiteChanges>;
+  execute(statements: string, transaction?: boolean): Promise<capSQLiteChanges>;
   /**
    * Execute SQLite DB Connection Query
    * @param statement
    * @param values (optional)
-   * @param isSQL92 (optional)
    * @returns Promise<Promise<DBSQLiteValues>
    * @since 2.9.0 refactor
    */
-  query(statement: string, values?: any[], isSQL92?: boolean): Promise<DBSQLiteValues>;
+  query(statement: string, values?: any[]): Promise<DBSQLiteValues>;
   /**
    * Execute SQLite DB Connection Raw Statement
    * @param statement
    * @param values (optional)
    * @param transaction (optional)
    * @param returnMode (optional)
-   * @param isSQL92 (optional)
    * @returns Promise<capSQLiteChanges>
    * @since 2.9.0 refactor
    */
@@ -1706,14 +1494,12 @@ export interface ISQLiteDBConnection {
     values?: any[],
     transaction?: boolean,
     returnMode?: string,
-    isSQL92?: boolean,
   ): Promise<capSQLiteChanges>;
   /**
    * Execute SQLite DB Connection Set
    * @param set
    * @param transaction (optional)
    * @param returnMode (optional)
-   * @param isSQL92 (optional)
    * @returns Promise<capSQLiteChanges>
    * @since 2.9.0 refactor
    */
@@ -1721,7 +1507,6 @@ export interface ISQLiteDBConnection {
     set: capSQLiteSet[],
     transaction?: boolean,
     returnMode?: string,
-    isSQL92?: boolean,
   ): Promise<capSQLiteChanges>;
   /**
    * Check if a SQLite DB Connection exists
@@ -1753,32 +1538,11 @@ export interface ISQLiteDBConnection {
    */
   delete(): Promise<void>;
   /**
-   * Create a synchronization table
-   * @returns Promise<capSQLiteChanges>
-   * @since 2.9.0 refactor
-   */
-  createSyncTable(): Promise<capSQLiteChanges>;
-  /**
-   * Set the synchronization date
-   * @param syncdate
-   * @returns Promise<void>
-   * @since 2.9.0 refactor
-   */
-  setSyncDate(syncdate: string): Promise<void>;
-  /**
-   * Get the synchronization date
-   * @returns Promise<capSQLiteSyncDate>
-   * @since 2.9.0 refactor
-   */
-  getSyncDate(): Promise<string>;
-  /**
    * Export the given database to a JSON Object
-   * @param mode
-   * @param encrypted (optional) since 5.0.8 not for Web platform
    * @returns Promise<capSQLiteJson>
    * @since 2.9.0 refactor
    */
-  exportToJson(mode: string, encrypted?: boolean): Promise<capSQLiteJson>;
+  exportToJson(): Promise<capSQLiteJson>;
   /**
    * Remove rows with sql_deleted = 1 after an export
    * @returns Promise<void>
@@ -1789,11 +1553,10 @@ export interface ISQLiteDBConnection {
   /**
    *
    * @param txn
-   * @param isSQL92
    * @returns Promise<capSQLiteChanges> since 5.0.7
    * @since 3.4.0
    */
-  executeTransaction(txn: capTask[], isSQL92: boolean): Promise<capSQLiteChanges>;
+  executeTransaction(txn: capTask[]): Promise<capSQLiteChanges>;
 }
 /**
  * SQLiteDBConnection Class
@@ -1933,7 +1696,7 @@ export class SQLiteDBConnection implements ISQLiteDBConnection {
       return Promise.reject(err);
     }
   }
-  async execute(statements: string, transaction = true, isSQL92 = true): Promise<capSQLiteChanges> {
+  async execute(statements: string, transaction = true): Promise<capSQLiteChanges> {
     try {
       if (!this.readonly) {
         const res: any = await this.sqlite.execute({
@@ -1941,7 +1704,6 @@ export class SQLiteDBConnection implements ISQLiteDBConnection {
           statements: statements,
           transaction: transaction,
           readonly: false,
-          isSQL92: isSQL92,
         });
         return Promise.resolve(res);
       } else {
@@ -1951,7 +1713,7 @@ export class SQLiteDBConnection implements ISQLiteDBConnection {
       return Promise.reject(err);
     }
   }
-  async query(statement: string, values?: any[], isSQL92 = true): Promise<DBSQLiteValues> {
+  async query(statement: string, values?: any[]): Promise<DBSQLiteValues> {
     let res: any;
     try {
       if (values && values.length > 0) {
@@ -1960,7 +1722,6 @@ export class SQLiteDBConnection implements ISQLiteDBConnection {
           statement: statement,
           values: values,
           readonly: this.readonly,
-          isSQL92: true,
         });
       } else {
         res = await this.sqlite.query({
@@ -1968,7 +1729,6 @@ export class SQLiteDBConnection implements ISQLiteDBConnection {
           statement: statement,
           values: [],
           readonly: this.readonly,
-          isSQL92: isSQL92,
         });
       }
 
@@ -1984,7 +1744,6 @@ export class SQLiteDBConnection implements ISQLiteDBConnection {
     values?: any[],
     transaction = true,
     returnMode = 'no',
-    isSQL92 = true,
   ): Promise<capSQLiteChanges> {
     let res: any;
     try {
@@ -1997,7 +1756,6 @@ export class SQLiteDBConnection implements ISQLiteDBConnection {
             transaction: transaction,
             readonly: false,
             returnMode: returnMode,
-            isSQL92: true,
           });
         } else {
           res = await this.sqlite.run({
@@ -2007,7 +1765,6 @@ export class SQLiteDBConnection implements ISQLiteDBConnection {
             transaction: transaction,
             readonly: false,
             returnMode: returnMode,
-            isSQL92: isSQL92,
           });
         }
         // reorder rows for ios
@@ -2024,7 +1781,6 @@ export class SQLiteDBConnection implements ISQLiteDBConnection {
     set: capSQLiteSet[],
     transaction = true,
     returnMode = 'no',
-    isSQL92 = true,
   ): Promise<capSQLiteChanges> {
     let res: any;
     try {
@@ -2035,7 +1791,6 @@ export class SQLiteDBConnection implements ISQLiteDBConnection {
           transaction: transaction,
           readonly: false,
           returnMode: returnMode,
-          isSQL92: isSQL92,
         });
         //      }
         // reorder rows for ios
@@ -2097,57 +1852,11 @@ export class SQLiteDBConnection implements ISQLiteDBConnection {
       return Promise.reject(err);
     }
   }
-  async createSyncTable(): Promise<capSQLiteChanges> {
-    try {
-      if (!this.readonly) {
-        const res: any = await this.sqlite.createSyncTable({
-          database: this.dbName,
-          readonly: false,
-        });
-        return Promise.resolve(res);
-      } else {
-        return Promise.reject('not allowed in read-only mode');
-      }
-    } catch (err) {
-      return Promise.reject(err);
-    }
-  }
-  async setSyncDate(syncdate: string): Promise<void> {
-    try {
-      if (!this.readonly) {
-        await this.sqlite.setSyncDate({
-          database: this.dbName,
-          syncdate: syncdate,
-          readonly: false,
-        });
-        return Promise.resolve();
-      } else {
-        return Promise.reject('not allowed in read-only mode');
-      }
-    } catch (err) {
-      return Promise.reject(err);
-    }
-  }
-  async getSyncDate(): Promise<string> {
-    try {
-      const res: any = await this.sqlite.getSyncDate({
-        database: this.dbName,
-        readonly: this.readonly,
-      });
-      let retDate = '';
-      if (res.syncDate > 0) retDate = new Date(res.syncDate * 1000).toISOString();
-      return Promise.resolve(retDate);
-    } catch (err) {
-      return Promise.reject(err);
-    }
-  }
-  async exportToJson(mode: string, encrypted = false): Promise<capSQLiteJson> {
+  async exportToJson(): Promise<capSQLiteJson> {
     try {
       const res: any = await this.sqlite.exportToJson({
         database: this.dbName,
-        jsonexportmode: mode,
         readonly: this.readonly,
-        encrypted: encrypted,
       });
       return Promise.resolve(res);
     } catch (err) {
@@ -2170,7 +1879,7 @@ export class SQLiteDBConnection implements ISQLiteDBConnection {
     }
   }
 
-  async executeTransaction(txn: capTask[], isSQL92 = true): Promise<capSQLiteChanges> {
+  async executeTransaction(txn: capTask[]): Promise<capSQLiteChanges> {
     let changes = 0;
     let isActive = false;
     if (!this.readonly) {
@@ -2189,15 +1898,12 @@ export class SQLiteDBConnection implements ISQLiteDBConnection {
             throw new Error('Error a task.statement must be provided');
           }
           if ('values' in task && task.values && task.values.length > 0) {
-            const retMode = task.statement.toUpperCase().includes('RETURNING') ? 'all' : 'no';
             const ret = await this.sqlite.run({
               database: this.dbName,
               statement: task.statement,
               values: task.values,
               transaction: false,
               readonly: false,
-              returnMode: retMode,
-              isSQL92: isSQL92,
             });
             if (ret.changes.changes < 0) {
               throw new Error('Error in transaction method run ');
