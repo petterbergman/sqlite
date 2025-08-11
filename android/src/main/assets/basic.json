@@ -1,0 +1,20 @@
+{
+  "database": "testjson_file",
+  "version": 1,
+  "mode": "full",
+  "overwrite": true,
+  "tables": [
+    {
+      "name": "users",
+      "schema": [
+        { "column": "id", "value": "INTEGER PRIMARY KEY NOT NULL" },
+        { "column": "name", "value": "TEXT NOT NULL" },
+        { "column": "age", "value": "INTEGER" }
+      ],
+      "values": [
+        [1, "Alice", 30],
+        [2, "Bob", 40]
+      ]
+    }
+  ]
+}
