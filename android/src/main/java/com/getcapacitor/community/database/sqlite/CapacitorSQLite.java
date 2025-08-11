@@ -1,9 +1,8 @@
 package com.getcapacitor.community.database.sqlite;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.util.Log;
-import android.widget.Toast;
+
 import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
@@ -12,13 +11,9 @@ import com.getcapacitor.community.database.sqlite.SQLite.GlobalSQLite;
 import com.getcapacitor.community.database.sqlite.SQLite.ImportExportJson.JsonSQLite;
 import com.getcapacitor.community.database.sqlite.SQLite.ImportExportJson.UtilsJson;
 import com.getcapacitor.community.database.sqlite.SQLite.SqliteConfig;
-import com.getcapacitor.community.database.sqlite.SQLite.UtilsDownloadFromHTTP;
 import com.getcapacitor.community.database.sqlite.SQLite.UtilsFile;
-import com.getcapacitor.community.database.sqlite.SQLite.UtilsMigrate;
-import com.getcapacitor.community.database.sqlite.SQLite.UtilsNCDatabase;
 import com.getcapacitor.community.database.sqlite.SQLite.UtilsSQLite;
 import java.io.File;
-import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Dictionary;
@@ -39,14 +34,7 @@ public class CapacitorSQLite {
     private final UtilsSQLite uSqlite = new UtilsSQLite();
     private final UtilsFile uFile = new UtilsFile();
     private final UtilsJson uJson = new UtilsJson();
-    private final UtilsMigrate uMigrate = new UtilsMigrate();
-    private final UtilsNCDatabase uNCDatabase = new UtilsNCDatabase();
-    private final UtilsDownloadFromHTTP uHTTP = new UtilsDownloadFromHTTP();
     private final GlobalSQLite globVar = new GlobalSQLite();
-    private final Boolean isEncryption = false;
-    private final Boolean biometricAuth = false;
-    private final String biometricTitle = "";
-    private final String biometricSubTitle = "";
     private final int VALIDITY_DURATION = 5;
     private final RetHandler rHandler = new RetHandler();
 
@@ -81,63 +69,10 @@ public class CapacitorSQLite {
         return value;
     }
 
-    public Boolean isSecretStored() throws Exception {
-        throw new Exception("Encryption not supported");
-    }
-
-    /**
-     * SetEncryptionSecret
-     *
-     * @param passphrase passphrase
-     * @throws Exception message
-     */
-    public void setEncryptionSecret(String passphrase) throws Exception {
-        throw new Exception("Encryption not supported");
-    }
-
-    /**
-     * ChangeEncryptionSecret
-     *
-     * @param passphrase new passphrase
-     * @param oldPassphrase old passphrase
-     * @throws Exception message
-     */
-    public void changeEncryptionSecret(PluginCall call, String passphrase, String oldPassphrase) throws Exception {
-        throw new Exception("Encryption not supported");
-    }
-
-    /**
-     * ClearEncryptionSecret
-     * @throws Exception message
-     */
-    public void clearEncryptionSecret() throws Exception {
-        throw new Exception("Encryption not supported");
-    }
-
-    /**
-     * CheckEncryptionSecret
-     *
-     * @param passphrase secret phrase for encryption
-     * @throws Exception message
-     */
-    public Boolean checkEncryptionSecret(String passphrase) throws Exception {
-        throw new Exception("Encryption not supported");
-    }
-
-    public String getNCDatabasePath(String folderPath, String database) throws Exception {
-        try {
-            return uNCDatabase.getNCDatabasePath(context, folderPath, database);
-        } catch (Exception e) {
-            throw new Exception(e.getMessage());
-        }
-    }
-
     /**
      * CreateConnection
      *
      * @param dbName database name
-     * @param encrypted boolean
-     * @param mode  "no-encryption", "secret", "encryption"
      * @param version database version
      * @param vUpgObject upgrade Object
      * @throws Exception message
@@ -154,34 +89,6 @@ public class CapacitorSQLite {
         }
         try {
             Database db = new Database(context, dbName + "SQLite.db", version, vUpgObject, readonly);
-            dbDict.put(connName, db);
-        } catch (Exception e) {
-            throw new Exception(e.getMessage());
-        }
-    }
-
-    /**
-     * CreateNCConnection
-     *
-     * @param dbPath database path
-     * @param version database version
-     * @throws Exception message
-     */
-    public void createNCConnection(String dbPath, int version) throws Exception {
-        // check if connection already exists
-        String connName = "RO_" + dbPath;
-        Database conn = dbDict.get(connName);
-        if (conn != null) {
-            String msg = "Connection " + dbPath + " already exists";
-            throw new Exception(msg);
-        }
-        try {
-            Boolean isDBPathExists = uFile.isPathExists(dbPath);
-            if (!isDBPathExists) {
-                String msg = "Database " + dbPath + " does not exist";
-                throw new Exception(msg);
-            }
-            Database db = new Database(context, dbPath, version, new Hashtable<>(), true);
             dbDict.put(connName, db);
         } catch (Exception e) {
             throw new Exception(e.getMessage());
@@ -459,14 +366,6 @@ public class CapacitorSQLite {
         }
     }
 
-    public void getFromHTTPRequest(String url) throws Exception {
-        try {
-            uHTTP.download(context, url);
-        } catch (Exception e) {
-            throw new Exception(e.getMessage());
-        }
-    }
-
     public Boolean checkConnectionsConsistency(JSArray dbNames, JSArray openModes) throws Exception {
         Set<String> keys = new HashSet<>(Collections.list(dbDict.keys()));
         JSArray nameDBs = new JSArray();
@@ -585,70 +484,6 @@ public class CapacitorSQLite {
         } else {
             String msg = "No databases available ";
             throw new Exception(msg);
-        }
-    }
-
-    /**
-     * GetMigratableDbList
-     *
-     * @return JSArray database list
-     * @throws Exception message
-     */
-    public JSArray getMigratableDbList(String folderPath) throws Exception {
-        String[] listFiles = uMigrate.getMigratableList(context, folderPath);
-        JSArray retArray = new JSArray();
-        for (String file : listFiles) {
-            if (!file.contains("SQLite")) {
-                retArray.put(file);
-            }
-        }
-        if (retArray.length() > 0) {
-            return retArray;
-        } else {
-            String msg = "No databases available ";
-            throw new Exception(msg);
-        }
-    }
-
-    /**
-     * AddSQLiteSuffix
-     *
-     * @param folderPath folder path
-     * @throws Exception message
-     */
-    public void addSQLiteSuffix(String folderPath, JSArray dbList) throws Exception {
-        try {
-            ArrayList<String> mDbList = uSqlite.stringJSArrayToArrayList(dbList);
-            uMigrate.addSQLiteSuffix(context, folderPath, mDbList);
-        } catch (Exception e) {
-            throw new Exception(e.getMessage());
-        }
-    }
-
-    /**
-     * @param folderPath folder path
-     * @throws Exception message
-     */
-    public void deleteOldDatabases(String folderPath, JSArray dbList) throws Exception {
-        try {
-            ArrayList<String> mDbList = uSqlite.stringJSArrayToArrayList(dbList);
-            uMigrate.deleteOldDatabases(context, folderPath, mDbList);
-        } catch (Exception e) {
-            throw new Exception(e.getMessage());
-        }
-    }
-
-    /**
-     *
-     * @param folderPath folder path
-     * @throws Exception message
-     */
-    public void moveDatabasesAndAddSuffix(String folderPath, JSArray dbList) throws Exception {
-        try {
-            ArrayList<String> mDbList = uSqlite.stringJSArrayToArrayList(dbList);
-            uMigrate.moveDatabasesAndAddSuffix(context, folderPath, mDbList);
-        } catch (Exception e) {
-            throw new Exception(e.getMessage());
         }
     }
 
