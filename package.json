@@ -51,8 +51,9 @@
     "build": "npm run clean && npm run docgen && tsc && rollup -c rollup.config.mjs",
     "clean": "rimraf ./dist",
     "watch": "tsc --watch",
-    "test": "npm run test:ios",
+    "test": "npm run test:ios && npm run test:android",
     "test:ios": "cd ios && xcodebuild -workspace Plugin.xcworkspace -scheme PluginTests -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 16 Pro' -only-testing:PluginTests/CapacitorSQLiteTests/testImportFromJsonBasic OTHER_CFLAGS='-DHAVE_GETHOSTUUID=0' test",
+    "test:android": "cd android && ./gradlew connectedDebugAndroidTest -x lint -Pandroid.testInstrumentationRunnerArguments.class=com.getcapacitor.community.database.sqlite.ImportFromJsonBasicInstrumentedTest",
     "prepublishOnly": "npm run build && npm run docgen",
     "release": "standard-version"
   },
