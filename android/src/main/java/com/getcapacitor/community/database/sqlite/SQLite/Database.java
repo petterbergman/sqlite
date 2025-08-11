@@ -49,7 +49,6 @@ public class Database {
     private Boolean _isOpen = false;
     private final String _dbName;
     private final Context _context;
-    private final String _mode;
     private final Boolean _readOnly;
     private final File _file;
     private final int _version;
@@ -59,7 +58,6 @@ public class Database {
     private final UtilsJson _uJson;
     private final UtilsUpgrade _uUpg;
     private final UtilsDrop _uDrop;
-    private final UtilsSecret _uSecret = null;
     private final Dictionary<Integer, JSONObject> _vUpgObject;
     private final ImportFromJson fromJson = new ImportFromJson();
     private final ExportToJson toJson = new ExportToJson();
@@ -1152,7 +1150,7 @@ public class Database {
         JSObject retObj = new JSObject();
         inJson.setDatabase(_dbName.substring(0, _dbName.length() - 9));
         inJson.setVersion(_version);
-        inJson.setEncrypted(_encrypted);
+        inJson.setEncrypted(false);
         inJson.setMode(mode);
         try {
             boolean isSyncTable = _uJson.isTableExists(this, "sync_table");
@@ -1182,14 +1180,6 @@ public class Database {
                     }
                 }
             }
-            if (this._encrypted && this._isEncryption && isEncrypted) {
-                retObj.put("encrypted", true);
-                retObj.put("overwrite", true);
-                String base64Str = UtilsEncryption.encryptJSONObject(this._context, retObj);
-                retObj = new JSObject();
-                retObj.put("expData", base64Str);
-            }
-
             return retObj;
         } catch (Exception e) {
             Log.e(TAG, "Error: exportToJson " + e.getMessage());

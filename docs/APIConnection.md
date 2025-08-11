@@ -13,12 +13,6 @@
 * [`getFromLocalDiskToStore(...)`](#getfromlocaldisktostore)
 * [`saveToLocalDisk(...)`](#savetolocaldisk)
 * [`echo(...)`](#echo)
-* [`isSecretStored()`](#issecretstored)
-* [`setEncryptionSecret(...)`](#setencryptionsecret)
-* [`changeEncryptionSecret(...)`](#changeencryptionsecret)
-* [`clearEncryptionSecret()`](#clearencryptionsecret)
-* [`checkEncryptionSecret(...)`](#checkencryptionsecret)
-* [`addUpgradeStatement(...)`](#addupgradestatement)
 * [`createConnection(...)`](#createconnection)
 * [`isConnection(...)`](#isconnection)
 * [`retrieveConnection(...)`](#retrieveconnection)
@@ -35,13 +29,9 @@
 * [`isJsonValid(...)`](#isjsonvalid)
 * [`copyFromAssets(...)`](#copyfromassets)
 * [`getFromHTTPRequest(...)`](#getfromhttprequest)
-* [`isDatabaseEncrypted(...)`](#isdatabaseencrypted)
-* [`isInConfigEncryption()`](#isinconfigencryption)
-* [`isInConfigBiometricAuth()`](#isinconfigbiometricauth)
 * [`isDatabase(...)`](#isdatabase)
 * [`isNCDatabase(...)`](#isncdatabase)
 * [`getDatabaseList()`](#getdatabaselist)
-* [`getMigratableDbList(...)`](#getmigratabledblist)
 * [`addSQLiteSuffix(...)`](#addsqlitesuffix)
 * [`deleteOldDatabases(...)`](#deleteolddatabases)
 * [`moveDatabasesAndAddSuffix(...)`](#movedatabasesandaddsuffix)
@@ -139,121 +129,19 @@ Echo a value
 --------------------
 
 
-### isSecretStored()
-
-```typescript
-isSecretStored() => Promise<capSQLiteResult>
-```
-
-Check if a secret is stored
-
-**Returns:** <code>Promise&lt;<a href="#capsqliteresult">capSQLiteResult</a>&gt;</code>
-
-**Since:** 3.0.0-beta.13
-
---------------------
-
-
-### setEncryptionSecret(...)
-
-```typescript
-setEncryptionSecret(passphrase: string) => Promise<void>
-```
-
-Set a passphrase in a secure store
-
-| Param            | Type                |
-| ---------------- | ------------------- |
-| **`passphrase`** | <code>string</code> |
-
-**Since:** 3.0.0-beta.13
-
---------------------
-
-
-### changeEncryptionSecret(...)
-
-```typescript
-changeEncryptionSecret(passphrase: string, oldpassphrase: string) => Promise<void>
-```
-
-Change the passphrase in a secure store
-
-| Param               | Type                |
-| ------------------- | ------------------- |
-| **`passphrase`**    | <code>string</code> |
-| **`oldpassphrase`** | <code>string</code> |
-
-**Since:** 3.0.0-beta.13
-
---------------------
-
-
-### clearEncryptionSecret()
-
-```typescript
-clearEncryptionSecret() => Promise<void>
-```
-
-Clear the passphrase in a secure store
-
-**Since:** 3.5.1
-
---------------------
-
-
-### checkEncryptionSecret(...)
-
-```typescript
-checkEncryptionSecret(passphrase: string) => Promise<capSQLiteResult>
-```
-
-Check the passphrase stored in a secure store
-
-| Param            | Type                |
-| ---------------- | ------------------- |
-| **`passphrase`** | <code>string</code> |
-
-**Returns:** <code>Promise&lt;<a href="#capsqliteresult">capSQLiteResult</a>&gt;</code>
-
-**Since:** 4.6.1
-
---------------------
-
-
-### addUpgradeStatement(...)
-
-```typescript
-addUpgradeStatement(database: string, upgrade: capSQLiteVersionUpgrade[]) => Promise<void>
-```
-
-Add the upgrade Statement for database version upgrading
-
-| Param          | Type                                   |
-| -------------- | -------------------------------------- |
-| **`database`** | <code>string</code>                    |
-| **`upgrade`**  | <code>capSQLiteVersionUpgrade[]</code> |
-
-**Since:** 5.6.4
-
---------------------
-
-
 ### createConnection(...)
 
 ```typescript
-createConnection(database: string, encrypted: boolean, mode: string, version: number, readonly: boolean) => Promise<SQLiteDBConnection>
+createConnection(database: string, version: number, readonly: boolean) => Promise<SQLiteDBConnection>
 ```
 
 Create a connection to a database
 
-| Param           | Type                 |
-| --------------- | -------------------- |
-| **`database`**  | <code>string</code>  |
-| **`encrypted`** | <code>boolean</code> |
-| **`mode`**      | <code>string</code>  |
-| **`version`**   | <code>number</code>  |
-| **`readonly`**  | <code>boolean</code> |
+| Param          | Type                 |
+| -------------- | -------------------- |
+| **`database`** | <code>string</code>  |
+| **`version`**  | <code>number</code>  |
+| **`readonly`** | <code>boolean</code> |
 
 **Returns:** <code>Promise&lt;SQLiteDBConnection&gt;</code>
 
@@ -531,55 +419,6 @@ getFromHTTPRequest(url?: string | undefined, overwrite?: boolean | undefined) =>
 --------------------
 
 
-### isDatabaseEncrypted(...)
-
-```typescript
-isDatabaseEncrypted(database: string) => Promise<capSQLiteResult>
-```
-
-Check if a SQLite database is encrypted
-
-| Param          | Type                |
-| -------------- | ------------------- |
-| **`database`** | <code>string</code> |
-
-**Returns:** <code>Promise&lt;<a href="#capsqliteresult">capSQLiteResult</a>&gt;</code>
-
-**Since:** 4.6.2-2
-
---------------------
-
-
-### isInConfigEncryption()
-
-```typescript
-isInConfigEncryption() => Promise<capSQLiteResult>
-```
-
-Check encryption value in capacitor.config
-
-**Returns:** <code>Promise&lt;<a href="#capsqliteresult">capSQLiteResult</a>&gt;</code>
-
-**Since:** 4.6.2-2
-
---------------------
-
-
-### isInConfigBiometricAuth()
-
-```typescript
-isInConfigBiometricAuth() => Promise<capSQLiteResult>
-```
-
-Check encryption value in capacitor.config
-
-**Returns:** <code>Promise&lt;<a href="#capsqliteresult">capSQLiteResult</a>&gt;</code>
-
-**Since:** 4.6.2-2
-
---------------------
-
-
 ### isDatabase(...)
 
 ```typescript
@@ -625,25 +464,6 @@ getDatabaseList() => Promise<capSQLiteValues>
 ```
 
 Get the database list
-
-**Returns:** <code>Promise&lt;<a href="#capsqlitevalues">capSQLiteValues</a>&gt;</code>
-
-**Since:** 3.0.0-beta.5
-
---------------------
-
-
-### getMigratableDbList(...)
-
-```typescript
-getMigratableDbList(folderPath?: string | undefined) => Promise<capSQLiteValues>
-```
-
-Get the Migratable database list
-
-| Param            | Type                | Description                                  |
-| ---------------- | ------------------- | -------------------------------------------- |
-| **`folderPath`** | <code>string</code> | : string // only iOS & Android since 3.2.4-2 |
 
 **Returns:** <code>Promise&lt;<a href="#capsqlitevalues">capSQLiteValues</a>&gt;</code>
 
@@ -720,14 +540,6 @@ This resembles calling addSQLiteSuffix and deleteOldDatabases, but it is more pe
 | Prop         | Type                 | Description                                   |
 | ------------ | -------------------- | --------------------------------------------- |
 | **`result`** | <code>boolean</code> | result set to true when successful else false |
-
-
-#### capSQLiteVersionUpgrade
-
-| Prop             | Type                  |
-| ---------------- | --------------------- |
-| **`toVersion`**  | <code>number</code>   |
-| **`statements`** | <code>string[]</code> |
 
 
 #### Map

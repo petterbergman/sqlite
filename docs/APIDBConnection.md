@@ -29,10 +29,7 @@
 * [`isTable(...)`](#istable)
 * [`getTableList()`](#gettablelist)
 * [`delete()`](#delete)
-* [`createSyncTable()`](#createsynctable)
-* [`setSyncDate(...)`](#setsyncdate)
-* [`getSyncDate()`](#getsyncdate)
-* [`exportToJson(...)`](#exporttojson)
+* [`exportToJson()`](#exporttojson)
 * [`deleteExportedRows()`](#deleteexportedrows)
 * [`executeTransaction(...)`](#executetransaction)
 * [Interfaces](#interfaces)
@@ -229,7 +226,7 @@ Enable Or Disable Extension Loading
 ### execute(...)
 
 ```typescript
-execute(statements: string, transaction?: boolean | undefined, isSQL92?: boolean | undefined) => Promise<capSQLiteChanges>
+execute(statements: string, transaction?: boolean | undefined) => Promise<capSQLiteChanges>
 ```
 
 Execute SQLite DB Connection Statements
@@ -238,7 +235,6 @@ Execute SQLite DB Connection Statements
 | ----------------- | -------------------- | ----------- |
 | **`statements`**  | <code>string</code>  |             |
 | **`transaction`** | <code>boolean</code> | (optional)  |
-| **`isSQL92`**     | <code>boolean</code> | (optional)  |
 
 **Returns:** <code>Promise&lt;<a href="#capsqlitechanges">capSQLiteChanges</a>&gt;</code>
 
@@ -250,16 +246,15 @@ Execute SQLite DB Connection Statements
 ### query(...)
 
 ```typescript
-query(statement: string, values?: any[] | undefined, isSQL92?: boolean | undefined) => Promise<DBSQLiteValues>
+query(statement: string, values?: any[] | undefined) => Promise<DBSQLiteValues>
 ```
 
 Execute SQLite DB Connection Query
 
-| Param           | Type                 | Description |
-| --------------- | -------------------- | ----------- |
-| **`statement`** | <code>string</code>  |             |
-| **`values`**    | <code>any[]</code>   | (optional)  |
-| **`isSQL92`**   | <code>boolean</code> | (optional)  |
+| Param           | Type                | Description |
+| --------------- | ------------------- | ----------- |
+| **`statement`** | <code>string</code> |             |
+| **`values`**    | <code>any[]</code>  | (optional)  |
 
 **Returns:** <code>Promise&lt;<a href="#dbsqlitevalues">DBSQLiteValues</a>&gt;</code>
 
@@ -271,7 +266,7 @@ Execute SQLite DB Connection Query
 ### run(...)
 
 ```typescript
-run(statement: string, values?: any[] | undefined, transaction?: boolean | undefined, returnMode?: string | undefined, isSQL92?: boolean | undefined) => Promise<capSQLiteChanges>
+run(statement: string, values?: any[] | undefined, transaction?: boolean | undefined, returnMode?: string | undefined) => Promise<capSQLiteChanges>
 ```
 
 Execute SQLite DB Connection Raw Statement
@@ -282,7 +277,6 @@ Execute SQLite DB Connection Raw Statement
 | **`values`**      | <code>any[]</code>   | (optional)  |
 | **`transaction`** | <code>boolean</code> | (optional)  |
 | **`returnMode`**  | <code>string</code>  | (optional)  |
-| **`isSQL92`**     | <code>boolean</code> | (optional)  |
 
 **Returns:** <code>Promise&lt;<a href="#capsqlitechanges">capSQLiteChanges</a>&gt;</code>
 
@@ -294,7 +288,7 @@ Execute SQLite DB Connection Raw Statement
 ### executeSet(...)
 
 ```typescript
-executeSet(set: capSQLiteSet[], transaction?: boolean | undefined, returnMode?: string | undefined, isSQL92?: boolean | undefined) => Promise<capSQLiteChanges>
+executeSet(set: capSQLiteSet[], transaction?: boolean | undefined, returnMode?: string | undefined) => Promise<capSQLiteChanges>
 ```
 
 Execute SQLite DB Connection Set
@@ -304,7 +298,6 @@ Execute SQLite DB Connection Set
 | **`set`**         | <code>capSQLiteSet[]</code> |             |
 | **`transaction`** | <code>boolean</code>        | (optional)  |
 | **`returnMode`**  | <code>string</code>         | (optional)  |
-| **`isSQL92`**     | <code>boolean</code>        | (optional)  |
 
 **Returns:** <code>Promise&lt;<a href="#capsqlitechanges">capSQLiteChanges</a>&gt;</code>
 
@@ -390,65 +383,13 @@ Delete a SQLite DB Connection
 --------------------
 
 
-### createSyncTable()
+### exportToJson()
 
 ```typescript
-createSyncTable() => Promise<capSQLiteChanges>
-```
-
-Create a synchronization table
-
-**Returns:** <code>Promise&lt;<a href="#capsqlitechanges">capSQLiteChanges</a>&gt;</code>
-
-**Since:** 2.9.0 refactor
-
---------------------
-
-
-### setSyncDate(...)
-
-```typescript
-setSyncDate(syncdate: string) => Promise<void>
-```
-
-Set the synchronization date
-
-| Param          | Type                |
-| -------------- | ------------------- |
-| **`syncdate`** | <code>string</code> |
-
-**Since:** 2.9.0 refactor
-
---------------------
-
-
-### getSyncDate()
-
-```typescript
-getSyncDate() => Promise<string>
-```
-
-Get the synchronization date
-
-**Returns:** <code>Promise&lt;string&gt;</code>
-
-**Since:** 2.9.0 refactor
-
---------------------
-
-
-### exportToJson(...)
-
-```typescript
-exportToJson(mode: string, encrypted?: boolean | undefined) => Promise<capSQLiteJson>
+exportToJson() => Promise<capSQLiteJson>
 ```
 
 Export the given database to a JSON Object
-
-| Param           | Type                 | Description                                 |
-| --------------- | -------------------- | ------------------------------------------- |
-| **`mode`**      | <code>string</code>  |                                             |
-| **`encrypted`** | <code>boolean</code> | (optional) since 5.0.8 not for Web platform |
 
 **Returns:** <code>Promise&lt;<a href="#capsqlitejson">capSQLiteJson</a>&gt;</code>
 
@@ -473,13 +414,12 @@ Remove rows with sql_deleted = 1 after an export
 ### executeTransaction(...)
 
 ```typescript
-executeTransaction(txn: capTask[], isSQL92: boolean) => Promise<capSQLiteChanges>
+executeTransaction(txn: capTask[]) => Promise<capSQLiteChanges>
 ```
 
-| Param         | Type                   |
-| ------------- | ---------------------- |
-| **`txn`**     | <code>capTask[]</code> |
-| **`isSQL92`** | <code>boolean</code>   |
+| Param     | Type                   |
+| --------- | ---------------------- |
+| **`txn`** | <code>capTask[]</code> |
 
 **Returns:** <code>Promise&lt;<a href="#capsqlitechanges">capSQLiteChanges</a>&gt;</code>
 
@@ -557,8 +497,6 @@ executeTransaction(txn: capTask[], isSQL92: boolean) => Promise<capSQLiteChanges
 | **`database`**  | <code>string</code>      | The database name                                     |
 | **`version`**   | <code>number</code>      | The database version                                  |
 | **`overwrite`** | <code>boolean</code>     | Delete the database prior to import (default false)   |
-| **`encrypted`** | <code>boolean</code>     | Set to true (database encryption) / false             |
-| **`mode`**      | <code>string</code>      | * Set the mode ["full", "partial"]                    |
 | **`tables`**    | <code>JsonTable[]</code> | * Array of Table (<a href="#jsontable">JsonTable</a>) |
 | **`views`**     | <code>JsonView[]</code>  | * Array of View (<a href="#jsonview">JsonView</a>)    |
 
