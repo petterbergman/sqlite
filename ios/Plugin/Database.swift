@@ -44,7 +44,6 @@ class Database {
     var account: String
     var path: String = ""
     var mDb: OpaquePointer?
-    let globalData: GlobalSQLite = GlobalSQLite()
     let uUpg: UtilsUpgrade = UtilsUpgrade()
     var readOnly: Bool = false
     var ncDB: Bool = false
@@ -958,6 +957,31 @@ class UtilsSQLCipher {
     class func parse(mVar: Any) -> Bool { return mVar is NSArray }
 
     // Minimal state to satisfy callers expecting encryption state
+}
+
+// Minimal upgrade helper to satisfy calls formerly in UtilsUpgrade.swift
+enum UtilsUpgradeError: Error {
+    case onUpgradeFailed(message: String)
+}
+
+class UtilsUpgrade {
+    @discardableResult
+    func onUpgrade(
+        mDB: Database,
+        upgDict: [Int: [String: Any]],
+        currentVersion: Int,
+        targetVersion: Int,
+        databaseLocation: String
+    ) throws -> Int {
+        do {
+            try UtilsSQLCipher.setVersion(mDB: mDB, version: targetVersion)
+            return 0
+        } catch UtilsSQLCipherError.setVersion(let message) {
+            throw UtilsUpgradeError.onUpgradeFailed(message: message)
+        } catch {
+            throw UtilsUpgradeError.onUpgradeFailed(message: "Unknown error")
+        }
+    }
 }
 
 // Provide a minimal State enum for getDatabaseState compatibility

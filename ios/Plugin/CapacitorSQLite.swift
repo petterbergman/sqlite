@@ -13,17 +13,11 @@ enum CapacitorSQLiteError: Error {
     private let retHandler: ReturnHandler = ReturnHandler()
     private var initMessage: String = ""
     private var isInit: Bool = false
-    private var isEncryption: Bool = false
-    private var isBiometricAuth: Bool = false
-    private var biometricTitle: String = ""
-    private var bioIdAuth: BiometricIDAuthentication =
-        BiometricIDAuthentication()
     private var authMessage: String = ""
-    private var internalBiometricObserver: Any?
-    private var intBioMessage: String = ""
     private var call: CAPPluginCall?
     private var account: String = ""
     private var prefixKeychain: String = ""
+    private var isEncryption: Bool = false
 
     // swiftlint:disable function_body_length
     // swiftlint:disable cyclomatic_complexity
@@ -32,12 +26,6 @@ enum CapacitorSQLiteError: Error {
         self.config = config
         super.init()
 
-        if let isEncrypt = config.iosIsEncryption {
-            if isEncrypt == 0 {
-                isEncryption = false
-            }
-        }
-        // Encryption removed
         if let dbLocation = config.iosDatabaseLocation {
             self.databaseLocation = dbLocation
             // create the databaseLocation directory
@@ -66,103 +54,8 @@ enum CapacitorSQLiteError: Error {
         return value
     }
 
-    // MARK: - IsSecretStored
-
-    @objc public func isSecretStored()  throws -> NSNumber { return 0 }
-
-    // MARK: - SetEncryptionSecret
-
-    @objc public func setEncryptionSecret(passphrase: String) throws { throw CapacitorSQLiteError.failed(message: "Encryption not supported") }
-
-    // MARK: - ChangeEncryptionSecret
-
-    // swiftlint:disable function_body_length
-    // swiftlint:disable no_space_in_method_call
-    @objc public func changeEncryptionSecret(call: CAPPluginCall, passphrase: String,
-                                             oldPassphrase: String) throws { throw CapacitorSQLiteError.failed(message: "Encryption not supported") }
     // swiftlint:enable no_space_in_method_call
     // swiftlint:enable function_body_length
-
-    // MARK: - ClearEncryptionSecret
-
-    @objc public func clearEncryptionSecret() throws { throw CapacitorSQLiteError.failed(message: "Encryption not supported") }
-
-    // MARK: - CheckEncryptionSecret
-
-    @objc public func checkEncryptionSecret(passphrase: String) throws -> NSNumber { throw CapacitorSQLiteError.failed(message: "Encryption not supported") }
-
-    // MARK: - getNCDatabasePath
-
-    @objc public func getNCDatabasePath(_ folderPath: String, dbName: String ) throws -> String {
-        guard isInit else {
-            throw CapacitorSQLiteError.failed(message: initMessage)
-        }
-        do {
-            let databasePath: String = try UtilsNCDatabase
-                .getNCDatabasePath(folderPath: folderPath,
-                                   database: dbName )
-            return databasePath
-        } catch let error {
-            throw CapacitorSQLiteError.failed(message: "\(error)")
-        }
-    }
-
-    // MARK: - CreateNCConnection
-
-    @objc public func createNCConnection(_ databasePath: String,
-                                         version: Int) throws {
-        guard isInit else {
-            throw CapacitorSQLiteError.failed(message: initMessage)
-        }
-        // check if the connection already exists
-        let connName: String = "RO_\(databasePath)"
-        let conn = dbDict[connName]
-        if conn != nil {
-            let msg = "Connection \(databasePath) already exists"
-            throw CapacitorSQLiteError.failed(message: msg)
-        }
-
-        do {
-            let isFileExists: Bool = UtilsFile
-                .isFileExist(filePath: databasePath)
-
-            if !isFileExists {
-                throw CapacitorSQLiteError.failed(message: "database \(databasePath) does not exist")
-            }
-            let mDb: Database = try Database(
-                databaseLocation: databaseLocation,
-                databaseName: databasePath,
-                encrypted: false, isEncryption: isEncryption, account: account,
-                mode: "no-encryption", version: version, readonly: true,
-                vUpgDict: [:])
-            dbDict[connName] = mDb
-            return
-        } catch let error {
-            throw CapacitorSQLiteError.failed(message: "\(error)")
-        }
-    }
-
-    // MARK: - CloseNCConnection
-
-    @objc public func closeNCConnection(_ dbName: String) throws {
-        guard isInit else {
-            throw CapacitorSQLiteError.failed(message: initMessage)
-        }
-        let connName: String = "RO_\(dbName)"
-        guard let mDb: Database = dbDict[connName] else {
-            let msg = "Connection to \(dbName) not available"
-            throw CapacitorSQLiteError.failed(message: msg)
-        }
-        if mDb.isDBOpen() {
-            do {
-                try mDb.close()
-            } catch DatabaseError.close(let message) {
-                throw CapacitorSQLiteError.failed(message: message)
-            }
-        }
-        dbDict.removeValue(forKey: connName)
-        return
-    }
 
     // MARK: - CreateConnection
 
@@ -391,28 +284,6 @@ enum CapacitorSQLiteError: Error {
 
         } catch DatabaseError.open(let message) {
             throw CapacitorSQLiteError.failed(message: message)
-        }
-    }
-
-    // MARK: - GetFromHTTPRequest
-
-    @objc public func getFromHTTPRequest(_ call: CAPPluginCall, url: String) throws {
-        guard isInit else {
-            throw CapacitorSQLiteError.failed(message: initMessage)
-        }
-        UtilsDownloadFromHTTP.download(databaseLocation: databaseLocation,
-                                       url: url) { ( result) in
-            switch result {
-            case .success:
-                self.retHandler.rResult(call: call)
-                return
-            case .failure(let error):
-                let msg = "Download from HTTP failed: \(error.localizedDescription)"
-                self.retHandler.rResult(call: call, message: msg)
-                return
-
-            }
-
         }
     }
 
@@ -1353,99 +1224,6 @@ enum CapacitorSQLiteError: Error {
         }
     }
 
-    // MARK: - getMigratableDbList
-
-    @objc func getMigratableDbList(_ folderPath: String) throws -> [String] {
-        guard isInit else {
-            throw CapacitorSQLiteError.failed(message: initMessage)
-        }
-        do {
-            let dbList: [String] = try UtilsMigrate
-                .getMigratableList(folderPath: folderPath)
-            // filter for db not including SQLite
-            let dbNoSQLite = dbList.filter({ !$0.contains("SQLite") })
-
-            return dbNoSQLite
-
-        } catch UtilsMigrateError.getMigratableList(let message) {
-            var msg: String = "getMigratableList:"
-            msg.append(" \(message)")
-            throw CapacitorSQLiteError.failed(message: msg)
-        } catch let error {
-            let msg: String = "\(error)"
-            throw CapacitorSQLiteError.failed(message: msg)
-        }
-    }
-
-    // MARK: - addSQLiteSuffix
-
-    @objc func addSQLiteSuffix(_ folderPath: String, dbList: [String]) throws {
-        guard isInit else {
-            throw CapacitorSQLiteError.failed(message: initMessage)
-        }
-        do {
-            try UtilsMigrate.addSQLiteSuffix(databaseLocation: databaseLocation,
-                                             folderPath: folderPath,
-                                             dbList: dbList)
-            return
-        } catch UtilsMigrateError.addSQLiteSuffix(let message) {
-            var msg: String = "addSQLiteSuffix:"
-            msg.append(" \(message)")
-            throw CapacitorSQLiteError.failed(message: msg)
-
-        } catch let error {
-            var msg: String = "addSQLiteSuffix:"
-            msg.append(" \(error)")
-            throw CapacitorSQLiteError.failed(message: msg)
-        }
-    }
-
-    // MARK: - deleteOldDatabases
-
-    @objc func deleteOldDatabases(_ folderPath: String, dbList: [String]) throws {
-        guard isInit else {
-            throw CapacitorSQLiteError.failed(message: initMessage)
-        }
-        do {
-            try UtilsMigrate
-                .deleteOldDatabases(folderPath: folderPath, dbList: dbList)
-            return
-        } catch UtilsMigrateError.deleteOldDatabases(let message) {
-            var msg: String = "deleteOldDatabases:"
-            msg.append(" \(message)")
-            throw CapacitorSQLiteError.failed(message: msg)
-
-        } catch let error {
-            var msg: String = "deleteOldDatabases:"
-            msg.append(" \(error)")
-            throw CapacitorSQLiteError.failed(message: msg)
-        }
-    }
-
-    // MARK: - moveDatabasesAndAddSuffix
-
-    @objc func moveDatabasesAndAddSuffix(_ folderPath: String, dbList: [String]) throws {
-        guard isInit else {
-            throw CapacitorSQLiteError.failed(message: initMessage)
-        }
-        do {
-            try UtilsMigrate
-                .moveDatabasesAndAddSuffix(databaseLocation: databaseLocation,
-                                           folderPath: folderPath,
-                                           dbList: dbList)
-            return
-        } catch UtilsMigrateError.moveDatabasesAndAddSuffix(let message) {
-            var msg: String = "moveDatabasesAndAddSuffix:"
-            msg.append(" \(message)")
-            throw CapacitorSQLiteError.failed(message: msg)
-
-        } catch let error {
-            var msg: String = "moveDatabasesAndAddSuffix:"
-            msg.append(" \(error)")
-            throw CapacitorSQLiteError.failed(message: msg)
-        }
-    }
-
     class func getDatabaseName(dbName: String) -> String {
         var retName: String = dbName
         if !retName.contains("/") {
@@ -1476,15 +1254,15 @@ enum CapacitorSQLiteError: Error {
         return
     }
 
-    func notifyBiometricEvents(name: Notification.Name, result: Bool, msg: String) {
-        var vId: [String: Any] = [:]
-        vId["result"] = result
-        if msg.count > 0 {
-            vId["message"] = msg
-        }
-        NotificationCenter.default.post(name: name, object: nil,
-                                        userInfo: vId)
-    }
+    // MARK: - Migration helpers (no-op shims on iOS)
+    func getMigratableDbList(_ folderPath: String) throws -> [String] { return [] }
+    func addSQLiteSuffix(_ folderPath: String, dbList: [String]) throws { return }
+    func deleteOldDatabases(_ folderPath: String, dbList: [String]) throws { return }
+    func moveDatabasesAndAddSuffix(_ folderPath: String, dbList: [String]) throws { return }
+    func getNCDatabasePath(_ folderPath: String, dbName: String) throws -> String? { return nil }
+    func createNCConnection(_ dbPath: String, version: Int) throws { return }
+    func closeNCConnection(_ dbPath: String) throws { return }
+    func getFromHTTPRequest(_ call: CAPPluginCall, url: String) throws { return }
 
 }
 // swiftlint:enable type_body_length

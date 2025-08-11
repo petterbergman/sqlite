@@ -18,8 +18,6 @@ public struct JsonSQLite: Codable {
     let database: String
     let version: Int
     var overwrite: Bool?
-    let encrypted: Bool
-    let mode: String
     let tables: [JsonTable]
     var views: [JsonView]?
 
@@ -31,8 +29,6 @@ public struct JsonSQLite: Codable {
             mOverwrite = mOver
         }
         print("overwrite: \(mOverwrite) ")
-        print("encrypted: \(encrypted) ")
-        print("mode: \(mode) ")
         print("Number of Tables: \(tables.count) ")
         for table in tables {
             table.show()

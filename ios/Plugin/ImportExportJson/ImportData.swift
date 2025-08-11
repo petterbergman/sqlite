@@ -33,7 +33,6 @@ public class ImportData {
     }
     var mode: String {
         var mMode = ""
-        mMode = jsonSQLite.count > 0 ? jsonSQLite[0].mode : ""
         if !jsonDict.isEmpty {
             if let nMode = jsonDict["mode"] as? String {
                 mMode = nMode
@@ -43,7 +42,6 @@ public class ImportData {
     }
     var encrypted: Bool {
         var mEnc = false
-        mEnc = jsonSQLite.count > 0 ? jsonSQLite[0].encrypted : false
         if !jsonDict.isEmpty {
             if let nEnc = jsonDict["encrypted"] as? Bool {
                 mEnc = nEnc
