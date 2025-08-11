@@ -51,7 +51,8 @@
     "build": "npm run clean && npm run docgen && tsc && rollup -c rollup.config.mjs",
     "clean": "rimraf ./dist",
     "watch": "tsc --watch",
-    "test": "echo \"No test specified\"",
+    "test": "npm run test:ios",
+    "test:ios": "cd ios && xcodebuild -workspace Plugin.xcworkspace -scheme PluginTests -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 16 Pro' -only-testing:PluginTests/CapacitorSQLiteTests/testImportFromJsonBasic OTHER_CFLAGS='-DHAVE_GETHOSTUUID=0' test",
     "prepublishOnly": "npm run build && npm run docgen",
     "release": "standard-version"
   },
