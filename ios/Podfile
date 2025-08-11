@@ -9,11 +9,9 @@ end
 
 target 'Plugin' do
   capacitor_pods
-  pod 'ZIPFoundation', '~> 0.9.18'
 end
 
 target 'PluginTests' do
   capacitor_pods
-  pod 'ZIPFoundation', '~> 0.9.18'
 end
 
