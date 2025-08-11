@@ -12,6 +12,7 @@ import static com.getcapacitor.community.database.sqlite.SQLite.UtilsSQLStatemen
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.os.Build;
 import android.util.Log;
@@ -25,7 +26,6 @@ import com.getcapacitor.JSObject;
 import com.getcapacitor.community.database.sqlite.SQLite.ImportExportJson.ExportToJson;
 import com.getcapacitor.community.database.sqlite.SQLite.ImportExportJson.ImportFromJson;
 import com.getcapacitor.community.database.sqlite.SQLite.ImportExportJson.JsonSQLite;
-import com.getcapacitor.community.database.sqlite.SQLite.ImportExportJson.UtilsEncryption;
 import com.getcapacitor.community.database.sqlite.SQLite.ImportExportJson.UtilsJson;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -38,7 +38,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import android.database.Cursor;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -64,13 +63,7 @@ public class Database {
     private Boolean ncDB = false;
     private boolean isAvailableTransaction = false;
 
-    public Database(
-        Context context,
-        String dbName,
-        int version,
-        Dictionary<Integer, JSONObject> vUpgObject,
-        Boolean readonly
-    ) {
+    public Database(Context context, String dbName, int version, Dictionary<Integer, JSONObject> vUpgObject, Boolean readonly) {
         this._context = context;
         this._dbName = dbName;
         this._version = version;
@@ -215,16 +208,17 @@ public class Database {
     public void open() throws Exception {
         int curVersion;
         try {
-            SupportSQLiteOpenHelper.Configuration cfg = SupportSQLiteOpenHelper.Configuration
-                .builder(_context)
+            SupportSQLiteOpenHelper.Configuration cfg = SupportSQLiteOpenHelper.Configuration.builder(_context)
                 .name(isNCDB() ? _file.getName() : _dbName)
-                .callback(new SupportSQLiteOpenHelper.Callback(_version) {
-                    @Override
-                    public void onCreate(SupportSQLiteDatabase db) {}
+                .callback(
+                    new SupportSQLiteOpenHelper.Callback(_version) {
+                        @Override
+                        public void onCreate(SupportSQLiteDatabase db) {}
 
-                    @Override
-                    public void onUpgrade(SupportSQLiteDatabase db, int oldVersion, int newVersion) {}
-                })
+                        @Override
+                        public void onUpgrade(SupportSQLiteDatabase db, int oldVersion, int newVersion) {}
+                    }
+                )
                 .build();
             SupportSQLiteOpenHelper helper = new FrameworkSQLiteOpenHelperFactory().create(cfg);
             _db = _readOnly ? helper.getReadableDatabase() : helper.getWritableDatabase();

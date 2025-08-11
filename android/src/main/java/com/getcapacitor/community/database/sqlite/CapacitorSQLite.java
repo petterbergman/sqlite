@@ -1,6 +1,5 @@
 package com.getcapacitor.community.database.sqlite;
 
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
@@ -11,7 +10,6 @@ import com.getcapacitor.PluginCall;
 import com.getcapacitor.community.database.sqlite.SQLite.Database;
 import com.getcapacitor.community.database.sqlite.SQLite.GlobalSQLite;
 import com.getcapacitor.community.database.sqlite.SQLite.ImportExportJson.JsonSQLite;
-import com.getcapacitor.community.database.sqlite.SQLite.ImportExportJson.UtilsEncryption;
 import com.getcapacitor.community.database.sqlite.SQLite.ImportExportJson.UtilsJson;
 import com.getcapacitor.community.database.sqlite.SQLite.SqliteConfig;
 import com.getcapacitor.community.database.sqlite.SQLite.UtilsDownloadFromHTTP;
@@ -144,12 +142,8 @@ public class CapacitorSQLite {
      * @param vUpgObject upgrade Object
      * @throws Exception message
      */
-    public void createConnection(
-        String dbName,
-        int version,
-        Dictionary<Integer, JSONObject> vUpgObject,
-        Boolean readonly
-    ) throws Exception {
+    public void createConnection(String dbName, int version, Dictionary<Integer, JSONObject> vUpgObject, Boolean readonly)
+        throws Exception {
         dbName = getDatabaseName(dbName);
         String connName = readonly ? "RO_" + dbName : "RW_" + dbName;
         // check if connection already exists
@@ -159,13 +153,7 @@ public class CapacitorSQLite {
             throw new Exception(msg);
         }
         try {
-            Database db = new Database(
-                context,
-                dbName + "SQLite.db",
-                version,
-                vUpgObject,
-                readonly
-            );
+            Database db = new Database(context, dbName + "SQLite.db", version, vUpgObject, readonly);
             dbDict.put(connName, db);
         } catch (Exception e) {
             throw new Exception(e.getMessage());
@@ -193,13 +181,7 @@ public class CapacitorSQLite {
                 String msg = "Database " + dbPath + " does not exist";
                 throw new Exception(msg);
             }
-            Database db = new Database(
-                context,
-                dbPath,
-                version,
-                new Hashtable<>(),
-                true
-            );
+            Database db = new Database(context, dbPath, version, new Hashtable<>(), true);
             dbDict.put(connName, db);
         } catch (Exception e) {
             throw new Exception(e.getMessage());
@@ -993,12 +975,6 @@ public class CapacitorSQLite {
     public JSObject importFromJson(String parsingData) throws Exception {
         try {
             JSObject jsonObject = new JSObject(parsingData);
-            if (jsonObject.has("expData")) {
-                // Decrypt the data
-                // test decrypt to be removed
-                JSObject decryptJson = UtilsEncryption.decryptJSONObject(this.context, jsonObject.getString("expData"));
-                jsonObject = decryptJson;
-            }
             JsonSQLite jsonSQL = new JsonSQLite();
             boolean isValid = jsonSQL.isJsonSQLite(jsonObject, false);
             if (!isValid) {
@@ -1012,13 +988,7 @@ public class CapacitorSQLite {
             Boolean overwrite = jsonSQL.getOverwrite();
             Boolean encrypted = false;
             String inMode = "no-encryption";
-            Database db = new Database(
-                context,
-                dbName,
-                dbVersion,
-                new Hashtable<Integer, JSONObject>(),
-                false
-            );
+            Database db = new Database(context, dbName, dbVersion, new Hashtable<Integer, JSONObject>(), false);
             if (overwrite && mode.equals("full")) {
                 Boolean isExists = this.uFile.isFileExists(context, dbName);
                 if (isExists) {

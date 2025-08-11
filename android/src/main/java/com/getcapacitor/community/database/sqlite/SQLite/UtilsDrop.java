@@ -1,12 +1,12 @@
 package com.getcapacitor.community.database.sqlite.SQLite;
 
+import android.database.Cursor;
 import android.util.Log;
 import com.getcapacitor.JSObject;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.List;
-import android.database.Cursor;
 
 public class UtilsDrop {
 

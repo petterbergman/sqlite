@@ -916,11 +916,7 @@ export interface ISQLiteConnection {
    * @returns Promise<SQLiteDBConnection>
    * @since 2.9.0 refactor
    */
-  createConnection(
-    database: string,
-    version: number,
-    readonly: boolean,
-  ): Promise<SQLiteDBConnection>;
+  createConnection(database: string, version: number, readonly: boolean): Promise<SQLiteDBConnection>;
   /**
    * Check if a connection exists
    * @param database
@@ -1126,11 +1122,7 @@ export class SQLiteConnection implements ISQLiteConnection {
       return Promise.reject(err);
     }
   }
-  async createConnection(
-    database: string,
-    version: number,
-    readonly: boolean,
-  ): Promise<SQLiteDBConnection> {
+  async createConnection(database: string, version: number, readonly: boolean): Promise<SQLiteDBConnection> {
     try {
       if (database.endsWith('.db')) database = database.slice(0, -3);
       await this.sqlite.createConnection({ database, version, readonly });
@@ -1489,12 +1481,7 @@ export interface ISQLiteDBConnection {
    * @returns Promise<capSQLiteChanges>
    * @since 2.9.0 refactor
    */
-  run(
-    statement: string,
-    values?: any[],
-    transaction?: boolean,
-    returnMode?: string,
-  ): Promise<capSQLiteChanges>;
+  run(statement: string, values?: any[], transaction?: boolean, returnMode?: string): Promise<capSQLiteChanges>;
   /**
    * Execute SQLite DB Connection Set
    * @param set
@@ -1503,11 +1490,7 @@ export interface ISQLiteDBConnection {
    * @returns Promise<capSQLiteChanges>
    * @since 2.9.0 refactor
    */
-  executeSet(
-    set: capSQLiteSet[],
-    transaction?: boolean,
-    returnMode?: string,
-  ): Promise<capSQLiteChanges>;
+  executeSet(set: capSQLiteSet[], transaction?: boolean, returnMode?: string): Promise<capSQLiteChanges>;
   /**
    * Check if a SQLite DB Connection exists
    * @returns Promise<capSQLiteResult>
@@ -1739,12 +1722,7 @@ export class SQLiteDBConnection implements ISQLiteDBConnection {
       return Promise.reject(err);
     }
   }
-  async run(
-    statement: string,
-    values?: any[],
-    transaction = true,
-    returnMode = 'no',
-  ): Promise<capSQLiteChanges> {
+  async run(statement: string, values?: any[], transaction = true, returnMode = 'no'): Promise<capSQLiteChanges> {
     let res: any;
     try {
       if (!this.readonly) {
@@ -1777,11 +1755,7 @@ export class SQLiteDBConnection implements ISQLiteDBConnection {
       return Promise.reject(err);
     }
   }
-  async executeSet(
-    set: capSQLiteSet[],
-    transaction = true,
-    returnMode = 'no',
-  ): Promise<capSQLiteChanges> {
+  async executeSet(set: capSQLiteSet[], transaction = true, returnMode = 'no'): Promise<capSQLiteChanges> {
     let res: any;
     try {
       if (!this.readonly) {
