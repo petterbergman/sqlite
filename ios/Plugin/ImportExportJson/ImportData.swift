@@ -38,7 +38,8 @@ public class ImportData {
                 mMode = nMode
             }
         }
-        return mMode
+        // Default to full when not provided
+        return mMode.count > 0 ? mMode : "full"
     }
     var encrypted: Bool {
         var mEnc = false

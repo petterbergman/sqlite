@@ -1,7 +1,6 @@
 {
   "database": "testjson_file",
   "version": 1,
-  "encrypted": false,
   "mode": "full",
   "overwrite": true,
   "tables": [

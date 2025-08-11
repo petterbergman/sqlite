@@ -813,7 +813,7 @@ enum CapacitorSQLiteError: Error {
         let encrypted: Bool = importData.encrypted
         let overwrite: Bool = importData.overwrite ?
             importData.overwrite : false
-        let mode: String = importData.mode
+        let mode: String = importData.mode.count > 0 ? importData.mode : "full"
         let inMode: String = encrypted ? "secret"
             : "no-encryption"
         let version: Int = importData.version
