@@ -64,7 +64,7 @@ public class ImportFromJsonBasicInstrumentedTest {
         assertEquals(2, cnt);
         db.close();
         long elapsedMs = android.os.SystemClock.elapsedRealtime() - startMs;
-       System.out.println("[TEST] importFromJson took " + elapsedMs + "ms");
+        System.out.println("[TEST] importFromJson took " + elapsedMs + "ms");
         Log.i(TAG, "importFromJson took " + elapsedMs + "ms");
         long totalElapsedMs = android.os.SystemClock.elapsedRealtime() - totalStartMs;
         System.out.println("[TEST] importFromJson_basic total elapsed " + totalElapsedMs + "ms");
@@ -76,9 +76,10 @@ public class ImportFromJsonBasicInstrumentedTest {
     public void query_all_tables_with_timing() throws Exception {
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         final String TAG = "ImportFromJsonTest";
-//        Copy Quartermaster4SQLite.db from assets (public/assets/databases) into databases dir
-//        and open it (UtilsFile.copyFromAssetsToDatabase adds SQLite suffix automatically)
-        com.getcapacitor.community.database.sqlite.SQLite.UtilsFile uFile = new com.getcapacitor.community.database.sqlite.SQLite.UtilsFile();
+        //        Copy Quartermaster4SQLite.db from assets (public/assets/databases) into databases dir
+        //        and open it (UtilsFile.copyFromAssetsToDatabase adds SQLite suffix automatically)
+        com.getcapacitor.community.database.sqlite.SQLite.UtilsFile uFile =
+            new com.getcapacitor.community.database.sqlite.SQLite.UtilsFile();
         // Overwrite to ensure fresh copy for timing
         uFile.copyFromAssetsToDatabase(context, true);
         String dbName = "Quartermaster4SQLite.db";

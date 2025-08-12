@@ -84,4 +84,84 @@ class CapacitorSQLiteTests: XCTestCase {
         do { try implementation.deleteDatabase(dbName, readonly: false) } catch { XCTFail("deleteDatabase failed: \(error)") }
         do { try implementation.closeConnection(dbName, readonly: false) } catch { XCTFail("closeConnection failed: \(error)") }
     }
+
+    func testQueryAllTablesWithTiming() {
+
+        let implementation = CapacitorSQLite(config: SqliteConfig())
+        // Copy DB from the test bundle into the databases folder using UtilsFile helper
+        do {
+            // Locate DB in the test bundle (either at root or under public/assets/databases)
+            let bundle = Bundle(for: type(of: self))
+            var sourceFileURL: URL?
+            if let url = bundle.url(forResource: "Quartermaster4SQLite", withExtension: "db") {
+                sourceFileURL = url
+            } else if let baseURL = bundle.resourceURL?.appendingPathComponent("public/assets/databases"),
+                      FileManager.default.fileExists(atPath: baseURL.appendingPathComponent("Quartermaster4SQLite.db").path) {
+                sourceFileURL = baseURL.appendingPathComponent("Quartermaster4SQLite.db")
+            }
+            guard let fileURL = sourceFileURL else {
+                XCTFail("Quartermaster4SQLite.db not found in test bundle")
+                return
+            }
+            let sourceDirURL = fileURL.deletingLastPathComponent()
+            let destDirURL = try UtilsFile.getFolderURL(folderPath: "Documents")
+            try UtilsFile.copyFromNames(dbPathURL: sourceDirURL,
+                                        fromFile: "Quartermaster4SQLite.db",
+                                        databaseURL: destDirURL,
+                                        toFile: "Quartermaster4SQLite.db")
+        } catch {
+            XCTFail("copyFromNames failed: \(error)")
+            return
+        }
+
+        let dbName = "Quartermaster4"
+        do {
+            try implementation.createConnection(dbName,
+                                                encrypted: false,
+                                                mode: "no-encryption",
+                                                version: 1,
+                                                vUpgDict: [:],
+                                                readonly: false)
+            try implementation.open(dbName, readonly: false)
+        } catch {
+            XCTFail("open Quartermaster4 failed: \(error)")
+            return
+        }
+
+        let totalStart = Date()
+        do {
+            let tListStart = Date()
+            let tables = try implementation.getTableList(dbName, readonly: false)
+            let tListMs = Int(Date().timeIntervalSince(tListStart) * 1000)
+            print("[TEST] (existing) getTableList() took \(tListMs)ms, count=\(tables.count)")
+            for table in tables {
+                let tCountStart = Date()
+                let countRows = try implementation.query(dbName,
+                                                         statement: "SELECT COUNT(*) AS cnt FROM \(table)",
+                                                         values: [],
+                                                         readonly: false)
+                let tCountMs = Int(Date().timeIntervalSince(tCountStart) * 1000)
+                var cntVal: Int = -1
+                if countRows.count > 1 {
+                    if let c = countRows[1]["cnt"] as? Int { cntVal = c }
+                    else if let c64 = countRows[1]["cnt"] as? Int64 { cntVal = Int(c64) }
+                }
+                print("[TEST] (existing) table=\(table) count=\(cntVal) (\(tCountMs)ms)")
+
+                let tSelStart = Date()
+                let allRows = try implementation.query(dbName,
+                                                       statement: "SELECT * FROM \(table)",
+                                                       values: [],
+                                                       readonly: false)
+                let tSelMs = Int(Date().timeIntervalSince(tSelStart) * 1000)
+                print("[TEST] (existing) table=\(table) full select rows=\(allRows.count - 1) (\(tSelMs)ms)")
+            }
+        } catch {
+            XCTFail("query timing existing DB failed: \(error)")
+        }
+        do { try implementation.close(dbName, readonly: false) } catch { XCTFail("close failed: \(error)") }
+        do { try implementation.closeConnection(dbName, readonly: false) } catch { XCTFail("closeConnection failed: \(error)") }
+        let totalMs = Int(Date().timeIntervalSince(totalStart) * 1000)
+        print("[TEST] testQueryAllTablesExistingDBTiming total elapsed \(totalMs)ms")
+    }
 }
