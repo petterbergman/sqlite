@@ -17,7 +17,7 @@
   "author": "Robin Genz <mail@robingenz.dev>",
   "license": "MIT",
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=22.0.0"
   },
   "repository": {
     "type": "git",
@@ -52,17 +52,17 @@
     "clean": "rimraf ./dist",
     "watch": "tsc --watch",
     "test": "npm run test:ios && npm run test:android",
-    "test:ios": "cd ios && xcodebuild -workspace Plugin.xcworkspace -scheme PluginTests -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 16 Pro' OTHER_CFLAGS='-DHAVE_GETHOSTUUID=0' test",
+    "test:ios": "cd ios && xcodebuild -workspace Plugin.xcworkspace -scheme PluginTests -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 17 Pro' OTHER_CFLAGS='-DHAVE_GETHOSTUUID=0' test",
     "test:android": "cd android && ./gradlew connectedDebugAndroidTest -x lint -Pandroid.testInstrumentationRunnerArguments.class=com.getcapacitor.community.database.sqlite.ImportFromJsonBasicInstrumentedTest",
     "prepublishOnly": "npm run build && npm run docgen",
     "release": "standard-version"
   },
   "devDependencies": {
-    "@capacitor/android": "7.0.0",
-    "@capacitor/cli": "7.0.0",
-    "@capacitor/core": "7.0.0",
+    "@capacitor/android": "8.3.1",
+    "@capacitor/cli": "8.3.1",
+    "@capacitor/core": "8.3.1",
     "@capacitor/docgen": "0.3.0",
-    "@capacitor/ios": "7.0.0",
+    "@capacitor/ios": "8.3.1",
     "@ionic/eslint-config": "0.4.0",
     "@ionic/prettier-config": "4.0.0",
     "@ionic/swiftlint-config": "2.0.0",
@@ -78,7 +78,7 @@
     "typescript": "4.1.5"
   },
   "peerDependencies": {
-    "@capacitor/core": ">=7.0.0"
+    "@capacitor/core": ">=8.0.0"
   },
   "prettier": "@ionic/prettier-config",
   "swiftlint": "@ionic/swiftlint-config",
