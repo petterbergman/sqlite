@@ -724,7 +724,7 @@ class Database {
     }
 }
 // swiftlint:enable type_body_length
-// swiftlint:enable file_length
+// Keep file_length disabled for this compatibility shim extension block.
 
 // Minimal non-encrypted shim to satisfy calls formerly in UtilsSQLCipher.swift
 import SQLite3
@@ -856,22 +856,26 @@ class UtilsSQLCipher {
             let colCount = sqlite3_column_count(stmt)
             var header: [String: Any] = [:]
             var names: [String] = []
-            for i in 0..<colCount { if let n = sqlite3_column_name(stmt, i) { names.append(String(cString: n)) } }
+            for columnIndex in 0..<colCount {
+                if let columnName = sqlite3_column_name(stmt, columnIndex) {
+                    names.append(String(cString: columnName))
+                }
+            }
             header["ios_columns"] = names
             results.append(header)
             repeat {
                 var row: [String: Any] = [:]
-                for i in 0..<colCount {
-                    let type = sqlite3_column_type(stmt, i)
-                    if let name = sqlite3_column_name(stmt, i) {
+                for columnIndex in 0..<colCount {
+                    let type = sqlite3_column_type(stmt, columnIndex)
+                    if let name = sqlite3_column_name(stmt, columnIndex) {
                         let key = String(cString: name)
                         switch type {
-                        case SQLITE_INTEGER: row[key] = Int64(sqlite3_column_int64(stmt, i))
-                        case SQLITE_FLOAT: row[key] = sqlite3_column_double(stmt, i)
-                        case SQLITE_TEXT: row[key] = String(cString: sqlite3_column_text(stmt, i))
+                        case SQLITE_INTEGER: row[key] = Int64(sqlite3_column_int64(stmt, columnIndex))
+                        case SQLITE_FLOAT: row[key] = sqlite3_column_double(stmt, columnIndex)
+                        case SQLITE_TEXT: row[key] = String(cString: sqlite3_column_text(stmt, columnIndex))
                         case SQLITE_BLOB:
-                            if let blob = sqlite3_column_blob(stmt, i) {
-                                let len = Int(sqlite3_column_bytes(stmt, i))
+                            if let blob = sqlite3_column_blob(stmt, columnIndex) {
+                                let len = Int(sqlite3_column_bytes(stmt, columnIndex))
                                 let data = Data(bytes: blob, count: len)
                                 row[key] = [UInt8](data)
                             } else { row[key] = NSNull() }
@@ -897,22 +901,26 @@ class UtilsSQLCipher {
         let colCount = sqlite3_column_count(stmt)
         var header: [String: Any] = [:]
         var names: [String] = []
-        for i in 0..<colCount { if let n = sqlite3_column_name(stmt, i) { names.append(String(cString: n)) } }
+        for columnIndex in 0..<colCount {
+            if let columnName = sqlite3_column_name(stmt, columnIndex) {
+                names.append(String(cString: columnName))
+            }
+        }
         header["ios_columns"] = names
         result.append(header)
         while sqlite3_step(stmt) == SQLITE_ROW {
             var row: [String: Any] = [:]
-            for i in 0..<colCount {
-                if let name = sqlite3_column_name(stmt, i) {
+            for columnIndex in 0..<colCount {
+                if let name = sqlite3_column_name(stmt, columnIndex) {
                     let key = String(cString: name)
-                    let type = sqlite3_column_type(stmt, i)
+                    let type = sqlite3_column_type(stmt, columnIndex)
                     switch type {
-                    case SQLITE_INTEGER: row[key] = Int64(sqlite3_column_int64(stmt, i))
-                    case SQLITE_FLOAT: row[key] = sqlite3_column_double(stmt, i)
-                    case SQLITE_TEXT: row[key] = String(cString: sqlite3_column_text(stmt, i))
+                    case SQLITE_INTEGER: row[key] = Int64(sqlite3_column_int64(stmt, columnIndex))
+                    case SQLITE_FLOAT: row[key] = sqlite3_column_double(stmt, columnIndex)
+                    case SQLITE_TEXT: row[key] = String(cString: sqlite3_column_text(stmt, columnIndex))
                     case SQLITE_BLOB:
-                        if let blob = sqlite3_column_blob(stmt, i) {
-                            let len = Int(sqlite3_column_bytes(stmt, i))
+                        if let blob = sqlite3_column_blob(stmt, columnIndex) {
+                            let len = Int(sqlite3_column_bytes(stmt, columnIndex))
                             let data = Data(bytes: blob, count: len)
                             row[key] = [UInt8](data)
                         } else { row[key] = NSNull() }
@@ -942,11 +950,11 @@ class UtilsSQLCipher {
 
     class func addToResponse(response: [[String: Any]], respSet: [[String: Any]]) -> [[String: Any]] {
         var ret = response
-        var m = respSet
+        var mergedResponseSet = respSet
         if !ret.isEmpty {
-            m = m.filter { dict in !(dict.keys.first == "ios_columns") }
+            mergedResponseSet = mergedResponseSet.filter { dict in !(dict.keys.first == "ios_columns") }
         }
-        ret.append(contentsOf: m)
+        ret.append(contentsOf: mergedResponseSet)
         return ret
     }
 

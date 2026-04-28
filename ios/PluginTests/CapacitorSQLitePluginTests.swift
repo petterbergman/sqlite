@@ -143,8 +143,8 @@ class CapacitorSQLiteTests: XCTestCase {
                 let tCountMs = Int(Date().timeIntervalSince(tCountStart) * 1000)
                 var cntVal: Int = -1
                 if countRows.count > 1 {
-                    if let c = countRows[1]["cnt"] as? Int { cntVal = c }
-                    else if let c64 = countRows[1]["cnt"] as? Int64 { cntVal = Int(c64) }
+                    if let countValue = countRows[1]["cnt"] as? Int { cntVal = countValue }
+                    else if let countValueInt64 = countRows[1]["cnt"] as? Int64 { cntVal = Int(countValueInt64) }
                 }
                 print("[TEST] (existing) table=\(table) count=\(cntVal) (\(tCountMs)ms)")
 

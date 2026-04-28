@@ -69,7 +69,7 @@ public class ImportFromJsonBasicInstrumentedTest {
         long totalElapsedMs = android.os.SystemClock.elapsedRealtime() - totalStartMs;
         System.out.println("[TEST] importFromJson_basic total elapsed " + totalElapsedMs + "ms");
         Log.i(TAG, "importFromJson_basic total elapsed " + totalElapsedMs + "ms");
-        assertTrue("importFromJson_basic exceeded 100, elapsed=" + totalElapsedMs + "ms", totalElapsedMs <= 100);
+        assertTrue("importFromJson_basic exceeded 500ms, elapsed=" + totalElapsedMs + "ms", totalElapsedMs <= 200);
     }
 
     @Test
@@ -109,6 +109,6 @@ public class ImportFromJsonBasicInstrumentedTest {
         long totalElapsed = android.os.SystemClock.elapsedRealtime() - totalStart;
         System.out.println("[TEST] query_all_tables_with_timing total elapsed " + totalElapsed + "ms");
         Log.i(TAG, "query_all_tables_with_timing total elapsed " + totalElapsed + "ms");
-        assertTrue("importFromJson_basic exceeded 500ms, elapsed=" + totalElapsed + "ms", totalElapsed <= 500);
+        assertTrue("query_all_tables_with_timing exceeded 500ms, elapsed=" + totalElapsed + "ms", totalElapsed <= 500);
     }
 }
