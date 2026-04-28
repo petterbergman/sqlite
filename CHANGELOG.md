@@ -1,6 +1,10 @@
 # Changelog
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+## [8.1.0](https://github.com/capacitor-community/sqlite/compare/v8.0.1...v8.1.0) (2026-04-28)
+### ⚠ BREAKING CHANGES
+
+* This plugin now supports Capacitor 8.
 
 ### [7.0.1](https://github.com/capacitor-community/sqlite/compare/v7.0.0...v7.0.1) (2025-07-02)
 

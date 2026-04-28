@@ -1091,43 +1091,40 @@ public class CapacitorSQLitePlugin extends Plugin {
     }
 
     private void AddObserversToNotificationCenter() {
-        NotificationCenter.defaultCenter()
-            .addMethodForNotification(
-                "importJsonProgress",
-                new MyRunnable() {
-                    @Override
-                    public void run() {
-                        JSObject data = new JSObject();
-                        data.put("progress", this.getInfo().get("progress"));
-                        notifyListeners("sqliteImportProgressEvent", data);
-                    }
+        NotificationCenter.defaultCenter().addMethodForNotification(
+            "importJsonProgress",
+            new MyRunnable() {
+                @Override
+                public void run() {
+                    JSObject data = new JSObject();
+                    data.put("progress", this.getInfo().get("progress"));
+                    notifyListeners("sqliteImportProgressEvent", data);
                 }
-            );
-        NotificationCenter.defaultCenter()
-            .addMethodForNotification(
-                "exportJsonProgress",
-                new MyRunnable() {
-                    @Override
-                    public void run() {
-                        JSObject data = new JSObject();
-                        data.put("progress", this.getInfo().get("progress"));
-                        notifyListeners("sqliteExportProgressEvent", data);
-                    }
+            }
+        );
+        NotificationCenter.defaultCenter().addMethodForNotification(
+            "exportJsonProgress",
+            new MyRunnable() {
+                @Override
+                public void run() {
+                    JSObject data = new JSObject();
+                    data.put("progress", this.getInfo().get("progress"));
+                    notifyListeners("sqliteExportProgressEvent", data);
                 }
-            );
-        NotificationCenter.defaultCenter()
-            .addMethodForNotification(
-                "biometricResults",
-                new MyRunnable() {
-                    @Override
-                    public void run() {
-                        JSObject data = new JSObject();
-                        data.put("result", this.getInfo().get("result"));
-                        data.put("message", this.getInfo().get("message"));
-                        notifyListeners("sqliteBiometricEvent", data);
-                    }
+            }
+        );
+        NotificationCenter.defaultCenter().addMethodForNotification(
+            "biometricResults",
+            new MyRunnable() {
+                @Override
+                public void run() {
+                    JSObject data = new JSObject();
+                    data.put("result", this.getInfo().get("result"));
+                    data.put("message", this.getInfo().get("message"));
+                    notifyListeners("sqliteBiometricEvent", data);
                 }
-            );
+            }
+        );
     }
 
     private SqliteConfig getSqliteConfig() throws JSONException {
@@ -1137,9 +1134,10 @@ public class CapacitorSQLitePlugin extends Plugin {
         config.setIsEncryption(isEncryption);
         JSONObject androidBiometric = pConfig.has("androidBiometric") ? pConfig.getJSONObject("androidBiometric") : null;
         if (androidBiometric != null) {
-            boolean biometricAuth = androidBiometric.has("biometricAuth") && isEncryption
-                ? androidBiometric.getBoolean("biometricAuth")
-                : config.getBiometricAuth();
+            boolean biometricAuth =
+                androidBiometric.has("biometricAuth") && isEncryption
+                    ? androidBiometric.getBoolean("biometricAuth")
+                    : config.getBiometricAuth();
             config.setBiometricAuth(biometricAuth);
             String biometricTitle = androidBiometric.has("biometricTitle")
                 ? androidBiometric.getString("biometricTitle")

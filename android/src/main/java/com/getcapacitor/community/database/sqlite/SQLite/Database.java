@@ -1178,7 +1178,8 @@ public class Database {
         } catch (Exception e) {
             Log.e(TAG, "Error: exportToJson " + e.getMessage());
             throw new Exception(e.getMessage());
-        } finally {}
+        } finally {
+        }
     }
 
     /**
