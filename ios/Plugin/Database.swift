@@ -47,13 +47,13 @@ class Database {
 
     // MARK: - isOpen
 
-    func isDBOpen () -> Bool {
+    func isDBOpen() -> Bool {
         return isOpen
     }
 
     // MARK: - Open
 
-    func open () throws {
+    func open() throws {
         do {
             mDb = try UtilsSQLCipher.openOrCreateDatabase(filename: path)
             isOpen = true
@@ -76,7 +76,7 @@ class Database {
 
     // MARK: - Close
 
-    func close () throws {
+    func close() throws {
         if isOpen {
             // close the database
             do {
@@ -92,7 +92,7 @@ class Database {
 
     // MARK: - GetVersion
 
-    func getVersion () throws -> Int {
+    func getVersion() throws -> Int {
         if isOpen {
             do {
                 let curVersion: Int = try UtilsSQLCipher
@@ -166,7 +166,6 @@ class Database {
 
     // MARK: - ExecSet
 
-    // swiftlint:disable function_body_length
     func execSet(set: [[String: Any]], transaction: Bool = true) throws -> [String: Any] {
         var msg: String = "Failed in execSet : "
         let initChanges = UtilsSQLCipher.dbChanges(mDB: mDb)
@@ -223,7 +222,6 @@ class Database {
         }
         return changesDict
     }
-    // swiftlint:enable function_body_length
 
     // MARK: - RunSQL
 
@@ -393,10 +391,10 @@ class UtilsSQLCipher {
         var mDB: OpaquePointer?
         if sqlite3_open_v2(filename, &mDB, flags | SQLITE_OPEN_FULLMUTEX, nil) == SQLITE_OK {
             // simple sanity check
-            var ok = false
+            var isValid = false
             let stmt = "SELECT count(*) FROM sqlite_master;"
-            if sqlite3_exec(mDB, stmt, nil, nil, nil) == SQLITE_OK { ok = true }
-            if ok { return mDB }
+            if sqlite3_exec(mDB, stmt, nil, nil, nil) == SQLITE_OK { isValid = true }
+            if isValid { return mDB }
             throw UtilsSQLCipherError.openOrCreateDatabase(message: "Cannot open the DB")
         } else {
             throw UtilsSQLCipherError.openOrCreateDatabase(message: "open_v2 failed")
@@ -404,10 +402,10 @@ class UtilsSQLCipher {
     }
 
     class func close(oDB: OpaquePointer?) throws {
-        let rc = sqlite3_close_v2(oDB)
-        if rc != SQLITE_OK {
+        let resCode = sqlite3_close_v2(oDB)
+        if resCode != SQLITE_OK {
             let errmsg = String(cString: sqlite3_errmsg(oDB))
-            throw UtilsSQLCipherError.close(message: "rc: \(rc) message: \(errmsg)")
+            throw UtilsSQLCipherError.close(message: "rc: \(resCode) message: \(errmsg)")
         }
     }
 
@@ -424,7 +422,6 @@ class UtilsSQLCipher {
             throw UtilsSQLCipherError.setForeignKeyConstraintsEnabled(message: "set foreign_keys failed")
         }
     }
-
 
     class func getVersion(mDB: Database) throws -> Int {
         let sql = "PRAGMA user_version;"
@@ -472,18 +469,18 @@ class UtilsSQLCipher {
         var stmt: OpaquePointer?
         var results: [[String: Any]] = []
         var lastId: Int64 = -1
-        var rc = sqlite3_prepare_v2(mDB.mDb, sql, -1, &stmt, nil)
-        if rc != SQLITE_OK { let errmsg = String(cString: sqlite3_errmsg(mDB.mDb)); throw UtilsSQLCipherError.prepareSQL(message: errmsg) }
+        var resCode = sqlite3_prepare_v2(mDB.mDb, sql, -1, &stmt, nil)
+        if resCode != SQLITE_OK { let errmsg = String(cString: sqlite3_errmsg(mDB.mDb)); throw UtilsSQLCipherError.prepareSQL(message: errmsg) }
         if !values.isEmpty {
             _ = UtilsBinding.bindValues(handle: stmt, values: values)
         }
-        rc = sqlite3_step(stmt)
-        if rc != SQLITE_DONE && rc != SQLITE_ROW {
+        resCode = sqlite3_step(stmt)
+        if resCode != SQLITE_DONE && resCode != SQLITE_ROW {
             let errmsg = String(cString: sqlite3_errmsg(mDB.mDb))
             sqlite3_finalize(stmt)
             throw UtilsSQLCipherError.prepareSQL(message: errmsg)
         }
-        if rc == SQLITE_ROW {
+        if resCode == SQLITE_ROW {
             // collect single row
             let colCount = sqlite3_column_count(stmt)
             var header: [String: Any] = [:]
@@ -526,8 +523,8 @@ class UtilsSQLCipher {
 
     class func querySQL(mDB: Database, sql: String, values: [Any]) throws -> [[String: Any]] {
         var stmt: OpaquePointer?
-        var rc = sqlite3_prepare_v2(mDB.mDb, sql, -1, &stmt, nil)
-        if rc != SQLITE_OK { let errmsg = String(cString: sqlite3_errmsg(mDB.mDb)); throw UtilsSQLCipherError.querySQL(message: errmsg) }
+        var resCode = sqlite3_prepare_v2(mDB.mDb, sql, -1, &stmt, nil)
+        if resCode != SQLITE_OK { let errmsg = String(cString: sqlite3_errmsg(mDB.mDb)); throw UtilsSQLCipherError.querySQL(message: errmsg) }
         if !values.isEmpty { _ = UtilsBinding.bindValues(handle: stmt, values: values) }
         var result: [[String: Any]] = []
         let colCount = sqlite3_column_count(stmt)

@@ -7,6 +7,7 @@ import com.getcapacitor.community.database.sqlite.SQLite.UtilsDrop;
 import com.getcapacitor.community.database.sqlite.SQLite.UtilsSQLite;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Locale;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -151,7 +152,7 @@ public class ImportFromJson {
         ArrayList<String> statements = new ArrayList<>();
         for (int j = 0; j < mTriggers.size(); j++) {
             String timeEvent = mTriggers.get(j).getTimeevent();
-            if (timeEvent.toUpperCase().endsWith(" ON")) {
+            if (timeEvent.toUpperCase(Locale.ROOT).endsWith(" ON")) {
                 timeEvent = timeEvent.substring(0, timeEvent.length() - 3);
             }
 

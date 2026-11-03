@@ -49,7 +49,6 @@ class ImportFromJson {
 
     // MARK: - ImportFromJson - createSchema
 
-    // swiftlint:disable function_body_length
     class func createSchema(mDB: Database, tables: [JsonTable]) throws -> Int {
         var changes: Int = 0
         var initChanges: Int = 0
@@ -107,7 +106,6 @@ class ImportFromJson {
         }
         return changes
     }
-    // swiftlint:enable function_body_length
 
     // MARK: - ImportFromJson - createSchemaStatement
 
@@ -216,7 +214,6 @@ class ImportFromJson {
 
     // MARK: - ImportFromJson - createDatabaseData
 
-    // swiftlint:disable function_body_length
     class func createDatabaseData(mDB: Database,
                                   tables: [JsonTable]) throws -> Int {
         var initChanges: Int = -1
@@ -266,7 +263,6 @@ class ImportFromJson {
                 message: message)
         }
     }
-    // swiftlint:enable function_body_length
 
     // MARK: - ImportFromJson - createTableData
 

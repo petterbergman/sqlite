@@ -19,6 +19,7 @@ public class UtilsJson {
      * @param obj
      * @return
      */
+    @SuppressWarnings("unchecked")
     public ArrayList<String> getColumnNames(Object obj) {
         ArrayList<String> colNames = new ArrayList<>();
         if (obj instanceof ArrayList) colNames = (ArrayList<String>) obj;

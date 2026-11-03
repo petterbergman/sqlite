@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -39,7 +40,7 @@ public class JsonIndex {
 
     public void setMode(String newMode) {
         if (newMode.equalsIgnoreCase("UNIQUE")) {
-            this.mode = newMode.toUpperCase();
+            this.mode = newMode.toUpperCase(Locale.ROOT);
         }
     }
 

@@ -292,7 +292,6 @@ public class CapacitorSQLitePlugin: CAPPlugin, CAPBridgedPlugin {
 
     // MARK: - Run
 
-    // swiftlint:disable function_body_length
     @objc func run(_ call: CAPPluginCall) {
         guard let dbName = call.options["database"] as? String else {
             retHandler.rChanges(
@@ -344,11 +343,9 @@ public class CapacitorSQLitePlugin: CAPPlugin, CAPBridgedPlugin {
         }
 
     }
-    // swiftlint:enable function_body_length
 
     // MARK: - Query
 
-    // swiftlint:disable function_body_length
     @objc func query(_ call: CAPPluginCall) {
         guard let dbName = call.options["database"]
                 as? String else {
@@ -402,7 +399,6 @@ public class CapacitorSQLitePlugin: CAPPlugin, CAPBridgedPlugin {
         }
 
     }
-    // swiftlint:enable function_body_length
 
     // MARK: - IsDBOpen
 

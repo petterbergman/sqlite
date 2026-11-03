@@ -348,8 +348,6 @@ class ExportToJson {
 
     }
 
-    // swiftlint:enable function_body_length
-
     // MARK: - ExportToJson - SplitFirstWord
 
     // split on the first run of any whitespace (spaces, tabs, \r)

@@ -5,6 +5,7 @@ import com.getcapacitor.JSObject;
 import com.getcapacitor.community.database.sqlite.SQLite.Database;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -211,10 +212,10 @@ public class ExportToJson {
                 String sc = s.replaceAll("\n", "").trim();
                 String[] row = sc.trim().split("\\s+", 2);
                 JsonColumn jsonRow = new JsonColumn();
-                String uppercasedValue = row[0].toUpperCase(); // Define uppercasedValue
+                String uppercasedValue = row[0].toUpperCase(Locale.ROOT); // Define uppercasedValue
                 int oPar;
                 int cPar;
-                switch (row[0].toUpperCase()) {
+                switch (row[0].toUpperCase(Locale.ROOT)) {
                     case "FOREIGN" -> {
                         oPar = sc.indexOf("(");
                         cPar = sc.indexOf(")");
@@ -346,7 +347,7 @@ public class ExportToJson {
                         } else {
                             logic = sqlArr[1].trim();
                         }
-                        if (timeEvent.toUpperCase().endsWith(" ON")) {
+                        if (timeEvent.toUpperCase(Locale.ROOT).endsWith(" ON")) {
                             timeEvent = timeEvent.substring(0, timeEvent.length() - 3);
                         }
                         jsonRow.setName(name);

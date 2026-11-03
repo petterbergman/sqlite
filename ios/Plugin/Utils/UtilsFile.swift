@@ -21,7 +21,6 @@ enum UtilsFileError: Error {
     case moveAllDBSQLiteFailed(message: String)
     case createDatabaseLocationFailed(message: String)
 }
-// swiftlint:disable file_length
 // swiftlint:disable type_body_length
 class UtilsFile {
 
@@ -199,7 +198,6 @@ class UtilsFile {
         }
     }
 
-
     // MARK: - getApplicationURL
 
     class func getApplicationURL() throws -> URL {
@@ -212,7 +210,6 @@ class UtilsFile {
             throw UtilsFileError.getApplicationURLFailed
         }
     }
-
 
     // MARK: - getCacheURL
 
@@ -246,7 +243,6 @@ class UtilsFile {
         }
     }
 
-
     // MARK: - GetFileList
 
     class func getFileList(path: String, ext: String? = nil) throws -> [String] {
@@ -272,7 +268,6 @@ class UtilsFile {
             throw UtilsFileError.getFileListFailed
         }
     }
-
 
     // MARK: - MoveFile
 
@@ -350,4 +345,3 @@ class UtilsFile {
     }
 }
 // swiftlint:enable type_body_length
-// swiftlint:enable file_length

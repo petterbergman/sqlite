@@ -22,6 +22,7 @@ import com.getcapacitor.community.database.sqlite.SQLite.ImportExportJson.JsonSQ
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -357,7 +358,7 @@ public class Database {
      * @throws Exception message
      */
     public JSObject prepareSQL(String statement, ArrayList<Object> values) throws Exception {
-        String stmtType = statement.trim().split("\\s+")[0].toUpperCase();
+        String stmtType = statement.trim().split("\\s+")[0].toUpperCase(Locale.ROOT);
         SupportSQLiteStatement stmt = null;
         JSObject retObject = new JSObject();
         try {

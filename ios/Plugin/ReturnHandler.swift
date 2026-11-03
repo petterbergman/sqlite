@@ -55,7 +55,6 @@ class ReturnHandler {
         }
     }
 
-
     // MARK: - rJsonSQLite
 
     func rJsonSQLite(call: CAPPluginCall, ret: [String: Any],
