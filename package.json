@@ -1,6 +1,6 @@
 {
   "name": "@petterbergman/capacitor-sqlite",
-  "version": "8.1.0-qm.2",
+  "version": "8.1.0-qm.3",
   "description": "Trimmed fork of @capacitor-community/sqlite used by QuarterMaster",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -70,7 +70,7 @@
     "@rollup/plugin-commonjs": "28.0.2",
     "@rollup/plugin-node-resolve": "16.0.0",
     "@types/node": "24.19.2",
-    "@types/sql.js": "1.4.9",
+    "@types/sql.js": "1.4.11",
     "eslint": "8.57.1",
     "fake-indexeddb": "6.2.7",
     "prettier": "3.8.3",
@@ -99,7 +99,7 @@
     }
   },
   "dependencies": {
-    "sql.js": "^1.11.0"
+    "sql.js": "^1.15.2"
   },
   "publishConfig": {
     "access": "public",

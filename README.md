@@ -66,7 +66,9 @@ npm install
 npx cap sync
 ```
 
-For the web platform, copy `sql-wasm.wasm` from `node_modules/sql.js/dist/` into your app's assets folder so it is served at `/assets/sql-wasm.wasm` (`src/assets` for Angular, `public/assets` for Vue/React), and call `initWebStore()` once before creating connections. No custom element is needed.
+For the web platform, copy `sql-wasm-browser.wasm` from `node_modules/sql.js/dist/` into your app's assets folder so it is served at `/assets/sql-wasm-browser.wasm` (`src/assets` for Angular, `public/assets` for Vue/React), and call `initWebStore()` once before creating connections. No custom element is needed.
+
+Bundlers pick sql.js's `browser` export, `sql-wasm-browser.js`, which loads that wasm file and has no Node-only imports, so no `fs` or `path` externals are needed.
 
 ## Requirements
 

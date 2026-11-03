@@ -3,7 +3,7 @@ import type { Database as SqlJsDatabase, SqlJsStatic, SqlValue } from 'sql.js';
 
 import type { WebStore } from './store';
 
-// The app copies sql-wasm.wasm here from the same sql.js package this module imports
+// The app copies sql-wasm-browser.wasm here from the same sql.js package this module imports
 const WASM_PATH = '/assets';
 
 let sqlJs: Promise<SqlJsStatic> | null = null;
@@ -112,6 +112,7 @@ export class WebDatabase {
     const SQL = await loadSqlJs();
     const data = await this.store.get(this.fileName);
     this.db = data ? new SQL.Database(data) : new SQL.Database();
+    this.db.exec('PRAGMA foreign_keys = ON');
     try {
       await this.save();
     } catch (err) {
@@ -130,9 +131,8 @@ export class WebDatabase {
 
   async save(): Promise<void> {
     const db = this.raw();
+    // export() keeps the connection and its pragmas, but throws inside an open write transaction
     await this.store.set(this.fileName, db.export());
-    // export() closes and reopens the database, which resets the pragmas
-    db.exec('PRAGMA foreign_keys = ON');
   }
 
   getVersion(): number {

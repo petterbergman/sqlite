@@ -39,7 +39,8 @@ export class WebStore {
 
   async has(fileName: string): Promise<boolean> {
     const data = await this.get(fileName);
-    return data !== null && data.length > 0;
+    // An opened but empty database is a single page: the header and an empty schema
+    return data !== null && data.length > pageSize(data);
   }
 
   private request<T>(mode: IDBTransactionMode, fn: (store: IDBObjectStore) => IDBRequest): Promise<T> {
@@ -53,6 +54,15 @@ export class WebStore {
       req.onerror = () => reject(req.error);
     });
   }
+}
+
+/**
+ * The page size from the SQLite file header, 0 when there is no header.
+ */
+function pageSize(data: Uint8Array): number {
+  if (data.length < 18) return 0;
+  const size = (data[16] << 8) | data[17];
+  return size === 1 ? 65536 : size;
 }
 
 function openIdb(version?: number): Promise<IDBDatabase> {
