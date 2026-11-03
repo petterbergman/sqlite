@@ -17,14 +17,15 @@ public class JsonSQLite {
     private String database = "";
     private Integer version = 1;
     private Boolean overwrite = false;
-    private Boolean encrypted = null;
-    private String mode = "";
     private ArrayList<JsonTable> tables = new ArrayList<JsonTable>();
     private ArrayList<JsonView> views = new ArrayList<JsonView>();
 
     private static final List<String> keyFirstLevel = new ArrayList<String>(
         Arrays.asList("database", "version", "overwrite", "encrypted", "mode", "tables", "views")
     );
+
+    // "encrypted" and "mode" are accepted for compatibility with jeep-sqlite, but only an
+    // unencrypted "full" import is supported
 
     // Getter
     public String getDatabase() {
@@ -37,14 +38,6 @@ public class JsonSQLite {
 
     public Boolean getOverwrite() {
         return overwrite;
-    }
-
-    public Boolean getEncrypted() {
-        return encrypted;
-    }
-
-    public String getMode() {
-        return mode;
     }
 
     public ArrayList<JsonTable> getTables() {
@@ -68,14 +61,6 @@ public class JsonSQLite {
         this.overwrite = newOverwrite;
     }
 
-    public void setEncrypted(Boolean newEncrypted) {
-        this.encrypted = newEncrypted;
-    }
-
-    public void setMode(String newMode) {
-        this.mode = newMode;
-    }
-
     public void setTables(ArrayList<JsonTable> newTables) {
         this.tables = newTables;
     }
@@ -84,19 +69,7 @@ public class JsonSQLite {
         this.views = newViews;
     }
 
-    public ArrayList<String> getKeys() {
-        ArrayList<String> retArray = new ArrayList<String>();
-        if (getDatabase().length() > 0) retArray.add("database");
-        if (getVersion() != null) retArray.add("version");
-        if (getOverwrite() != null) retArray.add("overwrite");
-        if (getEncrypted() != null) retArray.add("encrypted");
-        if (getMode().length() > 0) retArray.add("mode");
-        if (getTables().size() > 0) retArray.add("tables");
-        if (getViews().size() > 0) retArray.add("views");
-        return retArray;
-    }
-
-    public boolean isJsonSQLite(JSObject jsObj, Boolean isEncryption) {
+    public boolean isJsonSQLite(JSObject jsObj) {
         if (jsObj == null || jsObj.length() == 0) return false;
         Iterator<String> keys = jsObj.keys();
         while (keys.hasNext()) {
@@ -130,21 +103,14 @@ public class JsonSQLite {
                     continue;
                 }
                 if (key.equals("encrypted")) {
-                    if (!(value instanceof Boolean)) {
+                    if (!(value instanceof Boolean) || jsObj.getBool(key)) {
                         return false;
-                    } else {
-                        encrypted = jsObj.getBool(key);
-                        if (encrypted && !isEncryption) {
-                            return false;
-                        }
                     }
                     continue;
                 }
                 if (key.equals("mode")) {
-                    if (!(value instanceof String)) {
+                    if (!"full".equals(value)) {
                         return false;
-                    } else {
-                        mode = jsObj.getString(key);
                     }
                     continue;
                 }
@@ -198,24 +164,6 @@ public class JsonSQLite {
             }
         }
         return true;
-    }
-
-    public void print() {
-        Log.d(TAG, "database: " + this.getDatabase());
-        Log.d(TAG, "version: " + this.getVersion());
-        Log.d(TAG, "overwrite: " + this.getOverwrite());
-        Log.d(TAG, "encrypted: " + this.getEncrypted());
-        Log.d(TAG, "mode: " + this.getMode());
-        Log.d(TAG, "number of Tables: " + this.getTables().size());
-        for (JsonTable table : this.getTables()) {
-            table.print();
-        }
-        if (this.getViews().size() > 0) {
-            Log.d(TAG, "number of Views: " + this.getViews().size());
-            for (JsonView view : this.getViews()) {
-                view.print();
-            }
-        }
     }
 
     public JSArray getTablesAsJSObject() {

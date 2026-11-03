@@ -1,6 +1,5 @@
 package com.getcapacitor.community.database.sqlite.SQLite.ImportExportJson;
 
-import android.util.Log;
 import com.getcapacitor.JSObject;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,7 +10,6 @@ import org.json.JSONObject;
 
 public class JsonView {
 
-    private static final String TAG = "JsonView";
     private static final List<String> keyViewsLevel = new ArrayList<String>(Arrays.asList("name", "value"));
     private String name = "";
     private String value = "";
@@ -69,11 +67,6 @@ public class JsonView {
             }
         }
         return true;
-    }
-
-    public void print() {
-        String toPrint = "name: " + this.getName() + " value: " + this.getValue();
-        Log.d(TAG, toPrint);
     }
 
     public JSObject getViewAsJSObject() {

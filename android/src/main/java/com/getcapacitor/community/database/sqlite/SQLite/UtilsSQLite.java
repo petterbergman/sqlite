@@ -1,7 +1,6 @@
 package com.getcapacitor.community.database.sqlite.SQLite;
 
 import android.database.Cursor;
-import android.util.Log;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 import com.getcapacitor.JSArray;
 import java.util.ArrayList;
@@ -125,33 +124,12 @@ public class UtilsSQLite {
         return list;
     }
 
-    public ArrayList<String> stringJSArrayToArrayList(JSArray jsArray) throws JSONException {
-        ArrayList<String> list = new ArrayList<String>();
-        for (int i = 0; i < jsArray.length(); i++) {
-            if (jsArray.get(i) instanceof String) {
-                list.add(jsArray.getString(i));
-            } else {
-                list = new ArrayList<String>();
-                break;
-            }
-        }
-        return list;
-    }
-
     public byte[] JSONArrayToByteArray(JSONArray arr) throws JSONException {
         byte[] bArr = new byte[arr.length()];
         for (int i = 0; i < arr.length(); i++) {
             bArr[i] = (byte) (((int) arr.get(i)) & 0xFF);
         }
         return bArr;
-    }
-
-    public Boolean parse(Object mVar) {
-        boolean ret = false;
-        if (mVar instanceof JSONArray) {
-            ret = true;
-        }
-        return ret;
     }
 
     public int ByteToInt(byte BVal) {

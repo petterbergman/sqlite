@@ -1,6 +1,5 @@
 package com.getcapacitor.community.database.sqlite.SQLite.ImportExportJson;
 
-import android.util.Log;
 import com.getcapacitor.JSObject;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,7 +10,6 @@ import org.json.JSONObject;
 
 public class JsonTrigger {
 
-    private static final String TAG = "JsonTrigger";
     private static final List<String> keyTriggerLevel = new ArrayList<String>(Arrays.asList("name", "timeevent", "condition", "logic"));
     private String name = null;
     private String timeevent = null;
@@ -104,13 +102,6 @@ public class JsonTrigger {
             }
         }
         return true;
-    }
-
-    public void print() {
-        String row = "";
-        row = "name: " + this.getName() + " timeevent: " + this.getTimeevent();
-        if (this.getCondition() != null) row += " condition: " + this.getCondition();
-        Log.d(TAG, row + " logic: " + this.getLogic());
     }
 
     public JSObject getTriggerAsJSObject() {

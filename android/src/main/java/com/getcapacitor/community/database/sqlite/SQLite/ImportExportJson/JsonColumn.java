@@ -1,6 +1,5 @@
 package com.getcapacitor.community.database.sqlite.SQLite.ImportExportJson;
 
-import android.util.Log;
 import com.getcapacitor.JSObject;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,7 +10,6 @@ import org.json.JSONObject;
 
 public class JsonColumn {
 
-    private static final String TAG = "JsonColumn";
     private static final List<String> keySchemaLevel = new ArrayList<String>(Arrays.asList("column", "value", "foreignkey", "constraint"));
     private String column = null;
     private String value = null;
@@ -104,14 +102,6 @@ public class JsonColumn {
             }
         }
         return true;
-    }
-
-    public void print() {
-        String row = "";
-        if (this.getColumn() != null) row = "column: " + this.getColumn();
-        if (this.getForeignkey() != null) row += " foreignkey: " + this.getForeignkey();
-        if (this.getConstraint() != null) row += " constraint: " + this.getConstraint();
-        Log.d(TAG, row + " value: " + this.getValue());
     }
 
     public JSObject getColumnAsJSObject() {

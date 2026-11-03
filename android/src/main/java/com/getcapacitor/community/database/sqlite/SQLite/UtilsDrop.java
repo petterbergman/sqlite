@@ -2,10 +2,7 @@ package com.getcapacitor.community.database.sqlite.SQLite;
 
 import android.database.Cursor;
 import android.util.Log;
-import com.getcapacitor.JSObject;
 import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.List;
 
 public class UtilsDrop {
@@ -211,50 +208,5 @@ public class UtilsDrop {
                 throw new Exception(msg);
             }
         }
-    }
-
-    /**
-     *  Drop Temporary Tables
-     *
-     * @param db
-     * @param alterTables
-     * @throws Exception
-     */
-    public void dropTempTables(Database db, Dictionary<String, List<String>> alterTables) throws Exception {
-        int changes = Integer.valueOf(-1);
-        try {
-            List<String> tables = this.getDictStringKeys(alterTables);
-            List<String> statements = new ArrayList<>();
-            for (String table : tables) {
-                String stmt = "DROP TABLE IF EXISTS _temp_" + table + ";";
-                statements.add(stmt);
-            }
-            if (statements.size() > 0) {
-                JSObject retObj = db.execute(statements.toArray(new String[0]));
-                changes = retObj.getInteger("changes");
-                if (changes < Integer.valueOf(0)) {
-                    throw new Exception("DropTempTables failed");
-                }
-            }
-        } catch (Exception e) {
-            String msg = "DropTempTables failed: " + e;
-            Log.d(TAG, msg);
-            throw new Exception(msg);
-        }
-    }
-
-    /**
-     * getDictStringKeys
-     *
-     * @param dict
-     * @return
-     */
-    public List<String> getDictStringKeys(Dictionary<String, List<String>> dict) {
-        List<String> lkeys = new ArrayList<>();
-        for (Enumeration<String> keys = dict.keys(); keys.hasMoreElements(); ) {
-            String keyVal = keys.nextElement();
-            lkeys.add(keyVal);
-        }
-        return lkeys;
     }
 }

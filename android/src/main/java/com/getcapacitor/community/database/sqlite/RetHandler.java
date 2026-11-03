@@ -33,29 +33,6 @@ public class RetHandler {
     }
 
     /**
-     * RetVersion Method
-     * Create and return the capVersionResult object
-     * @param call
-     * @param res
-     * @param message
-     */
-    public void retVersion(PluginCall call, Integer res, String message) {
-        JSObject ret = new JSObject();
-        if (message != null) {
-            ret.put("message", message);
-            Log.v(TAG, "*** ERROR " + message);
-            call.reject(message);
-            return;
-        }
-        if (res != null) {
-            ret.put("version", res);
-            call.resolve(ret);
-        } else {
-            call.resolve();
-        }
-    }
-
-    /**
      * RetChanges Method
      * Create and return the capSQLiteChanges object
      * @param call
@@ -94,25 +71,6 @@ public class RetHandler {
     }
 
     /**
-     * RetSyncDate Method
-     * Create and return the capSQLiteSyncDate object
-     * @param call
-     * @param res
-     * @param message
-     */
-    public void retSyncDate(PluginCall call, Long res, String message) {
-        JSObject ret = new JSObject();
-        if (message != null) {
-            ret.put("message", message);
-            Log.v(TAG, "*** ERROR " + message);
-            call.reject(message);
-        } else {
-            ret.put("syncDate", res);
-            call.resolve(ret);
-        }
-    }
-
-    /**
      * RetJSObject Method
      * Create and return the capSQLiteJson object
      * @param call
@@ -128,52 +86,6 @@ public class RetHandler {
         } else {
             ret.put("export", res);
             call.resolve(ret);
-        }
-    }
-
-    /**
-     * RetPath Method
-     * Create and return the capNCDatabasePathResult object
-     * @param call
-     * @param res
-     * @param message
-     */
-    public void retPath(PluginCall call, String res, String message) {
-        JSObject ret = new JSObject();
-        if (message != null) {
-            ret.put("message", message);
-            Log.v(TAG, "*** ERROR " + message);
-            call.reject(message);
-            return;
-        }
-        if (res != null) {
-            ret.put("path", res);
-            call.resolve(ret);
-        } else {
-            call.resolve();
-        }
-    }
-
-    /**
-     * RetUrl Method
-     * Create and return the capSQLiteUrl object
-     * @param call
-     * @param res
-     * @param message
-     */
-    public void retUrl(PluginCall call, String res, String message) {
-        JSObject ret = new JSObject();
-        if (message != null) {
-            ret.put("message", message);
-            Log.v(TAG, "*** ERROR " + message);
-            call.reject(message);
-            return;
-        }
-        if (res != null) {
-            ret.put("url", res);
-            call.resolve(ret);
-        } else {
-            call.resolve();
         }
     }
 }

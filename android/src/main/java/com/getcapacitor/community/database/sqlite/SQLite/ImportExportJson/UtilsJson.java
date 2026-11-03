@@ -3,13 +3,8 @@ package com.getcapacitor.community.database.sqlite.SQLite.ImportExportJson;
 import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.community.database.sqlite.SQLite.Database;
-import com.getcapacitor.community.database.sqlite.SQLite.UtilsDrop;
-import java.sql.Blob;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -18,41 +13,6 @@ public class UtilsJson {
     private JsonColumn uJCol = new JsonColumn();
     private JsonIndex uJIdx = new JsonIndex();
     private JsonTrigger uJTrg = new JsonTrigger();
-    private JsonView uJView = new JsonView();
-    private UtilsDrop _uDrop = new UtilsDrop();
-
-    /**
-     * Check existence of last_modified column
-     * @param db
-     * @return
-     * @throws Exception
-     */
-    public boolean isLastModified(Database db) throws Exception {
-        if (!db.isOpen()) {
-            throw new Exception("isLastModified: Database not opened");
-        }
-        boolean ret = false;
-        try {
-            List<String> tables = _uDrop.getTablesNames(db);
-            for (String tableName : tables) {
-                JSObject namesTypes = getTableColumnNamesTypes(db, tableName);
-                ArrayList<String> colNames = new ArrayList<>();
-                if (namesTypes.has("names")) {
-                    colNames = getColumnNames(namesTypes.get("names"));
-                } else {
-                    throw new Exception("isLastModified: Table " + tableName + " no names");
-                }
-
-                if (colNames.size() > 0 && colNames.contains("last_modified")) {
-                    ret = true;
-                    break;
-                }
-            }
-            return ret;
-        } catch (Exception e) {
-            throw new Exception("isLastModified: " + e.getMessage());
-        }
-    }
 
     /**
      * Get Column name's list
@@ -64,38 +24,6 @@ public class UtilsJson {
         if (obj instanceof ArrayList) colNames = (ArrayList<String>) obj;
 
         return colNames;
-    }
-
-    /**
-     * Check existence of sql_deleted column
-     * @param db
-     * @return
-     * @throws Exception
-     */
-    public boolean isSqlDeleted(Database db) throws Exception {
-        if (!db.isOpen()) {
-            throw new Exception("isSqlDeleted: Database not opened");
-        }
-        boolean ret = false;
-        try {
-            List<String> tables = _uDrop.getTablesNames(db);
-            for (String tableName : tables) {
-                JSObject namesTypes = getTableColumnNamesTypes(db, tableName);
-                ArrayList<String> colNames = new ArrayList<>();
-                if (namesTypes.has("names")) {
-                    colNames = getColumnNames(namesTypes.get("names"));
-                } else {
-                    throw new Exception("isSqlDeleted: Table " + tableName + " no names");
-                }
-                if (colNames.contains("sql_deleted")) {
-                    ret = true;
-                    break;
-                }
-            }
-            return ret;
-        } catch (Exception e) {
-            throw new Exception("isSqlDeleted: " + e.getMessage());
-        }
     }
 
     /**
@@ -121,62 +49,6 @@ public class UtilsJson {
     }
 
     /**
-     * Check if a view exists
-     *
-     * @param db
-     * @param viewName
-     * @return
-     */
-    public boolean isViewExists(Database db, String viewName) throws Exception {
-        boolean ret = false;
-        String query = new StringBuilder("SELECT name FROM " + "sqlite_master WHERE type='view' AND name='")
-            .append(viewName)
-            .append("';")
-            .toString();
-        try {
-            JSArray resQuery = db.selectSQL(query, new ArrayList<Object>());
-            if (resQuery.length() > 0) ret = true;
-            return ret;
-        } catch (Exception e) {
-            throw new Exception("isViewExists: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Check if the Id already exsists
-     *
-     * @param mDb
-     * @param tableName
-     * @param firstColumnName
-     * @param key
-     * @return
-     */
-    public boolean isIdExists(Database mDb, String tableName, String firstColumnName, Object key) throws Exception {
-        boolean ret = false;
-        StringBuilder sbQuery = new StringBuilder("SELECT ")
-            .append(firstColumnName)
-            .append(" FROM ")
-            .append(tableName)
-            .append(" WHERE ")
-            .append(firstColumnName);
-
-        // fix #160 by peakcool
-        if (key instanceof String) {
-            sbQuery.append(" = '").append(key).append("';");
-        } else {
-            sbQuery.append(" = ").append(key).append(";");
-        }
-        String query = sbQuery.toString();
-        try {
-            JSArray resQuery = mDb.selectSQL(query, new ArrayList<Object>());
-            if (resQuery.length() == 1) ret = true;
-            return ret;
-        } catch (Exception e) {
-            throw new Exception("isIdExists: " + e.getMessage());
-        }
-    }
-
-    /**
      * Create a String from a given Array of Strings with
      * a given separator
      *
@@ -184,109 +56,6 @@ public class UtilsJson {
      * @param sep
      * @return
      */
-
-    public String convertToString(ArrayList<String> arr, char sep) {
-        StringBuilder builder = new StringBuilder();
-        // Append all Integers in StringBuilder to the StringBuilder.
-        for (String str : arr) {
-            builder.append(str);
-            builder.append(sep);
-        }
-        // Remove last delimiter with setLength.
-        builder.setLength(builder.length() - 1);
-        return builder.toString();
-    }
-
-    /**
-     * Convert ArrayList to JSArray
-     *
-     * @param row
-     * @return
-     */
-    public JSArray convertToJSArray(ArrayList<Object> row) {
-        JSArray jsArray = new JSArray();
-        for (int i = 0; i < row.size(); i++) {
-            jsArray.put(row.get(i));
-        }
-        return jsArray;
-    }
-
-    /**
-     * Create the ? string for a given values length
-     *
-     * @param length
-     * @return
-     */
-    public String createQuestionMarkString(Integer length) {
-        String retString = "";
-        StringBuilder strB = new StringBuilder();
-        for (int i = 0; i < length; i++) {
-            strB.append("?,");
-        }
-        strB.deleteCharAt(strB.length() - 1);
-        retString = strB.toString();
-        return retString;
-    }
-
-    /**
-     * Create the Name string from a given Names array
-     *
-     * @param names
-     * @return
-     */
-    public String setNameForUpdate(ArrayList<String> names) {
-        String retString = "";
-        StringBuilder strB = new StringBuilder();
-        for (int i = 0; i < names.size(); i++) {
-            strB.append("(" + names.get(i) + ") = ? ,");
-        }
-        strB.deleteCharAt(strB.length() - 1);
-        retString = strB.toString();
-        return retString;
-    }
-
-    /**
-     * Check the values type from fields type
-     *
-     * @param types
-     * @param values
-     * @return
-     */
-    public boolean checkColumnTypes(ArrayList<String> types, ArrayList<Object> values) {
-        boolean isType = true;
-        for (int i = 0; i < values.size(); i++) {
-            isType = this.isType(types.get(i), values.get(i));
-            if (!isType) break;
-        }
-        return isType;
-    }
-
-    /**
-     * Check if the the value type is the same than the field type
-     *
-     * @param type
-     * @param value
-     * @return
-     */
-    private boolean isType(String type, Object value) {
-        boolean ret = false;
-        String val = String.valueOf(value).toUpperCase();
-        if (val.equals("NULL")) {
-            ret = true;
-        } else if (val.contains("BASE64")) {
-            ret = true;
-        } else if (value == null) {
-            ret = true;
-        } else {
-            if (type.equals("NULL") && value instanceof JSONObject) ret = true;
-            if (type.equals("TEXT") && value instanceof String) ret = true;
-            if (type.equals("INTEGER") && value instanceof Integer) ret = true;
-            if (type.equals("INTEGER") && value instanceof Long) ret = true;
-            if (type.equals("REAL") && (value instanceof Double || value instanceof Integer)) ret = true;
-            if (type.equals("BLOB") && value instanceof Blob) ret = true;
-        }
-        return ret;
-    }
 
     /**
      * Get Field's type and name for a given table
@@ -318,53 +87,6 @@ public class UtilsJson {
         } catch (Exception e) {
             throw new Exception("GetTableColumnNamesTypes: " + e.getMessage());
         }
-    }
-
-    /**
-     * Get JSObject keys
-     *
-     * @param jsonObject
-     * @return
-     */
-    public ArrayList<String> getJSObjectKeys(JSObject jsonObject) {
-        // one level JSObject keys
-        ArrayList<String> retArray = new ArrayList<>();
-        Iterator<String> keys = jsonObject.keys();
-        while (keys.hasNext()) {
-            String key = keys.next();
-            retArray.add(key);
-        }
-        return retArray;
-    }
-
-    /**
-     * Check Row validity
-     *
-     * @param mDb
-     * @param tColNames
-     * @param tColTypes
-     * @param row
-     * @param j
-     * @param tableName
-     * @throws Exception
-     */
-    public void checkRowValidity(
-        Database mDb,
-        ArrayList<String> tColNames,
-        ArrayList<String> tColTypes,
-        ArrayList<Object> row,
-        int j,
-        String tableName
-    ) throws Exception {
-        if (tColNames.size() != row.size() || row.size() == 0 || tColNames.size() == 0) {
-            throw new Exception("checkRowValidity: Table" + tableName + " values row " + j + " not correct length");
-        }
-        // Check the column's type before proceeding
-        boolean retTypes = checkColumnTypes(tColTypes, row);
-        if (!retTypes) {
-            throw new Exception("checkRowValidity: Table" + tableName + " values row " + j + " not correct types");
-        }
-        return;
     }
 
     /**
@@ -452,30 +174,6 @@ public class UtilsJson {
             boolean isValid = uJTrg.isTrigger(jsTrg);
             if (!isValid) {
                 throw new Exception("checkTriggersValidity: triggers[" + i + "] not valid");
-            }
-        }
-        return;
-    }
-
-    /**
-     * Check Views Validity
-     *
-     * @param views
-     * @throws Exception
-     */
-    public void checkViewsValidity(ArrayList<JsonView> views) throws Exception {
-        for (int i = 0; i < views.size(); i++) {
-            JSONObject jsView = new JSONObject();
-            ArrayList<String> keys = views.get(i).getKeys();
-            if (keys.contains("value")) {
-                jsView.put("value", views.get(i).getValue());
-            }
-            if (keys.contains("name")) {
-                jsView.put("name", views.get(i).getName());
-            }
-            boolean isValid = uJView.isView(jsView);
-            if (!isValid) {
-                throw new Exception("checkViewsValidity: views[" + i + "] not valid");
             }
         }
         return;

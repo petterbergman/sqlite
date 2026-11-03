@@ -1,6 +1,5 @@
 package com.getcapacitor.community.database.sqlite.SQLite.ImportExportJson;
 
-import android.util.Log;
 import com.getcapacitor.JSObject;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,7 +11,6 @@ import org.json.JSONObject;
 
 public class JsonTable {
 
-    private static final String TAG = "JsonTable";
     private static final List<String> keyTableLevel = new ArrayList<String>(
         Arrays.asList("name", "schema", "indexes", "triggers", "values")
     );
@@ -158,26 +156,6 @@ public class JsonTable {
             }
         }
         return true;
-    }
-
-    public void print() {
-        Log.d(TAG, "name: " + this.getName());
-        Log.d(TAG, "number of Schema: " + this.getSchema().size());
-        for (JsonColumn sch : this.getSchema()) {
-            sch.print();
-        }
-        Log.d(TAG, "number of Indexes: " + this.getIndexes().size());
-        for (JsonIndex idx : this.getIndexes()) {
-            idx.print();
-        }
-        Log.d(TAG, "number of Triggers: " + this.getTriggers().size());
-        for (JsonTrigger trg : this.getTriggers()) {
-            trg.print();
-        }
-        Log.d(TAG, "number of Values: " + this.getValues().size());
-        for (ArrayList<Object> row : this.getValues()) {
-            Log.d(TAG, "row: " + row);
-        }
     }
 
     public JSObject getTableAsJSObject() {

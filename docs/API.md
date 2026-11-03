@@ -205,44 +205,20 @@ Note that in general in SQLite this is not recommended, since it makes your quer
 
 * [`initWebStore()`](#initwebstore)
 * [`saveToStore(...)`](#savetostore)
-* [`getFromLocalDiskToStore(...)`](#getfromlocaldisktostore)
-* [`saveToLocalDisk(...)`](#savetolocaldisk)
 * [`createConnection(...)`](#createconnection)
 * [`closeConnection(...)`](#closeconnection)
-* [`echo(...)`](#echo)
 * [`open(...)`](#open)
 * [`close(...)`](#close)
-* [`beginTransaction(...)`](#begintransaction)
-* [`commitTransaction(...)`](#committransaction)
-* [`rollbackTransaction(...)`](#rollbacktransaction)
-* [`isTransactionActive(...)`](#istransactionactive)
-* [`getUrl(...)`](#geturl)
-* [`getVersion(...)`](#getversion)
 * [`execute(...)`](#execute)
 * [`executeSet(...)`](#executeset)
 * [`run(...)`](#run)
 * [`query(...)`](#query)
-* [`isDBExists(...)`](#isdbexists)
 * [`isDBOpen(...)`](#isdbopen)
 * [`isDatabase(...)`](#isdatabase)
-* [`isTableExists(...)`](#istableexists)
-* [`deleteDatabase(...)`](#deletedatabase)
 * [`isJsonValid(...)`](#isjsonvalid)
 * [`importFromJson(...)`](#importfromjson)
 * [`exportToJson(...)`](#exporttojson)
-* [`deleteExportedRows(...)`](#deleteexportedrows)
-* [`copyFromAssets(...)`](#copyfromassets)
-* [`getFromHTTPRequest(...)`](#getfromhttprequest)
-* [`getDatabaseList()`](#getdatabaselist)
-* [`getTableList(...)`](#gettablelist)
-* [`addSQLiteSuffix(...)`](#addsqlitesuffix)
-* [`deleteOldDatabases(...)`](#deleteolddatabases)
-* [`moveDatabasesAndAddSuffix(...)`](#movedatabasesandaddsuffix)
 * [`checkConnectionsConsistency(...)`](#checkconnectionsconsistency)
-* [`getNCDatabasePath(...)`](#getncdatabasepath)
-* [`createNCConnection(...)`](#createncconnection)
-* [`closeNCConnection(...)`](#closencconnection)
-* [`isNCDatabase(...)`](#isncdatabase)
 * [Interfaces](#interfaces)
 
 </docgen-index>
@@ -285,40 +261,6 @@ Save database to  the web store
 --------------------
 
 
-### getFromLocalDiskToStore(...)
-
-```typescript
-getFromLocalDiskToStore(options: capSQLiteLocalDiskOptions) => Promise<void>
-```
-
-Get database from local disk and save it to store
-
-| Param         | Type                                                                            | Description                                                          |
-| ------------- | ------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| **`options`** | <code><a href="#capsqlitelocaldiskoptions">capSQLiteLocalDiskOptions</a></code> | : <a href="#capsqlitelocaldiskoptions">capSQLiteLocalDiskOptions</a> |
-
-**Since:** 4.6.3
-
---------------------
-
-
-### saveToLocalDisk(...)
-
-```typescript
-saveToLocalDisk(options: capSQLiteOptions) => Promise<void>
-```
-
-Save database to local disk
-
-| Param         | Type                                                          | Description                                        |
-| ------------- | ------------------------------------------------------------- | -------------------------------------------------- |
-| **`options`** | <code><a href="#capsqliteoptions">capSQLiteOptions</a></code> | : <a href="#capsqliteoptions">capSQLiteOptions</a> |
-
-**Since:** 4.6.3
-
---------------------
-
-
 ### createConnection(...)
 
 ```typescript
@@ -349,25 +291,6 @@ close a database connection
 | **`options`** | <code><a href="#capsqliteoptions">capSQLiteOptions</a></code> | <a href="#capsqliteoptions">capSQLiteOptions</a> |
 
 **Since:** 2.9.0 refactor
-
---------------------
-
-
-### echo(...)
-
-```typescript
-echo(options: capEchoOptions) => Promise<capEchoResult>
-```
-
-Echo a given string
-
-| Param         | Type                                                      | Description                                    |
-| ------------- | --------------------------------------------------------- | ---------------------------------------------- |
-| **`options`** | <code><a href="#capechooptions">capEchoOptions</a></code> | : <a href="#capechooptions">capEchoOptions</a> |
-
-**Returns:** <code>Promise&lt;<a href="#capechoresult">capEchoResult</a>&gt;</code>
-
-**Since:** 0.0.1
 
 --------------------
 
@@ -403,120 +326,6 @@ Close a SQLite database
 | **`options`** | <code><a href="#capsqliteoptions">capSQLiteOptions</a></code> | : <a href="#capsqliteoptions">capSQLiteOptions</a> |
 
 **Since:** 0.0.1
-
---------------------
-
-
-### beginTransaction(...)
-
-```typescript
-beginTransaction(options: capSQLiteOptions) => Promise<capSQLiteChanges>
-```
-
-Begin Database Transaction
-
-| Param         | Type                                                          |
-| ------------- | ------------------------------------------------------------- |
-| **`options`** | <code><a href="#capsqliteoptions">capSQLiteOptions</a></code> |
-
-**Returns:** <code>Promise&lt;<a href="#capsqlitechanges">capSQLiteChanges</a>&gt;</code>
-
-**Since:** 5.0.7
-
---------------------
-
-
-### commitTransaction(...)
-
-```typescript
-commitTransaction(options: capSQLiteOptions) => Promise<capSQLiteChanges>
-```
-
-Commit Database Transaction
-
-| Param         | Type                                                          |
-| ------------- | ------------------------------------------------------------- |
-| **`options`** | <code><a href="#capsqliteoptions">capSQLiteOptions</a></code> |
-
-**Returns:** <code>Promise&lt;<a href="#capsqlitechanges">capSQLiteChanges</a>&gt;</code>
-
-**Since:** 5.0.7
-
---------------------
-
-
-### rollbackTransaction(...)
-
-```typescript
-rollbackTransaction(options: capSQLiteOptions) => Promise<capSQLiteChanges>
-```
-
-Rollback Database Transaction
-
-| Param         | Type                                                          |
-| ------------- | ------------------------------------------------------------- |
-| **`options`** | <code><a href="#capsqliteoptions">capSQLiteOptions</a></code> |
-
-**Returns:** <code>Promise&lt;<a href="#capsqlitechanges">capSQLiteChanges</a>&gt;</code>
-
-**Since:** 5.0.7
-
---------------------
-
-
-### isTransactionActive(...)
-
-```typescript
-isTransactionActive(options: capSQLiteOptions) => Promise<capSQLiteResult>
-```
-
-Is Database Transaction Active
-
-| Param         | Type                                                          |
-| ------------- | ------------------------------------------------------------- |
-| **`options`** | <code><a href="#capsqliteoptions">capSQLiteOptions</a></code> |
-
-**Returns:** <code>Promise&lt;<a href="#capsqliteresult">capSQLiteResult</a>&gt;</code>
-
-**Since:** 5.0.7
-
---------------------
-
-
-### getUrl(...)
-
-```typescript
-getUrl(options: capSQLiteOptions) => Promise<capSQLiteUrl>
-```
-
-GetUrl get the database Url
-
-| Param         | Type                                                          | Description                                        |
-| ------------- | ------------------------------------------------------------- | -------------------------------------------------- |
-| **`options`** | <code><a href="#capsqliteoptions">capSQLiteOptions</a></code> | : <a href="#capsqliteoptions">capSQLiteOptions</a> |
-
-**Returns:** <code>Promise&lt;<a href="#capsqliteurl">capSQLiteUrl</a>&gt;</code>
-
-**Since:** 3.3.3-4
-
---------------------
-
-
-### getVersion(...)
-
-```typescript
-getVersion(options: capSQLiteOptions) => Promise<capVersionResult>
-```
-
-Get a SQLite database version
-
-| Param         | Type                                                          | Description                                        |
-| ------------- | ------------------------------------------------------------- | -------------------------------------------------- |
-| **`options`** | <code><a href="#capsqliteoptions">capSQLiteOptions</a></code> | : <a href="#capsqliteoptions">capSQLiteOptions</a> |
-
-**Returns:** <code>Promise&lt;<a href="#capversionresult">capVersionResult</a>&gt;</code>
-
-**Since:** 3.2.0
 
 --------------------
 
@@ -597,25 +406,6 @@ Query a Single Statement
 --------------------
 
 
-### isDBExists(...)
-
-```typescript
-isDBExists(options: capSQLiteOptions) => Promise<capSQLiteResult>
-```
-
-Check if a SQLite database exists with opened connection
-
-| Param         | Type                                                          | Description                                        |
-| ------------- | ------------------------------------------------------------- | -------------------------------------------------- |
-| **`options`** | <code><a href="#capsqliteoptions">capSQLiteOptions</a></code> | : <a href="#capsqliteoptions">capSQLiteOptions</a> |
-
-**Returns:** <code>Promise&lt;<a href="#capsqliteresult">capSQLiteResult</a>&gt;</code>
-
-**Since:** 2.0.1-1
-
---------------------
-
-
 ### isDBOpen(...)
 
 ```typescript
@@ -650,42 +440,6 @@ Check if a SQLite database exists without connection
 **Returns:** <code>Promise&lt;<a href="#capsqliteresult">capSQLiteResult</a>&gt;</code>
 
 **Since:** 3.0.0-beta.5
-
---------------------
-
-
-### isTableExists(...)
-
-```typescript
-isTableExists(options: capSQLiteTableOptions) => Promise<capSQLiteResult>
-```
-
-Check if a table exists in a SQLite database
-
-| Param         | Type                                                                    | Description                                                  |
-| ------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------ |
-| **`options`** | <code><a href="#capsqlitetableoptions">capSQLiteTableOptions</a></code> | : <a href="#capsqlitetableoptions">capSQLiteTableOptions</a> |
-
-**Returns:** <code>Promise&lt;<a href="#capsqliteresult">capSQLiteResult</a>&gt;</code>
-
-**Since:** 3.0.0-beta.5
-
---------------------
-
-
-### deleteDatabase(...)
-
-```typescript
-deleteDatabase(options: capSQLiteOptions) => Promise<void>
-```
-
-Delete a SQLite database
-
-| Param         | Type                                                          | Description                                        |
-| ------------- | ------------------------------------------------------------- | -------------------------------------------------- |
-| **`options`** | <code><a href="#capsqliteoptions">capSQLiteOptions</a></code> | : <a href="#capsqliteoptions">capSQLiteOptions</a> |
-
-**Since:** 0.0.1
 
 --------------------
 
@@ -731,153 +485,18 @@ Import from Json Object
 ### exportToJson(...)
 
 ```typescript
-exportToJson(options: capSQLiteExportOptions) => Promise<capSQLiteJson>
+exportToJson(options: capSQLiteOptions) => Promise<capSQLiteJson>
 ```
 
-Export to Json Object
+Export the whole database to a Json Object
 
-| Param         | Type                                                                      | Description                                                    |
-| ------------- | ------------------------------------------------------------------------- | -------------------------------------------------------------- |
-| **`options`** | <code><a href="#capsqliteexportoptions">capSQLiteExportOptions</a></code> | : <a href="#capsqliteexportoptions">capSQLiteExportOptions</a> |
+| Param         | Type                                                          | Description                                        |
+| ------------- | ------------------------------------------------------------- | -------------------------------------------------- |
+| **`options`** | <code><a href="#capsqliteoptions">capSQLiteOptions</a></code> | : <a href="#capsqliteoptions">capSQLiteOptions</a> |
 
 **Returns:** <code>Promise&lt;<a href="#capsqlitejson">capSQLiteJson</a>&gt;</code>
 
 **Since:** 2.0.1-1
-
---------------------
-
-
-### deleteExportedRows(...)
-
-```typescript
-deleteExportedRows(options: capSQLiteOptions) => Promise<void>
-```
-
-Remove rows with sql_deleted = 1 after an export
-
-| Param         | Type                                                          |
-| ------------- | ------------------------------------------------------------- |
-| **`options`** | <code><a href="#capsqliteoptions">capSQLiteOptions</a></code> |
-
-**Since:** 3.4.3-2
-
---------------------
-
-
-### copyFromAssets(...)
-
-```typescript
-copyFromAssets(options: capSQLiteFromAssetsOptions) => Promise<void>
-```
-
-Copy databases from public/assets/databases folder to application databases folder
-
-| Param         | Type                                                                              | Description                         |
-| ------------- | --------------------------------------------------------------------------------- | ----------------------------------- |
-| **`options`** | <code><a href="#capsqlitefromassetsoptions">capSQLiteFromAssetsOptions</a></code> | : capSQLiteFromAssets since 3.2.5-2 |
-
-**Since:** 2.9.0 refactor
-
---------------------
-
-
-### getFromHTTPRequest(...)
-
-```typescript
-getFromHTTPRequest(options: capSQLiteHTTPOptions) => Promise<void>
-```
-
-Get database or zipped database(s) from url
-
-| Param         | Type                                                                  | Description                                                |
-| ------------- | --------------------------------------------------------------------- | ---------------------------------------------------------- |
-| **`options`** | <code><a href="#capsqlitehttpoptions">capSQLiteHTTPOptions</a></code> | : <a href="#capsqlitehttpoptions">capSQLiteHTTPOptions</a> |
-
-**Since:** 4.1.1
-
---------------------
-
-
-### getDatabaseList()
-
-```typescript
-getDatabaseList() => Promise<capSQLiteValues>
-```
-
-Get the database list
-
-**Returns:** <code>Promise&lt;<a href="#capsqlitevalues">capSQLiteValues</a>&gt;</code>
-
-**Since:** 3.0.0-beta.5
-
---------------------
-
-
-### getTableList(...)
-
-```typescript
-getTableList(options: capSQLiteOptions) => Promise<capSQLiteValues>
-```
-
-Get the database's table list
-
-| Param         | Type                                                          |
-| ------------- | ------------------------------------------------------------- |
-| **`options`** | <code><a href="#capsqliteoptions">capSQLiteOptions</a></code> |
-
-**Returns:** <code>Promise&lt;<a href="#capsqlitevalues">capSQLiteValues</a>&gt;</code>
-
-**Since:** 3.4.2-3
-
---------------------
-
-
-### addSQLiteSuffix(...)
-
-```typescript
-addSQLiteSuffix(options: capSQLitePathOptions) => Promise<void>
-```
-
-Add SQLIte Suffix to existing databases
-
-| Param         | Type                                                                  | Description                                                |
-| ------------- | --------------------------------------------------------------------- | ---------------------------------------------------------- |
-| **`options`** | <code><a href="#capsqlitepathoptions">capSQLitePathOptions</a></code> | : <a href="#capsqlitepathoptions">capSQLitePathOptions</a> |
-
-**Since:** 3.0.0-beta.5
-
---------------------
-
-
-### deleteOldDatabases(...)
-
-```typescript
-deleteOldDatabases(options: capSQLitePathOptions) => Promise<void>
-```
-
-Delete Old Cordova databases
-
-| Param         | Type                                                                  | Description                                                |
-| ------------- | --------------------------------------------------------------------- | ---------------------------------------------------------- |
-| **`options`** | <code><a href="#capsqlitepathoptions">capSQLitePathOptions</a></code> | : <a href="#capsqlitepathoptions">capSQLitePathOptions</a> |
-
-**Since:** 3.0.0-beta.5
-
---------------------
-
-
-### moveDatabasesAndAddSuffix(...)
-
-```typescript
-moveDatabasesAndAddSuffix(options: capSQLitePathOptions) => Promise<void>
-```
-
-Moves databases to the location the plugin can read them, and adds sqlite suffix
-This resembles calling addSQLiteSuffix and deleteOldDatabases, but it is more performant as it doesn't copy but moves the files
-
-| Param         | Type                                                                  | Description                                                |
-| ------------- | --------------------------------------------------------------------- | ---------------------------------------------------------- |
-| **`options`** | <code><a href="#capsqlitepathoptions">capSQLitePathOptions</a></code> | : <a href="#capsqlitepathoptions">capSQLitePathOptions</a> |
 
 --------------------
 
@@ -903,117 +522,22 @@ return false : no consistency, connections are closed
 --------------------
 
 
-### getNCDatabasePath(...)
-
-```typescript
-getNCDatabasePath(options: capNCDatabasePathOptions) => Promise<capNCDatabasePathResult>
-```
-
-get a non conformed database path
-
-| Param         | Type                                                                          | Description                                                      |
-| ------------- | ----------------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| **`options`** | <code><a href="#capncdatabasepathoptions">capNCDatabasePathOptions</a></code> | <a href="#capncdatabasepathoptions">capNCDatabasePathOptions</a> |
-
-**Returns:** <code>Promise&lt;<a href="#capncdatabasepathresult">capNCDatabasePathResult</a>&gt;</code>
-
-**Since:** 3.3.3-1
-
---------------------
-
-
-### createNCConnection(...)
-
-```typescript
-createNCConnection(options: capNCConnectionOptions) => Promise<void>
-```
-
-create a non conformed database connection
-
-| Param         | Type                                                                      | Description                                                  |
-| ------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| **`options`** | <code><a href="#capncconnectionoptions">capNCConnectionOptions</a></code> | <a href="#capncconnectionoptions">capNCConnectionOptions</a> |
-
-**Since:** 3.3.3-1
-
---------------------
-
-
-### closeNCConnection(...)
-
-```typescript
-closeNCConnection(options: capNCOptions) => Promise<void>
-```
-
-close a non conformed database connection
-
-| Param         | Type                                                  | Description                              |
-| ------------- | ----------------------------------------------------- | ---------------------------------------- |
-| **`options`** | <code><a href="#capncoptions">capNCOptions</a></code> | <a href="#capncoptions">capNCOptions</a> |
-
-**Since:** 3.3.3-1
-
---------------------
-
-
-### isNCDatabase(...)
-
-```typescript
-isNCDatabase(options: capNCOptions) => Promise<capSQLiteResult>
-```
-
-Check if a non conformed database exists without connection
-
-| Param         | Type                                                  | Description                                |
-| ------------- | ----------------------------------------------------- | ------------------------------------------ |
-| **`options`** | <code><a href="#capncoptions">capNCOptions</a></code> | : <a href="#capncoptions">capNCOptions</a> |
-
-**Returns:** <code>Promise&lt;<a href="#capsqliteresult">capSQLiteResult</a>&gt;</code>
-
-**Since:** 3.3.3-1
-
---------------------
-
-
 ### Interfaces
 
 
 #### capSQLiteOptions
 
-| Prop           | Type                 | Description                                      |
-| -------------- | -------------------- | ------------------------------------------------ |
-| **`database`** | <code>string</code>  | The database name                                |
-| **`readonly`** | <code>boolean</code> | Set to true (database in read-only mode) / false |
-
-
-#### capSQLiteLocalDiskOptions
-
-| Prop            | Type                 | Description                                                                                              |
-| --------------- | -------------------- | -------------------------------------------------------------------------------------------------------- |
-| **`overwrite`** | <code>boolean</code> | Set the overwrite mode for saving the database from local disk to store "true"/"false" default to "true" |
+| Prop           | Type                | Description       |
+| -------------- | ------------------- | ----------------- |
+| **`database`** | <code>string</code> | The database name |
 
 
 #### capConnectionOptions
 
-| Prop           | Type                 | Description                                      |
-| -------------- | -------------------- | ------------------------------------------------ |
-| **`database`** | <code>string</code>  | The database name                                |
-| **`version`**  | <code>number</code>  | The database version                             |
-| **`readonly`** | <code>boolean</code> | Set to true (database in read-only mode) / false |
-
-
-#### capEchoResult
-
-| Prop        | Type                | Description     |
-| ----------- | ------------------- | --------------- |
-| **`value`** | <code>string</code> | String returned |
-
-
-#### capEchoOptions
-
-| Prop        | Type                | Description         |
-| ----------- | ------------------- | ------------------- |
-| **`value`** | <code>string</code> | String to be echoed |
+| Prop           | Type                | Description          |
+| -------------- | ------------------- | -------------------- |
+| **`database`** | <code>string</code> | The database name    |
+| **`version`**  | <code>number</code> | The database version |
 
 
 #### capSQLiteChanges
@@ -1032,27 +556,6 @@ Check if a non conformed database exists without connection
 | **`values`**  | <code>any[]</code>  | values when RETURNING                                |
 
 
-#### capSQLiteResult
-
-| Prop         | Type                 | Description                                   |
-| ------------ | -------------------- | --------------------------------------------- |
-| **`result`** | <code>boolean</code> | result set to true when successful else false |
-
-
-#### capSQLiteUrl
-
-| Prop      | Type                | Description    |
-| --------- | ------------------- | -------------- |
-| **`url`** | <code>string</code> | a returned url |
-
-
-#### capVersionResult
-
-| Prop          | Type                | Description     |
-| ------------- | ------------------- | --------------- |
-| **`version`** | <code>number</code> | Number returned |
-
-
 #### capSQLiteExecuteOptions
 
 | Prop              | Type                 | Description                                         | Since         |
@@ -1060,18 +563,15 @@ Check if a non conformed database exists without connection
 | **`database`**    | <code>string</code>  | The database name                                   |               |
 | **`statements`**  | <code>string</code>  | The batch of raw SQL statements as string           |               |
 | **`transaction`** | <code>boolean</code> | Enable / Disable transactions default Enable (true) | 3.0.0-beta.10 |
-| **`readonly`**    | <code>boolean</code> | ReadOnly / ReadWrite default ReadWrite (false)      | 4.1.0-7       |
 
 
 #### capSQLiteSetOptions
 
-| Prop              | Type                        | Description                                                            | Since         |
-| ----------------- | --------------------------- | ---------------------------------------------------------------------- | ------------- |
-| **`database`**    | <code>string</code>         | The database name                                                      |               |
-| **`set`**         | <code>capSQLiteSet[]</code> | The batch of raw SQL statements as Array of capSQLLiteSet              |               |
-| **`transaction`** | <code>boolean</code>        | Enable / Disable transactions default Enable (true)                    | 3.0.0-beta.10 |
-| **`readonly`**    | <code>boolean</code>        | ReadOnly / ReadWrite default ReadWrite (false)                         | 4.1.0-7       |
-| **`returnMode`**  | <code>string</code>         | return mode default 'no' value 'all' value 'one' for Electron platform | 5.0.5-3       |
+| Prop              | Type                        | Description                                               | Since         |
+| ----------------- | --------------------------- | --------------------------------------------------------- | ------------- |
+| **`database`**    | <code>string</code>         | The database name                                         |               |
+| **`set`**         | <code>capSQLiteSet[]</code> | The batch of raw SQL statements as Array of capSQLLiteSet |               |
+| **`transaction`** | <code>boolean</code>        | Enable / Disable transactions default Enable (true)       | 3.0.0-beta.10 |
 
 
 #### capSQLiteSet
@@ -1084,14 +584,12 @@ Check if a non conformed database exists without connection
 
 #### capSQLiteRunOptions
 
-| Prop              | Type                 | Description                                                            | Since         |
-| ----------------- | -------------------- | ---------------------------------------------------------------------- | ------------- |
-| **`database`**    | <code>string</code>  | The database name                                                      |               |
-| **`statement`**   | <code>string</code>  | A statement                                                            |               |
-| **`values`**      | <code>any[]</code>   | A set of values for a statement                                        |               |
-| **`transaction`** | <code>boolean</code> | Enable / Disable transactions default Enable (true)                    | 3.0.0-beta.10 |
-| **`readonly`**    | <code>boolean</code> | ReadOnly / ReadWrite default ReadWrite (false)                         | 4.1.0-7       |
-| **`returnMode`**  | <code>string</code>  | return mode default 'no' value 'all' value 'one' for Electron platform | 5.0.5-3       |
+| Prop              | Type                 | Description                                         | Since         |
+| ----------------- | -------------------- | --------------------------------------------------- | ------------- |
+| **`database`**    | <code>string</code>  | The database name                                   |               |
+| **`statement`**   | <code>string</code>  | A statement                                         |               |
+| **`values`**      | <code>any[]</code>   | A set of values for a statement                     |               |
+| **`transaction`** | <code>boolean</code> | Enable / Disable transactions default Enable (true) | 3.0.0-beta.10 |
 
 
 #### capSQLiteValues
@@ -1103,21 +601,18 @@ Check if a non conformed database exists without connection
 
 #### capSQLiteQueryOptions
 
-| Prop            | Type                 | Description                                     | Since         |
-| --------------- | -------------------- | ----------------------------------------------- | ------------- |
-| **`database`**  | <code>string</code>  | The database name                               |               |
-| **`statement`** | <code>string</code>  | A statement                                     |               |
-| **`values`**    | <code>any[]</code>   | A set of values for a statement Change to any[] | 3.0.0-beta.11 |
-| **`readonly`**  | <code>boolean</code> | ReadOnly / ReadWrite default ReadWrite (false)  | 4.1.0-7       |
+| Prop            | Type                | Description                                     | Since         |
+| --------------- | ------------------- | ----------------------------------------------- | ------------- |
+| **`database`**  | <code>string</code> | The database name                               |               |
+| **`statement`** | <code>string</code> | A statement                                     |               |
+| **`values`**    | <code>any[]</code>  | A set of values for a statement Change to any[] | 3.0.0-beta.11 |
 
 
-#### capSQLiteTableOptions
+#### capSQLiteResult
 
-| Prop           | Type                 | Description                                    | Since   |
-| -------------- | -------------------- | ---------------------------------------------- | ------- |
-| **`database`** | <code>string</code>  | The database name                              |         |
-| **`table`**    | <code>string</code>  | The table name                                 |         |
-| **`readonly`** | <code>boolean</code> | ReadOnly / ReadWrite default ReadWrite (false) | 4.1.0-7 |
+| Prop         | Type                 | Description                                   |
+| ------------ | -------------------- | --------------------------------------------- |
+| **`result`** | <code>boolean</code> | result set to true when successful else false |
 
 
 #### capSQLiteImportOptions
@@ -1193,74 +688,11 @@ Check if a non conformed database exists without connection
 | **`value`** | <code>string</code> | The view create statement |
 
 
-#### capSQLiteExportOptions
-
-| Prop                 | Type                 | Description                                             | Since   |
-| -------------------- | -------------------- | ------------------------------------------------------- | ------- |
-| **`database`**       | <code>string</code>  | The database name                                       |         |
-| **`jsonexportmode`** | <code>string</code>  | Set the mode to export JSON Object: "full" or "partial" |         |
-| **`readonly`**       | <code>boolean</code> | ReadOnly / ReadWrite default ReadWrite (false)          | 4.1.0-7 |
-
-
-#### capSQLiteFromAssetsOptions
-
-| Prop            | Type                 | Description                                                                      |
-| --------------- | -------------------- | -------------------------------------------------------------------------------- |
-| **`overwrite`** | <code>boolean</code> | Set the overwrite mode for the copy from assets "true"/"false" default to "true" |
-
-
-#### capSQLiteHTTPOptions
-
-| Prop            | Type                 | Description                                                                      |
-| --------------- | -------------------- | -------------------------------------------------------------------------------- |
-| **`url`**       | <code>string</code>  | The url of the database or the zipped database(s)                                |
-| **`overwrite`** | <code>boolean</code> | Set the overwrite mode for the copy from assets "true"/"false" default to "true" |
-
-
-#### capSQLitePathOptions
-
-| Prop             | Type                  | Description                                                                                                              |
-| ---------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| **`folderPath`** | <code>string</code>   | The folder path of existing databases If not given folder path is "default"                                              |
-| **`dbNameList`** | <code>string[]</code> | The database name's list to be copied and/or deleted since 3.2.4-1 If not given all databases in the specify folder path |
-
-
 #### capAllConnectionsOptions
 
-| Prop            | Type                  | Description                                                      | Since         |
-| --------------- | --------------------- | ---------------------------------------------------------------- | ------------- |
-| **`dbNames`**   | <code>string[]</code> | the dbName of all connections                                    | 3.0.0-beta.10 |
-| **`openModes`** | <code>string[]</code> | the openMode ("RW" read&write, "RO" readonly) of all connections | 4.1.0         |
-
-
-#### capNCDatabasePathResult
-
-| Prop       | Type                | Description     |
-| ---------- | ------------------- | --------------- |
-| **`path`** | <code>string</code> | String returned |
-
-
-#### capNCDatabasePathOptions
-
-| Prop           | Type                | Description       |
-| -------------- | ------------------- | ----------------- |
-| **`path`**     | <code>string</code> | the database path |
-| **`database`** | <code>string</code> | The database name |
-
-
-#### capNCConnectionOptions
-
-| Prop               | Type                | Description          |
-| ------------------ | ------------------- | -------------------- |
-| **`databasePath`** | <code>string</code> | The database path    |
-| **`version`**      | <code>number</code> | The database version |
-
-
-#### capNCOptions
-
-| Prop               | Type                | Description       |
-| ------------------ | ------------------- | ----------------- |
-| **`databasePath`** | <code>string</code> | The database path |
+| Prop          | Type                  | Description                   | Since         |
+| ------------- | --------------------- | ----------------------------- | ------------- |
+| **`dbNames`** | <code>string[]</code> | the dbName of all connections | 3.0.0-beta.10 |
 
 </docgen-api>
 

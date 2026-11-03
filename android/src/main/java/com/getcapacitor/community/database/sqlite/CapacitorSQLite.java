@@ -1,71 +1,28 @@
 package com.getcapacitor.community.database.sqlite;
 
 import android.content.Context;
-import android.util.Log;
 import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
-import com.getcapacitor.PluginCall;
 import com.getcapacitor.community.database.sqlite.SQLite.Database;
-import com.getcapacitor.community.database.sqlite.SQLite.GlobalSQLite;
 import com.getcapacitor.community.database.sqlite.SQLite.ImportExportJson.JsonSQLite;
-import com.getcapacitor.community.database.sqlite.SQLite.ImportExportJson.UtilsJson;
-import com.getcapacitor.community.database.sqlite.SQLite.SqliteConfig;
 import com.getcapacitor.community.database.sqlite.SQLite.UtilsFile;
 import com.getcapacitor.community.database.sqlite.SQLite.UtilsSQLite;
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import org.json.JSONObject;
 
 public class CapacitorSQLite {
 
-    private static final String TAG = CapacitorSQLite.class.getName();
     private final Context context;
-    private final Dictionary<String, Database> dbDict = new Hashtable<>();
+    private final Map<String, Database> dbDict = new HashMap<>();
     private final UtilsSQLite uSqlite = new UtilsSQLite();
     private final UtilsFile uFile = new UtilsFile();
-    private final UtilsJson uJson = new UtilsJson();
-    private final GlobalSQLite globVar = new GlobalSQLite();
-    private final int VALIDITY_DURATION = 5;
-    private final RetHandler rHandler = new RetHandler();
 
-    private PluginCall call;
-
-    public CapacitorSQLite(Context context, SqliteConfig config) throws Exception {
+    public CapacitorSQLite(Context context) {
         this.context = context;
-        this.call = call;
-        // encryption and biometric flags fixed via field defaults
-    }
-
-    private void notifyBiometricEvent(Boolean ret, String msg) {
-        Map<String, Object> info = new HashMap<>() {
-            {
-                put("result", ret);
-                put("message", msg);
-            }
-        };
-        Log.v(TAG, "$$$$$ in notifyBiometricEvent " + info);
-        NotificationCenter.defaultCenter().postNotification("biometricResults", info);
-    }
-
-    private void setSharedPreferences() throws Exception {}
-
-    /**
-     * Echo
-     *
-     * @param value string to echo
-     * @return string to echo
-     */
-    public String echo(String value) {
-        return value;
     }
 
     /**
@@ -73,25 +30,16 @@ public class CapacitorSQLite {
      *
      * @param dbName database name
      * @param version database version
-     * @param vUpgObject upgrade Object
      * @throws Exception message
      */
-    public void createConnection(String dbName, int version, Dictionary<Integer, JSONObject> vUpgObject, Boolean readonly)
-        throws Exception {
+    public void createConnection(String dbName, int version) throws Exception {
         dbName = getDatabaseName(dbName);
-        String connName = readonly ? "RO_" + dbName : "RW_" + dbName;
         // check if connection already exists
-        Database conn = dbDict.get(connName);
-        if (conn != null) {
+        if (dbDict.containsKey(dbName)) {
             String msg = "Connection " + dbName + " already exists";
             throw new Exception(msg);
         }
-        try {
-            Database db = new Database(context, dbName + "SQLite.db", version, vUpgObject, readonly);
-            dbDict.put(connName, db);
-        } catch (Exception e) {
-            throw new Exception(e.getMessage());
-        }
+        dbDict.put(dbName, new Database(context, dbName + "SQLite.db", version));
     }
 
     /**
@@ -100,20 +48,8 @@ public class CapacitorSQLite {
      * @param dbName database name
      * @throws Exception message
      */
-    public void open(String dbName, Boolean readonly) throws Exception {
-        dbName = getDatabaseName(dbName);
-        String connName = readonly ? "RO_" + dbName : "RW_" + dbName;
-        Database db = dbDict.get(connName);
-        if (db != null) {
-            try {
-                db.open();
-            } catch (Exception e) {
-                throw new Exception(e.getMessage());
-            }
-        } else {
-            String msg = "No available connection for database " + dbName;
-            throw new Exception(msg);
-        }
+    public void open(String dbName) throws Exception {
+        getConnection(dbName).open();
     }
 
     /**
@@ -122,222 +58,15 @@ public class CapacitorSQLite {
      * @param dbName database name
      * @throws Exception message
      */
-    public void close(String dbName, Boolean readonly) throws Exception {
-        dbName = getDatabaseName(dbName);
-        String connName = readonly ? "RO_" + dbName : "RW_" + dbName;
-        Database db = dbDict.get(connName);
-        if (db != null) {
-            if (db.isOpen()) {
-                if (!db.inTransaction()) {
-                    try {
-                        db.close();
-                    } catch (Exception e) {
-                        throw new Exception(e.getMessage());
-                    }
-                } else {
-                    String msg = "database " + dbName + " failed to close still in transaction";
-                    throw new Exception(msg);
-                }
-            } else {
-                String msg = "database " + dbName + " not opened";
-                throw new Exception(msg);
-            }
-        } else {
-            String msg = "No available connection for database " + dbName;
-            throw new Exception(msg);
+    public void close(String dbName) throws Exception {
+        Database db = getConnection(dbName);
+        if (!db.isOpen()) {
+            throw new Exception("database " + getDatabaseName(dbName) + " not opened");
         }
-    }
-
-    /**
-     * BeginTransaction
-     *
-     * @param dbName Database name
-     * @return JSObject changes
-     * @throws Exception message
-     */
-    public JSObject beginTransaction(String dbName) throws Exception {
-        JSObject retObj = new JSObject();
-        dbName = getDatabaseName(dbName);
-        String connName = "RW_" + dbName;
-        Database db = dbDict.get(connName);
-        if (db != null) {
-            if (!db.isNCDB() && db.isOpen()) {
-                try {
-                    Integer res = db.beginTransaction();
-                    retObj.put("changes", res);
-                    return retObj;
-                } catch (Exception e) {
-                    throw new Exception(e.getMessage());
-                }
-            } else {
-                String msg = "database " + dbName + " not opened";
-                throw new Exception(msg);
-            }
-        } else {
-            String msg = "No available connection for database " + dbName;
-            throw new Exception(msg);
+        if (db.inTransaction()) {
+            throw new Exception("database " + getDatabaseName(dbName) + " failed to close still in transaction");
         }
-    }
-
-    /**
-     * CommitTransaction
-     *
-     * @param dbName Database name
-     * @return JSObject changes
-     * @throws Exception message
-     */
-    public JSObject commitTransaction(String dbName) throws Exception {
-        JSObject retObj = new JSObject();
-        dbName = getDatabaseName(dbName);
-        String connName = "RW_" + dbName;
-        Database db = dbDict.get(connName);
-        if (db != null) {
-            if (!db.isNCDB() && db.isOpen()) {
-                try {
-                    Integer res = db.commitTransaction();
-                    retObj.put("changes", res);
-                    return retObj;
-                } catch (Exception e) {
-                    throw new Exception(e.getMessage());
-                }
-            } else {
-                String msg = "database " + dbName + " not opened";
-                throw new Exception(msg);
-            }
-        } else {
-            String msg = "No available connection for database " + dbName;
-            throw new Exception(msg);
-        }
-    }
-
-    /**
-     * Rollback Transaction
-     *
-     * @param dbName Database name
-     * @return JSObject changes
-     * @throws Exception message
-     */
-    public JSObject rollbackTransaction(String dbName) throws Exception {
-        JSObject retObj = new JSObject();
-        dbName = getDatabaseName(dbName);
-        String connName = "RW_" + dbName;
-        Database db = dbDict.get(connName);
-        if (db != null) {
-            if (!db.isNCDB() && db.isOpen()) {
-                try {
-                    Integer res = db.rollbackTransaction();
-                    retObj.put("changes", res);
-                    return retObj;
-                } catch (Exception e) {
-                    throw new Exception(e.getMessage());
-                }
-            } else {
-                String msg = "database " + dbName + " not opened";
-                throw new Exception(msg);
-            }
-        } else {
-            String msg = "No available connection for database " + dbName;
-            throw new Exception(msg);
-        }
-    }
-
-    /**
-     * IsTransactionActive
-     *
-     * @param dbName database name
-     * @return Boolean
-     * @throws Exception message
-     */
-    public Boolean isTransactionActive(String dbName) throws Exception {
-        dbName = getDatabaseName(dbName);
-        String connName = "RW_" + dbName;
-        Database db = dbDict.get(connName);
-        if (db != null) {
-            if (!db.isNCDB() && db.isOpen()) {
-                try {
-                    boolean res = db.isAvailTrans();
-                    return res;
-                } catch (Exception e) {
-                    throw new Exception(e.getMessage());
-                }
-            } else {
-                String msg = "database " + dbName + " not opened";
-                throw new Exception(msg);
-            }
-        } else {
-            String msg = "No available connection for database " + dbName;
-            throw new Exception(msg);
-        }
-    }
-
-    /**
-     * GetUrl
-     *
-     * @param dbName database name
-     * @return String
-     * @throws Exception message
-     */
-    public String getUrl(String dbName, Boolean readonly) throws Exception {
-        dbName = getDatabaseName(dbName);
-        String connName = readonly ? "RO_" + dbName : "RW_" + dbName;
-        Database db = dbDict.get(connName);
-        if (db != null) {
-            try {
-                return db.getUrl();
-            } catch (Exception e) {
-                throw new Exception(e.getMessage());
-            }
-        } else {
-            String msg = "No available connection for database " + dbName;
-            throw new Exception(msg);
-        }
-    }
-
-    /**
-     * GetVersion
-     *
-     * @param dbName database name
-     * @return Integer
-     * @throws Exception message
-     */
-    public Integer getVersion(String dbName, Boolean readonly) throws Exception {
-        dbName = getDatabaseName(dbName);
-        String connName = readonly ? "RO_" + dbName : "RW_" + dbName;
-        Database db = dbDict.get(connName);
-        if (db != null) {
-            try {
-                return db.getVersion();
-            } catch (Exception e) {
-                throw new Exception(e.getMessage());
-            }
-        } else {
-            String msg = "No available connection for database " + dbName;
-            throw new Exception(msg);
-        }
-    }
-
-    /**
-     * CloseNCConnection
-     *
-     * @param dbPath database path
-     * @throws Exception message
-     */
-    public void closeNCConnection(String dbPath) throws Exception {
-        String connName = "RO_" + dbPath;
-        Database db = dbDict.get(connName);
-        if (db != null) {
-            if (db.isOpen()) {
-                try {
-                    db.close();
-                } catch (Exception e) {
-                    throw new Exception(e.getMessage());
-                }
-            }
-            dbDict.remove(connName);
-        } else {
-            String msg = "No available connection for database " + dbPath;
-            throw new Exception(msg);
-        }
+        db.close();
     }
 
     /**
@@ -346,68 +75,32 @@ public class CapacitorSQLite {
      * @param dbName database name
      * @throws Exception message
      */
-    public void closeConnection(String dbName, Boolean readonly) throws Exception {
-        dbName = getDatabaseName(dbName);
-        String connName = readonly ? "RO_" + dbName : "RW_" + dbName;
-        Database db = dbDict.get(connName);
-        if (db != null) {
-            if (db.isOpen()) {
-                try {
-                    db.close();
-                } catch (Exception e) {
-                    throw new Exception(e.getMessage());
-                }
-            }
-            dbDict.remove(connName);
-        } else {
-            String msg = "No available connection for database " + dbName;
-            throw new Exception(msg);
+    public void closeConnection(String dbName) throws Exception {
+        Database db = getConnection(dbName);
+        if (db.isOpen()) {
+            db.close();
         }
+        dbDict.remove(getDatabaseName(dbName));
     }
 
-    public Boolean checkConnectionsConsistency(JSArray dbNames, JSArray openModes) throws Exception {
-        Set<String> keys = new HashSet<>(Collections.list(dbDict.keys()));
-        JSArray nameDBs = new JSArray();
+    public Boolean checkConnectionsConsistency(JSArray dbNames) throws Exception {
+        Set<String> conns = new HashSet<>();
         for (int i = 0; i < dbNames.length(); i++) {
-            String name = openModes.getString(i) + "_" + dbNames.getString(i);
-            nameDBs.put(name);
+            conns.add(getDatabaseName(dbNames.getString(i)));
         }
-        Set<String> conns = new HashSet<>(uSqlite.stringJSArrayToArrayList(nameDBs));
         try {
-            if (conns.size() == 0) {
-                closeAllConnections();
-                return false;
-            }
-            if (keys.size() < conns.size()) {
+            if (conns.isEmpty() || dbDict.size() < conns.size()) {
                 // not solvable inconsistency
                 closeAllConnections();
                 return false;
             }
-            if (keys.size() > conns.size()) {
-                for (String key : keys) {
-                    if (!conns.contains(key)) {
-                        dbDict.remove(key);
-                    }
-                }
+            // drop native connections the JS side no longer knows about
+            dbDict.keySet().retainAll(conns);
+            if (dbDict.keySet().equals(conns)) {
+                return true;
             }
-            keys = new HashSet<>(Collections.list(dbDict.keys()));
-            if (keys.size() == conns.size()) {
-                Set<String> symmetricDiff = new HashSet<>(keys);
-                symmetricDiff.addAll(conns);
-                Set<String> tmp = new HashSet<>(keys);
-                tmp.retainAll(conns);
-                symmetricDiff.removeAll(tmp);
-                if (symmetricDiff.size() == 0) {
-                    return true;
-                } else {
-                    // not solvable inconsistency
-                    closeAllConnections();
-                    return false;
-                }
-            } else {
-                closeAllConnections();
-                return false;
-            }
+            closeAllConnections();
+            return false;
         } catch (Exception e) {
             throw new Exception(e.getMessage());
         }
@@ -425,68 +118,6 @@ public class CapacitorSQLite {
     }
 
     /**
-     * IsDatabaseEncrypted
-     *
-     * @param dbName database name
-     * @return Boolean
-     * @throws Exception message
-     */
-    public Boolean isDatabaseEncrypted(String dbName) throws Exception {
-        throw new Exception("Encryption not supported");
-    }
-
-    /**
-     * IsNCDatabase
-     *
-     * @param dbPath database path
-     * @return Boolean
-     */
-    public Boolean isNCDatabase(String dbPath) {
-        return uFile.isPathExists(dbPath);
-    }
-
-    /**
-     * IsTableExists
-     *
-     * @param dbName database name
-     * @param tableName table name
-     * @throws Exception message
-     */
-    public Boolean isTableExists(String dbName, String tableName, Boolean readonly) throws Exception {
-        dbName = getDatabaseName(dbName);
-        String connName = readonly ? "RO_" + dbName : "RW_" + dbName;
-        Database db = dbDict.get(connName);
-        if (db != null) {
-            return uJson.isTableExists(db, tableName);
-        } else {
-            String msg = "No available connection for database " + dbName;
-            throw new Exception(msg);
-        }
-    }
-
-    /**
-     * GetDatabaseList
-     *
-     * @return JSArray database list
-     * @throws Exception message
-     */
-    public JSArray getDatabaseList() throws Exception {
-        String[] listFiles = uFile.getListOfFiles(context);
-        JSArray retArray = new JSArray();
-        for (String file : listFiles) {
-            if (file.contains("SQLite")) {
-                retArray.put(file);
-            }
-        }
-        if (retArray.length() > 0) {
-            return retArray;
-        } else {
-            String msg = "No databases available ";
-            throw new Exception(msg);
-        }
-    }
-
-    /**
      * Execute
      *
      * @param dbName Database name
@@ -494,30 +125,11 @@ public class CapacitorSQLite {
      * @return JSObject changes
      * @throws Exception message
      */
-    public JSObject execute(String dbName, String statements, Boolean transaction, Boolean readonly) throws Exception {
-        dbName = getDatabaseName(dbName);
-        String connName = "RW_" + dbName;
-        Database db = dbDict.get(connName);
-        if (db != null) {
-            if (readonly) {
-                throw new Exception("not allowed in read-only mode");
-            }
-            if (!db.isNCDB() && db.isOpen()) {
-                // convert string in string[]
-                String[] sqlCmdArray = uSqlite.getStatementsArray(statements);
-                try {
-                    return db.execute(sqlCmdArray, transaction);
-                } catch (Exception e) {
-                    throw new Exception(e.getMessage());
-                }
-            } else {
-                String msg = "database " + dbName + " not opened";
-                throw new Exception(msg);
-            }
-        } else {
-            String msg = "No available connection for database " + dbName;
-            throw new Exception(msg);
-        }
+    public JSObject execute(String dbName, String statements, Boolean transaction) throws Exception {
+        Database db = getOpenConnection(dbName);
+        // convert string in string[]
+        String[] sqlCmdArray = uSqlite.getStatementsArray(statements);
+        return db.execute(sqlCmdArray, transaction);
     }
 
     /**
@@ -525,31 +137,11 @@ public class CapacitorSQLite {
      *
      * @param dbName database name
      * @param set Set containing statements and values
-     * @return JSObject changes, lastId, values when RETURNING
+     * @return JSObject changes, lastId
      * @throws Exception message
      */
-    public JSObject executeSet(String dbName, JSArray set, Boolean transaction, Boolean readonly, String returnMode) throws Exception {
-        dbName = getDatabaseName(dbName);
-        String connName = "RW_" + dbName;
-        Database db = dbDict.get(connName);
-        if (db != null) {
-            if (readonly) {
-                throw new Exception("not allowed in read-only mode");
-            }
-            if (!db.isNCDB() && db.isOpen()) {
-                try {
-                    return db.executeSet(set, transaction, returnMode);
-                } catch (Exception e) {
-                    throw new Exception(e.getMessage());
-                }
-            } else {
-                String msg = "database " + dbName + " not opened";
-                throw new Exception(msg);
-            }
-        } else {
-            String msg = "No available connection for database " + dbName;
-            throw new Exception(msg);
-        }
+    public JSObject executeSet(String dbName, JSArray set, Boolean transaction) throws Exception {
+        return getOpenConnection(dbName).executeSet(set, transaction);
     }
 
     /**
@@ -558,45 +150,13 @@ public class CapacitorSQLite {
      * @param dbName Database name
      * @param statement SQLite statement
      * @param values SQLite values if any
-     * @return JSObject changes, lastId, values when RETURNING
+     * @return JSObject changes, lastId
      * @throws Exception message
      */
-    public JSObject run(String dbName, String statement, JSArray values, Boolean transaction, Boolean readonly, String returnMode)
-        throws Exception {
-        JSObject res;
-        dbName = getDatabaseName(dbName);
-        String connName = "RW_" + dbName;
-        Database db = dbDict.get(connName);
-        if (db != null) {
-            if (readonly) {
-                throw new Exception("not allowed in read-only mode");
-            }
-            if (!db.isNCDB() && db.isOpen()) {
-                if (values.length() > 0) {
-                    try {
-                        //                        returnMode = "no";
-                        ArrayList<Object> arrValues = uSqlite.objectJSArrayToArrayList(values);
-                        res = db.runSQL(statement, arrValues, transaction, returnMode);
-                        return res;
-                    } catch (Exception e) {
-                        throw new Exception(e.getMessage());
-                    }
-                } else {
-                    try {
-                        res = db.runSQL(statement, new ArrayList<>(), transaction, returnMode);
-                        return res;
-                    } catch (Exception e) {
-                        throw new Exception(e.getMessage());
-                    }
-                }
-            } else {
-                String msg = "database " + dbName + " not opened";
-                throw new Exception(msg);
-            }
-        } else {
-            String msg = "No available connection for database " + dbName;
-            throw new Exception(msg);
-        }
+    public JSObject run(String dbName, String statement, JSArray values, Boolean transaction) throws Exception {
+        Database db = getOpenConnection(dbName);
+        ArrayList<Object> arrValues = values.length() > 0 ? uSqlite.objectJSArrayToArrayList(values) : new ArrayList<>();
+        return db.runSQL(statement, arrValues, transaction);
     }
 
     /**
@@ -608,199 +168,21 @@ public class CapacitorSQLite {
      * @return JSArray
      * @throws Exception message
      */
-    public JSArray query(String dbName, String statement, JSArray values, Boolean readonly) throws Exception {
-        JSArray res;
-        dbName = getDatabaseName(dbName);
-        String connName = readonly ? "RO_" + dbName : "RW_" + dbName;
-        Database db = dbDict.get(connName);
-        if (db != null) {
-            if (db.isOpen()) {
-                if (values.length() > 0) {
-                    try {
-                        ArrayList<Object> arrValues = uSqlite.objectJSArrayToArrayList(values);
-                        res = db.selectSQL(statement, arrValues);
-                        return res;
-                    } catch (Exception e) {
-                        throw new Exception(e.getMessage());
-                    }
-                } else {
-                    try {
-                        res = db.selectSQL(statement, new ArrayList<>());
-                        return res;
-                    } catch (Exception e) {
-                        throw new Exception(e.getMessage());
-                    }
-                }
-            } else {
-                String msg = "database " + dbName + " not opened";
-                throw new Exception(msg);
-            }
-        } else {
-            String msg = "No available connection for database " + dbName;
-            throw new Exception(msg);
-        }
+    public JSArray query(String dbName, String statement, JSArray values) throws Exception {
+        Database db = getOpenConnection(dbName);
+        ArrayList<Object> arrValues = values.length() > 0 ? uSqlite.objectJSArrayToArrayList(values) : new ArrayList<>();
+        return db.selectSQL(statement, arrValues);
     }
 
-    public JSArray getTableList(String dbName, Boolean readonly) throws Exception {
-        JSArray res;
-        String connName = readonly ? "RO_" + dbName : "RW_" + dbName;
-        Database db = dbDict.get(connName);
-        if (db != null) {
-            if (db.isOpen()) {
-                res = db.getTableNames();
-                return res;
-            } else {
-                String msg = "database " + dbName + " not opened";
-                throw new Exception(msg);
-            }
-        } else {
-            String msg = "No available connection for database " + dbName;
-            throw new Exception(msg);
-        }
-    }
-
-    public Boolean isDBExists(String dbName, Boolean readonly) throws Exception {
-        dbName = getDatabaseName(dbName);
-        String connName = readonly ? "RO_" + dbName : "RW_" + dbName;
-        Database db = dbDict.get(connName);
-        if (db != null) {
-            File databaseFile = context.getDatabasePath(dbName + "SQLite.db");
-            return databaseFile.exists();
-        } else {
-            String msg = "No available connection for database " + dbName;
-            throw new Exception(msg);
-        }
-    }
-
-    public Boolean isDBOpen(String dbName, Boolean readonly) throws Exception {
-        dbName = getDatabaseName(dbName);
-        String connName = readonly ? "RO_" + dbName : "RW_" + dbName;
-        Database db = dbDict.get(connName);
-        if (db != null) {
-            return db.isOpen();
-        } else {
-            String msg = "No available connection for database " + dbName;
-            throw new Exception(msg);
-        }
-    }
-
-    public void deleteDatabase(String dbName, Boolean readonly) throws Exception {
-        dbName = getDatabaseName(dbName);
-        String connName = "RW_" + dbName;
-        Database db = dbDict.get(connName);
-        if (db != null) {
-            if (readonly) {
-                throw new Exception("not allowed in read-only mode");
-            }
-            try {
-                db.deleteDB(dbName + "SQLite.db");
-            } catch (Exception e) {
-                throw new Exception(e.getMessage());
-            }
-        } else {
-            String msg = "No available connection for database " + dbName;
-            throw new Exception(msg);
-        }
-    }
-
-    public JSObject createSyncTable(String dbName, Boolean readonly) throws Exception {
-        dbName = getDatabaseName(dbName);
-        String connName = "RW_" + dbName;
-        Database db = dbDict.get(connName);
-        if (db != null) {
-            if (readonly) {
-                throw new Exception("not allowed in read-only mode");
-            }
-            try {
-                if (!db.isOpen()) {
-                    String msg = "CreateSyncTable: db not opened";
-                    throw new Exception(msg);
-                }
-                return db.createSyncTable();
-            } catch (Exception e) {
-                throw new Exception(e.getMessage());
-            }
-        } else {
-            String msg = "No available connection for database " + dbName;
-            throw new Exception(msg);
-        }
-    }
-
-    public void setSyncDate(String dbName, String syncDate, Boolean readonly) throws Exception {
-        dbName = getDatabaseName(dbName);
-        String connName = "RW_" + dbName;
-        Database db = dbDict.get(connName);
-        if (db != null) {
-            if (readonly) {
-                throw new Exception("not allowed in read-only mode");
-            }
-            try {
-                if (!db.isOpen()) {
-                    String msg = "SetSyncDate: db not opened";
-                    throw new Exception(msg);
-                }
-                db.setSyncDate(syncDate);
-            } catch (Exception e) {
-                throw new Exception(e.getMessage());
-            }
-        } else {
-            String msg = "No available connection for database " + dbName;
-            throw new Exception(msg);
-        }
-    }
-
-    public Long getSyncDate(String dbName, Boolean readonly) throws Exception {
-        dbName = getDatabaseName(dbName);
-        String connName = readonly ? "RO_" + dbName : "RW_" + dbName;
-        Database db = dbDict.get(connName);
-        if (db != null) {
-            try {
-                if (!db.isOpen()) {
-                    String msg = "GetSyncDate: db not opened";
-                    throw new Exception(msg);
-                }
-                return db.getSyncDate();
-            } catch (Exception e) {
-                throw new Exception(e.getMessage());
-            }
-        } else {
-            String msg = "No available connection for database " + dbName;
-            throw new Exception(msg);
-        }
-    }
-
-    public Dictionary<Integer, JSONObject> addUpgradeStatement(JSArray upgrade) throws Exception {
-        Dictionary<Integer, JSONObject> upgDict = new Hashtable<>();
-
-        for (int i = 0; i < upgrade.length(); i++) {
-            JSONObject upgObj;
-            try {
-                upgObj = (JSONObject) upgrade.get(i);
-                if (upgObj == null || !upgObj.has("toVersion") || !upgObj.has("statements")) {
-                    String msg = "Must provide an upgrade statement";
-                    msg += " {toVersion,statement}";
-                    throw new Exception(msg);
-                }
-            } catch (Exception e) {
-                String msg = "Must provide an upgrade statement " + e.getMessage();
-                throw new Exception(msg);
-            }
-            try {
-                int toVersion = upgObj.getInt("toVersion");
-                upgDict.put(toVersion, upgObj);
-            } catch (Exception e) {
-                String msg = "Must provide toVersion as Integer" + e.getMessage();
-                throw new Exception(msg);
-            }
-        }
-        return upgDict;
+    public Boolean isDBOpen(String dbName) throws Exception {
+        return getConnection(dbName).isOpen();
     }
 
     public Boolean isJsonValid(String parsingData) throws Exception {
         try {
             JSObject jsonObject = new JSObject(parsingData);
             JsonSQLite jsonSQL = new JsonSQLite();
-            return jsonSQL.isJsonSQLite(jsonObject, false);
+            return jsonSQL.isJsonSQLite(jsonObject);
         } catch (Exception e) {
             throw new Exception(e.getMessage());
         }
@@ -810,7 +192,7 @@ public class CapacitorSQLite {
         try {
             JSObject jsonObject = new JSObject(parsingData);
             JsonSQLite jsonSQL = new JsonSQLite();
-            boolean isValid = jsonSQL.isJsonSQLite(jsonObject, false);
+            boolean isValid = jsonSQL.isJsonSQLite(jsonObject);
             if (!isValid) {
                 String msg = "Stringify Json Object not Valid";
                 throw new Exception(msg);
@@ -818,45 +200,35 @@ public class CapacitorSQLite {
             String dbName = getDatabaseName(jsonSQL.getDatabase());
             dbName = dbName + "SQLite.db";
             Integer dbVersion = jsonSQL.getVersion();
-            String mode = jsonSQL.getMode();
-            Boolean overwrite = jsonSQL.getOverwrite();
-            Boolean encrypted = false;
-            String inMode = "no-encryption";
-            Database db = new Database(context, dbName, dbVersion, new Hashtable<Integer, JSONObject>(), false);
-            if (overwrite && mode.equals("full")) {
-                Boolean isExists = this.uFile.isFileExists(context, dbName);
-                if (isExists) {
-                    this.uFile.deleteFile(context, dbName);
-                }
+            Database db = new Database(context, dbName, dbVersion);
+            if (jsonSQL.getOverwrite() && this.uFile.isFileExists(context, dbName)) {
+                this.uFile.deleteFile(context, dbName);
             }
             db.open();
-            if (!db.isOpen()) {
-                String msg = dbName + "SQLite.db not opened";
-                throw new Exception(msg);
-            } else {
-                // check if the database as some tables
-                JSArray tableList = db.getTableNames();
-                if (mode.equals("full") && tableList.length() > 0) {
-                    Integer curVersion = db.getVersion();
-                    if (dbVersion < curVersion) {
-                        String msg = "ImportFromJson: Cannot import a ";
-                        msg += "version lower than" + curVersion;
-                        throw new Exception(msg);
-                    }
-                    if (curVersion.equals(dbVersion)) {
-                        JSObject result = new JSObject();
-                        result.put("changes", Integer.valueOf(0));
-                        return result;
-                    }
-                }
-                JSObject res = db.importFromJson(jsonSQL);
-                db.close();
-                if (!Objects.equals(res.getInteger("changes"), -1)) {
-                    return res;
-                } else {
-                    String msg = "importFromJson: import JsonObject not successful";
+            // check if the database as some tables
+            JSArray tableList = db.getTableNames();
+            if (tableList.length() > 0) {
+                Integer curVersion = db.getVersion();
+                if (dbVersion < curVersion) {
+                    db.close();
+                    String msg = "ImportFromJson: Cannot import a ";
+                    msg += "version lower than" + curVersion;
                     throw new Exception(msg);
                 }
+                if (curVersion.equals(dbVersion)) {
+                    db.close();
+                    JSObject result = new JSObject();
+                    result.put("changes", Integer.valueOf(0));
+                    return result;
+                }
+            }
+            JSObject res = db.importFromJson(jsonSQL);
+            db.close();
+            if (!Objects.equals(res.getInteger("changes"), -1)) {
+                return res;
+            } else {
+                String msg = "importFromJson: import JsonObject not successful";
+                throw new Exception(msg);
             }
         } catch (Exception e) {
             String msg = "importFromJson : " + e.getMessage();
@@ -864,66 +236,17 @@ public class CapacitorSQLite {
         }
     }
 
-    public JSObject exportToJson(String dbName, String expMode, Boolean readonly, Boolean encrypted) throws Exception {
-        dbName = getDatabaseName(dbName);
-        String connName = readonly ? "RO_" + dbName : "RW_" + dbName;
-        Database db = dbDict.get(connName);
-        if (db != null) {
-            try {
-                if (!db.isOpen()) {
-                    String msg = "ExportToJson: db not opened";
-                    throw new Exception(msg);
-                }
-                JSObject ret = db.exportToJson(expMode, false);
-                if (ret.length() == 0) {
-                    String msg = "ExportToJson: : return Object is empty " + "No data to synchronize";
-                    throw new Exception(msg);
-                } else if (ret.length() == 5 || ret.length() == 6 || ret.length() == 7) {
-                    return ret;
-                } else {
-                    String msg = "ExportToJson: return Obj is not a JsonSQLite Obj";
-                    throw new Exception(msg);
-                }
-            } catch (Exception e) {
-                String msg = "ExportToJson " + e.getMessage();
-                throw new Exception(msg);
-            }
-        } else {
-            String msg = "No available connection for database " + dbName;
-            throw new Exception(msg);
-        }
-    }
-
-    public void deleteExportedRows(String dbName, Boolean readonly) throws Exception {
-        dbName = getDatabaseName(dbName);
-        String connName = "RW_" + dbName;
-        Database db = dbDict.get(connName);
-        if (db != null) {
-            if (readonly) {
-                throw new Exception("not allowed in read-only mode");
-            }
-            try {
-                if (!db.isOpen()) {
-                    String msg = "deleteExportedRows: db not opened";
-                    throw new Exception(msg);
-                }
-                db.deleteExportedRows();
-            } catch (Exception e) {
-                String msg = "DeleteExportedRows " + e.getMessage();
-                throw new Exception(msg);
-            }
-        } else {
-            String msg = "No available connection for database " + dbName;
-            throw new Exception(msg);
-        }
-    }
-
-    public void copyFromAssets(Boolean overwrite) throws Exception {
-        String msg = "copy failed : ";
+    public JSObject exportToJson(String dbName) throws Exception {
+        Database db = getOpenConnection(dbName);
         try {
-            uFile.copyFromAssetsToDatabase(context, overwrite);
+            JSObject ret = db.exportToJson();
+            if (ret.length() == 0) {
+                String msg = "ExportToJson: : return Object is empty " + "No data to synchronize";
+                throw new Exception(msg);
+            }
+            return ret;
         } catch (Exception e) {
-            msg += e.getMessage();
+            String msg = "ExportToJson " + e.getMessage();
             throw new Exception(msg);
         }
     }
@@ -938,15 +261,29 @@ public class CapacitorSQLite {
         return retName;
     }
 
+    private Database getConnection(String dbName) throws Exception {
+        Database db = dbDict.get(getDatabaseName(dbName));
+        if (db == null) {
+            String msg = "No available connection for database " + getDatabaseName(dbName);
+            throw new Exception(msg);
+        }
+        return db;
+    }
+
+    private Database getOpenConnection(String dbName) throws Exception {
+        Database db = getConnection(dbName);
+        if (!db.isOpen()) {
+            String msg = "database " + getDatabaseName(dbName) + " not opened";
+            throw new Exception(msg);
+        }
+        return db;
+    }
+
     private void closeAllConnections() throws Exception {
         // close all connections
         try {
-            Enumeration<String> connections = dbDict.keys();
-            while (connections.hasMoreElements()) {
-                String dbName = connections.nextElement();
-                boolean readonly = dbName.startsWith("RO_");
-                dbName = dbName.substring(3);
-                closeConnection(dbName, readonly);
+            for (String dbName : new ArrayList<>(dbDict.keySet())) {
+                closeConnection(dbName);
             }
         } catch (Exception e) {
             String msg = "close all connections " + e.getMessage();

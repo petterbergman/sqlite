@@ -10,31 +10,15 @@
 
 * [`initWebStore()`](#initwebstore)
 * [`saveToStore(...)`](#savetostore)
-* [`getFromLocalDiskToStore(...)`](#getfromlocaldisktostore)
-* [`saveToLocalDisk(...)`](#savetolocaldisk)
-* [`echo(...)`](#echo)
 * [`createConnection(...)`](#createconnection)
 * [`isConnection(...)`](#isconnection)
 * [`retrieveConnection(...)`](#retrieveconnection)
-* [`retrieveAllConnections()`](#retrieveallconnections)
 * [`closeConnection(...)`](#closeconnection)
 * [`closeAllConnections()`](#closeallconnections)
 * [`checkConnectionsConsistency()`](#checkconnectionsconsistency)
-* [`getNCDatabasePath(...)`](#getncdatabasepath)
-* [`createNCConnection(...)`](#createncconnection)
-* [`closeNCConnection(...)`](#closencconnection)
-* [`isNCConnection(...)`](#isncconnection)
-* [`retrieveNCConnection(...)`](#retrievencconnection)
 * [`importFromJson(...)`](#importfromjson)
 * [`isJsonValid(...)`](#isjsonvalid)
-* [`copyFromAssets(...)`](#copyfromassets)
-* [`getFromHTTPRequest(...)`](#getfromhttprequest)
 * [`isDatabase(...)`](#isdatabase)
-* [`isNCDatabase(...)`](#isncdatabase)
-* [`getDatabaseList()`](#getdatabaselist)
-* [`addSQLiteSuffix(...)`](#addsqlitesuffix)
-* [`deleteOldDatabases(...)`](#deleteolddatabases)
-* [`moveDatabasesAndAddSuffix(...)`](#movedatabasesandaddsuffix)
 * [Interfaces](#interfaces)
 
 </docgen-index>
@@ -76,72 +60,18 @@ Save the datbase to the web store
 --------------------
 
 
-### getFromLocalDiskToStore(...)
-
-```typescript
-getFromLocalDiskToStore(overwrite: boolean) => Promise<void>
-```
-
-Get database from local disk and save it to store
-
-| Param           | Type                 | Description |
-| --------------- | -------------------- | ----------- |
-| **`overwrite`** | <code>boolean</code> | : boolean   |
-
-**Since:** 4.6.3
-
---------------------
-
-
-### saveToLocalDisk(...)
-
-```typescript
-saveToLocalDisk(database: string) => Promise<void>
-```
-
-Save database to local disk
-
-| Param          | Type                | Description |
-| -------------- | ------------------- | ----------- |
-| **`database`** | <code>string</code> | : string    |
-
-**Since:** 4.6.3
-
---------------------
-
-
-### echo(...)
-
-```typescript
-echo(value: string) => Promise<capEchoResult>
-```
-
-Echo a value
-
-| Param       | Type                |
-| ----------- | ------------------- |
-| **`value`** | <code>string</code> |
-
-**Returns:** <code>Promise&lt;<a href="#capechoresult">capEchoResult</a>&gt;</code>
-
-**Since:** 2.9.0 refactor
-
---------------------
-
-
 ### createConnection(...)
 
 ```typescript
-createConnection(database: string, version: number, readonly: boolean) => Promise<SQLiteDBConnection>
+createConnection(database: string, version: number) => Promise<SQLiteDBConnection>
 ```
 
 Create a connection to a database
 
-| Param          | Type                 |
-| -------------- | -------------------- |
-| **`database`** | <code>string</code>  |
-| **`version`**  | <code>number</code>  |
-| **`readonly`** | <code>boolean</code> |
+| Param          | Type                |
+| -------------- | ------------------- |
+| **`database`** | <code>string</code> |
+| **`version`**  | <code>number</code> |
 
 **Returns:** <code>Promise&lt;SQLiteDBConnection&gt;</code>
 
@@ -153,15 +83,14 @@ Create a connection to a database
 ### isConnection(...)
 
 ```typescript
-isConnection(database: string, readonly: boolean) => Promise<capSQLiteResult>
+isConnection(database: string) => Promise<capSQLiteResult>
 ```
 
 Check if a connection exists
 
-| Param          | Type                 |
-| -------------- | -------------------- |
-| **`database`** | <code>string</code>  |
-| **`readonly`** | <code>boolean</code> |
+| Param          | Type                |
+| -------------- | ------------------- |
+| **`database`** | <code>string</code> |
 
 **Returns:** <code>Promise&lt;<a href="#capsqliteresult">capSQLiteResult</a>&gt;</code>
 
@@ -173,32 +102,16 @@ Check if a connection exists
 ### retrieveConnection(...)
 
 ```typescript
-retrieveConnection(database: string, readonly: boolean) => Promise<SQLiteDBConnection>
+retrieveConnection(database: string) => Promise<SQLiteDBConnection>
 ```
 
 Retrieve an existing database connection
 
-| Param          | Type                 |
-| -------------- | -------------------- |
-| **`database`** | <code>string</code>  |
-| **`readonly`** | <code>boolean</code> |
+| Param          | Type                |
+| -------------- | ------------------- |
+| **`database`** | <code>string</code> |
 
 **Returns:** <code>Promise&lt;SQLiteDBConnection&gt;</code>
-
-**Since:** 2.9.0 refactor
-
---------------------
-
-
-### retrieveAllConnections()
-
-```typescript
-retrieveAllConnections() => Promise<Map<string, SQLiteDBConnection>>
-```
-
-Retrieve all database connections
-
-**Returns:** <code>Promise&lt;<a href="#map">Map</a>&lt;string, SQLiteDBConnection&gt;&gt;</code>
 
 **Since:** 2.9.0 refactor
 
@@ -208,15 +121,14 @@ Retrieve all database connections
 ### closeConnection(...)
 
 ```typescript
-closeConnection(database: string, readonly: boolean) => Promise<void>
+closeConnection(database: string) => Promise<void>
 ```
 
 Close a database connection
 
-| Param          | Type                 |
-| -------------- | -------------------- |
-| **`database`** | <code>string</code>  |
-| **`readonly`** | <code>boolean</code> |
+| Param          | Type                |
+| -------------- | ------------------- |
+| **`database`** | <code>string</code> |
 
 **Since:** 2.9.0 refactor
 
@@ -249,101 +161,6 @@ if inconsistency all connections are removed
 **Returns:** <code>Promise&lt;<a href="#capsqliteresult">capSQLiteResult</a>&gt;</code>
 
 **Since:** 3.0.0-beta.10
-
---------------------
-
-
-### getNCDatabasePath(...)
-
-```typescript
-getNCDatabasePath(path: string, database: string) => Promise<capNCDatabasePathResult>
-```
-
-get a non-conformed database path
-
-| Param          | Type                |
-| -------------- | ------------------- |
-| **`path`**     | <code>string</code> |
-| **`database`** | <code>string</code> |
-
-**Returns:** <code>Promise&lt;<a href="#capncdatabasepathresult">capNCDatabasePathResult</a>&gt;</code>
-
-**Since:** 3.3.3-1
-
---------------------
-
-
-### createNCConnection(...)
-
-```typescript
-createNCConnection(databasePath: string, version: number) => Promise<SQLiteDBConnection>
-```
-
-Create a non-conformed database connection
-
-| Param              | Type                |
-| ------------------ | ------------------- |
-| **`databasePath`** | <code>string</code> |
-| **`version`**      | <code>number</code> |
-
-**Returns:** <code>Promise&lt;SQLiteDBConnection&gt;</code>
-
-**Since:** 3.3.3-1
-
---------------------
-
-
-### closeNCConnection(...)
-
-```typescript
-closeNCConnection(databasePath: string) => Promise<void>
-```
-
-Close a non-conformed database connection
-
-| Param              | Type                |
-| ------------------ | ------------------- |
-| **`databasePath`** | <code>string</code> |
-
-**Since:** 3.3.3-1
-
---------------------
-
-
-### isNCConnection(...)
-
-```typescript
-isNCConnection(databasePath: string) => Promise<capSQLiteResult>
-```
-
-Check if a non-conformed databaseconnection exists
-
-| Param              | Type                |
-| ------------------ | ------------------- |
-| **`databasePath`** | <code>string</code> |
-
-**Returns:** <code>Promise&lt;<a href="#capsqliteresult">capSQLiteResult</a>&gt;</code>
-
-**Since:** 3.3.3-1
-
---------------------
-
-
-### retrieveNCConnection(...)
-
-```typescript
-retrieveNCConnection(databasePath: string) => Promise<SQLiteDBConnection>
-```
-
-Retrieve an existing non-conformed database connection
-
-| Param              | Type                |
-| ------------------ | ------------------- |
-| **`databasePath`** | <code>string</code> |
-
-**Returns:** <code>Promise&lt;SQLiteDBConnection&gt;</code>
-
-**Since:** 3.3.3-1
 
 --------------------
 
@@ -386,39 +203,6 @@ Check the validity of a JSON Object
 --------------------
 
 
-### copyFromAssets(...)
-
-```typescript
-copyFromAssets(overwrite?: boolean | undefined) => Promise<void>
-```
-
-Copy databases from public/assets/databases folder to application databases folder
-
-| Param           | Type                 | Description   |
-| --------------- | -------------------- | ------------- |
-| **`overwrite`** | <code>boolean</code> | since 3.2.5-2 |
-
-**Since:** 2.9.0 refactor
-
---------------------
-
-
-### getFromHTTPRequest(...)
-
-```typescript
-getFromHTTPRequest(url?: string | undefined, overwrite?: boolean | undefined) => Promise<void>
-```
-
-| Param           | Type                 |
-| --------------- | -------------------- |
-| **`url`**       | <code>string</code>  |
-| **`overwrite`** | <code>boolean</code> |
-
-**Since:** 4.1.1
-
---------------------
-
-
 ### isDatabase(...)
 
 ```typescript
@@ -438,101 +222,7 @@ Check if a database exists
 --------------------
 
 
-### isNCDatabase(...)
-
-```typescript
-isNCDatabase(databasePath: string) => Promise<capSQLiteResult>
-```
-
-Check if a non conformed database exists
-
-| Param              | Type                |
-| ------------------ | ------------------- |
-| **`databasePath`** | <code>string</code> |
-
-**Returns:** <code>Promise&lt;<a href="#capsqliteresult">capSQLiteResult</a>&gt;</code>
-
-**Since:** 3.3.3-1
-
---------------------
-
-
-### getDatabaseList()
-
-```typescript
-getDatabaseList() => Promise<capSQLiteValues>
-```
-
-Get the database list
-
-**Returns:** <code>Promise&lt;<a href="#capsqlitevalues">capSQLiteValues</a>&gt;</code>
-
-**Since:** 3.0.0-beta.5
-
---------------------
-
-
-### addSQLiteSuffix(...)
-
-```typescript
-addSQLiteSuffix(folderPath?: string | undefined, dbNameList?: string[] | undefined) => Promise<void>
-```
-
-Add SQLIte Suffix to existing databases
-
-| Param            | Type                  | Description   |
-| ---------------- | --------------------- | ------------- |
-| **`folderPath`** | <code>string</code>   |               |
-| **`dbNameList`** | <code>string[]</code> | since 3.2.4-1 |
-
-**Since:** 3.0.0-beta.5
-
---------------------
-
-
-### deleteOldDatabases(...)
-
-```typescript
-deleteOldDatabases(folderPath?: string | undefined, dbNameList?: string[] | undefined) => Promise<void>
-```
-
-Delete Old Cordova databases
-
-| Param            | Type                  | Description   |
-| ---------------- | --------------------- | ------------- |
-| **`folderPath`** | <code>string</code>   |               |
-| **`dbNameList`** | <code>string[]</code> | since 3.2.4-1 |
-
-**Since:** 3.0.0-beta.5
-
---------------------
-
-
-### moveDatabasesAndAddSuffix(...)
-
-```typescript
-moveDatabasesAndAddSuffix(folderPath?: string | undefined, dbNameList?: string[] | undefined) => Promise<void>
-```
-
-Moves databases to the location the plugin can read them, and adds sqlite suffix
-This resembles calling addSQLiteSuffix and deleteOldDatabases, but it is more performant as it doesn't copy but moves the files
-
-| Param            | Type                  | Description                                                                                                                                                       |
-| ---------------- | --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`folderPath`** | <code>string</code>   | the origin from where to move the databases                                                                                                                       |
-| **`dbNameList`** | <code>string[]</code> | the names of the databases to move, check out the getMigratableDbList to get a list, an empty list will result in copying all the databases with '.db' extension. |
-
---------------------
-
-
 ### Interfaces
-
-
-#### capEchoResult
-
-| Prop        | Type                | Description     |
-| ----------- | ------------------- | --------------- |
-| **`value`** | <code>string</code> | String returned |
 
 
 #### capSQLiteResult
@@ -540,29 +230,6 @@ This resembles calling addSQLiteSuffix and deleteOldDatabases, but it is more pe
 | Prop         | Type                 | Description                                   |
 | ------------ | -------------------- | --------------------------------------------- |
 | **`result`** | <code>boolean</code> | result set to true when successful else false |
-
-
-#### Map
-
-| Prop       | Type                |
-| ---------- | ------------------- |
-| **`size`** | <code>number</code> |
-
-| Method      | Signature                                                                                                      |
-| ----------- | -------------------------------------------------------------------------------------------------------------- |
-| **clear**   | () =&gt; void                                                                                                  |
-| **delete**  | (key: K) =&gt; boolean                                                                                         |
-| **forEach** | (callbackfn: (value: V, key: K, map: <a href="#map">Map</a>&lt;K, V&gt;) =&gt; void, thisArg?: any) =&gt; void |
-| **get**     | (key: K) =&gt; V \| undefined                                                                                  |
-| **has**     | (key: K) =&gt; boolean                                                                                         |
-| **set**     | (key: K, value: V) =&gt; this                                                                                  |
-
-
-#### capNCDatabasePathResult
-
-| Prop       | Type                | Description     |
-| ---------- | ------------------- | --------------- |
-| **`path`** | <code>string</code> | String returned |
 
 
 #### capSQLiteChanges
@@ -579,12 +246,5 @@ This resembles calling addSQLiteSuffix and deleteOldDatabases, but it is more pe
 | **`changes`** | <code>number</code> | the number of changes from an execute or run command |
 | **`lastId`**  | <code>number</code> | the lastId created from a run command                |
 | **`values`**  | <code>any[]</code>  | values when RETURNING                                |
-
-
-#### capSQLiteValues
-
-| Prop         | Type               | Description                                                                              |
-| ------------ | ------------------ | ---------------------------------------------------------------------------------------- |
-| **`values`** | <code>any[]</code> | the data values list as an Array iOS the first row is the returned ios_columns name list |
 
 </docgen-api>

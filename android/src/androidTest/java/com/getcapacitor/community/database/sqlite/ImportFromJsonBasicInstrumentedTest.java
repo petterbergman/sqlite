@@ -8,22 +8,27 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
-import com.getcapacitor.community.database.sqlite.SQLite.Database;
-import com.getcapacitor.community.database.sqlite.SQLite.SqliteConfig;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Hashtable;
-import org.json.JSONObject;
+import java.util.Arrays;
+import org.json.JSONArray;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
 public class ImportFromJsonBasicInstrumentedTest {
 
-    private String loadJsonFromAssets(Context context, String name) throws Exception {
-        InputStream is = context.getAssets().open(name);
+    private static final String TAG = "ImportFromJsonTest";
+
+    private String loadJsonFromAssets(String name) throws Exception {
+        // Test fixtures live in src/androidTest/assets so they don't ship with the library
+        Context testContext = InstrumentationRegistry.getInstrumentation().getContext();
+        InputStream is = testContext.getAssets().open(name);
         BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
         StringBuilder sb = new StringBuilder();
         String line;
@@ -37,14 +42,12 @@ public class ImportFromJsonBasicInstrumentedTest {
     @Test
     public void importFromJson_basic() throws Exception {
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        final String TAG = "ImportFromJsonTest";
         long totalStartMs = android.os.SystemClock.elapsedRealtime();
 
-        // Place basic.json into android/app/src/main/assets/ or this module's assets via test APK assets merging
-        String json = loadJsonFromAssets(context, "basic.json");
+        String json = loadJsonFromAssets("basic.json");
         assertTrue(json.contains("testjson_file"));
 
-        CapacitorSQLite cap = new CapacitorSQLite(context, new SqliteConfig());
+        CapacitorSQLite cap = new CapacitorSQLite(context);
         // Validate JSON
         assertTrue(cap.isJsonValid(json));
 
@@ -54,15 +57,23 @@ public class ImportFromJsonBasicInstrumentedTest {
         assertNotNull(res);
         assertTrue(res.getInteger("changes") >= 0);
 
-        // Open and query via Database helper
-        String dbName = "testjson_fileSQLite.db";
-        Database db = new Database(context, dbName, 1, new Hashtable<Integer, JSONObject>(), false);
-        db.open();
-        JSArray rows = db.selectSQL("SELECT COUNT(*) AS cnt FROM users", new java.util.ArrayList<>());
+        // Open, query and export through the connection API
+        String dbName = "testjson_file";
+        cap.createConnection(dbName, 1);
+        cap.open(dbName);
+        JSArray rows = cap.query(dbName, "SELECT COUNT(*) AS cnt FROM users", new JSArray());
         assertTrue(rows.length() > 0);
         int cnt = rows.getJSONObject(rows.length() - 1).getInt("cnt");
         assertEquals(2, cnt);
-        db.close();
+        JSObject export = cap.exportToJson(dbName);
+        assertEquals("testjson_file", export.getString("database"));
+        JSONArray tables = export.getJSONArray("tables");
+        assertEquals("users", tables.getJSONObject(0).getString("name"));
+        assertEquals(2, tables.getJSONObject(0).getJSONArray("values").length());
+        cap.close(dbName);
+        cap.closeConnection(dbName);
+        assertTrue(cap.isDatabase(dbName));
+
         long elapsedMs = android.os.SystemClock.elapsedRealtime() - startMs;
         System.out.println("[TEST] importFromJson took " + elapsedMs + "ms");
         Log.i(TAG, "importFromJson took " + elapsedMs + "ms");
@@ -73,39 +84,63 @@ public class ImportFromJsonBasicInstrumentedTest {
     }
 
     @Test
+    public void rejects_partial_json() throws Exception {
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        CapacitorSQLite cap = new CapacitorSQLite(context);
+        String json = loadJsonFromAssets("basic.json").replace("\"full\"", "\"partial\"");
+        assertFalse(cap.isJsonValid(json));
+        assertThrows(Exception.class, () -> cap.importFromJson(json));
+    }
+
+    @Test
     public void query_all_tables_with_timing() throws Exception {
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        final String TAG = "ImportFromJsonTest";
-        //        Copy Quartermaster4SQLite.db from assets (public/assets/databases) into databases dir
-        //        and open it (UtilsFile.copyFromAssetsToDatabase adds SQLite suffix automatically)
-        com.getcapacitor.community.database.sqlite.SQLite.UtilsFile uFile =
-            new com.getcapacitor.community.database.sqlite.SQLite.UtilsFile();
-        // Overwrite to ensure fresh copy for timing
-        uFile.copyFromAssetsToDatabase(context, true);
-        String dbName = "Quartermaster4SQLite.db";
-        Database db = new Database(context, dbName, 1, new Hashtable<Integer, JSONObject>(), false);
+        // Copy a fresh Quartermaster4SQLite.db into the databases dir when the fixture is present
+        Context testContext = InstrumentationRegistry.getInstrumentation().getContext();
+        if (Arrays.asList(testContext.getAssets().list("")).contains("Quartermaster4SQLite.db")) {
+            File dbFile = context.getDatabasePath("Quartermaster4SQLite.db");
+            dbFile.getParentFile().mkdirs();
+            try (
+                InputStream in = testContext.getAssets().open("Quartermaster4SQLite.db");
+                OutputStream out = new FileOutputStream(dbFile)
+            ) {
+                byte[] buffer = new byte[8192];
+                int len;
+                while ((len = in.read(buffer)) > 0) {
+                    out.write(buffer, 0, len);
+                }
+            }
+        }
+        String dbName = "Quartermaster4";
+        CapacitorSQLite cap = new CapacitorSQLite(context);
+        cap.createConnection(dbName, 1);
 
         long totalStart = android.os.SystemClock.elapsedRealtime();
-        db.open();
-        JSArray tables = db.getTableNames();
+        cap.open(dbName);
+        JSArray tables = cap.query(
+            dbName,
+            "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE 'android_%'",
+            new JSArray()
+        );
         System.out.println("[TEST] tables count=" + tables.length());
         Log.i(TAG, "tables count=" + tables.length());
         for (int i = 0; i < tables.length(); i++) {
-            String table = tables.getString(i);
+            String table = tables.getJSONObject(i).getString("name");
             long tCountStart = android.os.SystemClock.elapsedRealtime();
-            JSArray countRows = db.selectSQL("SELECT COUNT(*) AS cnt FROM " + table, new java.util.ArrayList<>());
+            JSArray countRows = cap.query(dbName, "SELECT COUNT(*) AS cnt FROM " + table, new JSArray());
             long tCount = android.os.SystemClock.elapsedRealtime() - tCountStart;
             int cnt = countRows.getJSONObject(countRows.length() - 1).getInt("cnt");
             System.out.println("[TEST] table=" + table + " count=" + cnt + " (" + tCount + "ms)");
             Log.i(TAG, "table=" + table + " count=" + cnt + " (" + tCount + "ms)");
 
             long tSelStart = android.os.SystemClock.elapsedRealtime();
-            JSArray allRows = db.selectSQL("SELECT * FROM " + table, new java.util.ArrayList<>());
+            JSArray allRows = cap.query(dbName, "SELECT * FROM " + table, new JSArray());
             long tSel = android.os.SystemClock.elapsedRealtime() - tSelStart;
             System.out.println("[TEST] table=" + table + " full select rows=" + allRows.length() + " (" + tSel + "ms)");
             Log.i(TAG, "table=" + table + " full select rows=" + allRows.length() + " (" + tSel + "ms)");
         }
-        db.close();
+        cap.close(dbName);
+        cap.closeConnection(dbName);
         long totalElapsed = android.os.SystemClock.elapsedRealtime() - totalStart;
         System.out.println("[TEST] query_all_tables_with_timing total elapsed " + totalElapsed + "ms");
         Log.i(TAG, "query_all_tables_with_timing total elapsed " + totalElapsed + "ms");

@@ -16,19 +16,10 @@ enum DatabaseError: Error {
     case executeSQL(message: String)
     case runSQL(message: String)
     case selectSQL(message: String)
-    case deleteDB(message: String)
     case execSet(message: String)
-    case createSyncTable(message: String)
-    case createSyncDate(message: String)
-    case getSyncDate(message: String)
     case exportToJson(message: String)
     case importFromJson(message: String)
     case getTableNames(message: String)
-    case deleteExportedRows(message: String)
-    case isAvailTrans(message: String)
-    case beginTransaction(message: String)
-    case commitTransaction(message: String)
-    case rollbackTransaction(message: String)
 }
 // swiftlint:disable file_length
 // swiftlint:disable type_body_length
@@ -36,48 +27,20 @@ class Database {
     var isOpen: Bool = false
     var dbName: String
     var dbVersion: Int
-    var encrypted: Bool
-    var isEncryption: Bool
-    var mode: String
-    var vUpgDict: [Int: [String: Any]]
-    var databaseLocation: String
-    var account: String
     var path: String = ""
     var mDb: OpaquePointer?
-    let uUpg: UtilsUpgrade = UtilsUpgrade()
-    var readOnly: Bool = false
-    var ncDB: Bool = false
-    var isAvailableTransaction = false
 
     // MARK: - Init
-    init(databaseLocation: String, databaseName: String,
-         encrypted: Bool, isEncryption: Bool,
-         account: String, mode: String, version: Int, readonly: Bool,
-         vUpgDict: [Int: [String: Any]] = [:]
-    ) throws {
+    init(databaseLocation: String, databaseName: String, version: Int) throws {
         self.dbVersion = version
-        self.encrypted = encrypted
-        self.isEncryption = isEncryption
-        self.account = account
         self.dbName = databaseName
-        self.mode = mode
-        self.vUpgDict = vUpgDict
-        self.databaseLocation = databaseLocation
-        self.readOnly = readonly
-        if databaseName.contains("/")  &&
-            databaseName.suffix(9) != "SQLite.db" {
-            self.readOnly = true
-            self.path = databaseName
-            self.ncDB = true
-        } else {
-            do {
-                self.path = try UtilsFile.getFilePath(
-                    databaseLocation: databaseLocation,
-                    fileName: databaseName)
-            } catch UtilsFileError.getFilePathFailed {
-                throw DatabaseError.filePath(
-                    message: "Could not generate the file path")
-            }
+        do {
+            self.path = try UtilsFile.getFilePath(
+                databaseLocation: databaseLocation,
+                fileName: databaseName)
+        } catch UtilsFileError.getFilePathFailed {
+            throw DatabaseError.filePath(
+                message: "Could not generate the file path")
         }
         print("database path \(self.path)")
     }
@@ -88,56 +51,16 @@ class Database {
         return isOpen
     }
 
-    // MARK: - isNCDB
-
-    func isNCDB () -> Bool {
-        return ncDB
-    }
-
-    // MARK: - getUrl
-
-    func getUrl () -> String {
-        return "file://\(path)"
-    }
-
     // MARK: - Open
 
-    // swiftlint:disable cyclomatic_complexity
-    // swiftlint:disable function_body_length
     func open () throws {
-        var password: String = ""
-        // encryption/decryption paths removed
-
         do {
-            mDb = try UtilsSQLCipher
-                .openOrCreateDatabase(filename: path,
-                                      password: password,
-                                      readonly: self.readOnly)
+            mDb = try UtilsSQLCipher.openOrCreateDatabase(filename: path)
             isOpen = true
             // PRAGMA foreign_keys = ON;
             try UtilsSQLCipher
                 .setForeignKeyConstraintsEnabled(mDB: self,
                                                  toggle: true)
-            if !ncDB && !self.readOnly {
-                let curVersion: Int = try UtilsSQLCipher.getVersion(mDB: self)
-
-                if dbVersion > curVersion && vUpgDict.count > 0 {
-                    // backup the database
-                    _ = try UtilsFile.copyFile(fileName: dbName,
-                                               toFileName: "backup-\(dbName)",
-                                               databaseLocation: databaseLocation)
-
-                    _ = try uUpg
-                        .onUpgrade(mDB: self, upgDict: vUpgDict,
-                                   currentVersion: curVersion,
-                                   targetVersion: dbVersion,
-                                   databaseLocation: databaseLocation)
-
-                    try UtilsSQLCipher
-                        .deleteBackupDB(databaseLocation: databaseLocation,
-                                        databaseName: dbName)
-                }
-            }
         } catch UtilsSQLCipherError.openOrCreateDatabase(let message) {
             var msg: String = "Failed in "
             msg.append("openOrCreateDatabase \(message)")
@@ -148,38 +71,8 @@ class Database {
             var msg: String = "Failed in "
             msg.append("setForeignKeyConstraintsEnabled \(message)")
             throw DatabaseError.open(message: msg)
-        } catch UtilsSQLCipherError.setVersion(let message) {
-            try close()
-            let msg: String = "Failed in setVersion \(message)"
-            throw DatabaseError.open(message: msg)
-        } catch UtilsSQLCipherError.getVersion(let message) {
-            try close()
-            let msg: String = "Failed in getVersion \(message)"
-            throw DatabaseError.open(message: msg)
-        } catch UtilsSQLCipherError.deleteBackupDB(let message) {
-            try close()
-            let msg: String = "Failed in deleteBackupDB \(message)"
-            throw DatabaseError.open(message: msg)
-        } catch UtilsUpgradeError.onUpgradeFailed(let message) {
-            // restore the database
-            do {
-                try UtilsSQLCipher
-                    .restoreDB(databaseLocation: databaseLocation,
-                               databaseName: dbName)
-                let msg: String = "Failed OnUpgrade \(message)"
-                try close()
-                throw DatabaseError.open(message: msg)
-
-            } catch UtilsSQLCipherError.restoreDB(let message) {
-                let msg: String = "Failed in restoreDB \(message)"
-                try close()
-                throw DatabaseError.open(message: msg)
-            }
         }
-        return
     }
-    // swiftlint:enable function_body_length
-    // swiftlint:enable cyclomatic_complexity
 
     // MARK: - Close
 
@@ -195,77 +88,6 @@ class Database {
             }
         }
         return
-    }
-
-    // MARK: - IsAvailTrans
-
-    func isAvailTrans() throws -> Bool {
-        if isOpen {
-            return isAvailableTransaction
-        } else {
-            let msg: String = "Failed in isAvailTrans database not opened"
-            throw DatabaseError.isAvailTrans(message: msg)
-        }
-    }
-
-    // MARK: - SetIsTransActive
-
-    func setIsTransActive(newValue: Bool ) {
-        isAvailableTransaction = newValue
-    }
-
-    // MARK: - BeginTransaction
-
-    func beginTransaction() throws -> Int {
-        if isOpen {
-            do {
-                try UtilsSQLCipher.beginTransaction(mDB: self)
-                setIsTransActive(newValue: true)
-                return 0
-            } catch UtilsSQLCipherError.beginTransaction(let message) {
-                let msg: String = "Failed in beginTransaction \(message)"
-                throw DatabaseError.beginTransaction(message: msg)
-            }
-        } else {
-            let msg: String = "Failed in beginTransaction database not opened"
-            throw DatabaseError.beginTransaction(message: msg)
-        }
-    }
-
-    // MARK: - CommitTransaction
-
-    func commitTransaction() throws -> Int {
-        if isOpen {
-            do {
-                try UtilsSQLCipher.commitTransaction(mDB: self)
-                setIsTransActive(newValue: false)
-                return 0
-            } catch UtilsSQLCipherError.commitTransaction(let message) {
-                let msg: String = "Failed in commitTransaction \(message)"
-                throw DatabaseError.commitTransaction(message: msg)
-            }
-        } else {
-            let msg: String = "Failed in commitTransaction database not opened"
-            throw DatabaseError.commitTransaction(message: msg)
-        }
-    }
-
-    // MARK: - RollbackTransaction
-
-    func rollbackTransaction() throws -> Int {
-        if isOpen {
-            do {
-                try UtilsSQLCipher.rollbackTransaction(mDB: self)
-                setIsTransActive(newValue: false)
-                return 0
-            } catch UtilsSQLCipherError.rollbackTransaction(let message) {
-                let msg: String = "Failed in rollbackTransaction \(message)"
-                throw DatabaseError.rollbackTransaction(message: msg)
-            }
-        } else {
-            let msg: String = "Failed in rollbackTransaction database not opened"
-            throw DatabaseError.rollbackTransaction(message: msg)
-        }
     }
 
     // MARK: - GetVersion
@@ -345,8 +167,7 @@ class Database {
     // MARK: - ExecSet
 
     // swiftlint:disable function_body_length
-    func execSet(set: [[String: Any]], transaction: Bool = true,
-                 returnMode: String = "no") throws -> [String: Any] {
+    func execSet(set: [[String: Any]], transaction: Bool = true) throws -> [String: Any] {
         var msg: String = "Failed in execSet : "
         let initChanges = UtilsSQLCipher.dbChanges(mDB: mDb)
         var changes: Int = -1
@@ -368,7 +189,7 @@ class Database {
         // Execute the query
         do {
             let resp = try UtilsSQLCipher
-                .executeSet(mDB: self, set: set, returnMode: returnMode)
+                .executeSet(mDB: self, set: set)
             lastId = resp.0
             response = resp.1
             changes = UtilsSQLCipher
@@ -406,8 +227,7 @@ class Database {
 
     // MARK: - RunSQL
 
-    func runSQL(sql: String, values: [Any], transaction: Bool = true,
-                returnMode: String = "no") throws -> [String: Any] {
+    func runSQL(sql: String, values: [Any], transaction: Bool = true) throws -> [String: Any] {
         var msg: String = "Failed in runSQL : "
         var changes: Int = -1
         var lastId: Int64 = -1
@@ -426,8 +246,7 @@ class Database {
         // Execute the query
         do {
             let resp = try UtilsSQLCipher
-                .prepareSQL(mDB: self, sql: sql, values: values,
-                            fromJson: false, returnMode: returnMode)
+                .prepareSQL(mDB: self, sql: sql, values: values)
             lastId = resp.0
             response = resp.1
         } catch UtilsSQLCipherError.prepareSQL(let message) {
@@ -491,194 +310,20 @@ class Database {
         return result
     }
 
-    // MARK: - DeleteDB
-
-    func deleteDB(databaseName: String) throws -> Bool {
-        let isFileExists: Bool = UtilsFile
-            .isFileExist(databaseLocation: databaseLocation,
-                         fileName: databaseName)
-        if isFileExists && !isOpen {
-            // open the database
-            do {
-                try self.open()
-            } catch DatabaseError.open( let message ) {
-                throw DatabaseError.deleteDB(message: message)
-            }
-        }
-        // close the database
-        do {
-            try self.close()
-        } catch DatabaseError.close( let message ) {
-            throw DatabaseError.deleteDB(message: message)
-        }
-        // delete the database
-        if isFileExists {
-            do {
-                try UtilsSQLCipher.deleteDB(databaseLocation: databaseLocation,
-                                            databaseName: databaseName)
-            } catch UtilsSQLCipherError.deleteDB(let message ) {
-                throw DatabaseError.deleteDB(message: message)
-            }
-        }
-        return true
-    }
-
-    // MARK: - createSyncTable
-
-    func createSyncTable() throws -> Int {
-        var retObj: Int = -1
-        // Open the database for writing
-        // check if the table has already been created
-        do {
-            let isExists: Bool = try UtilsJson.isTableExists(
-                mDB: self, tableName: "sync_table")
-            if !isExists {
-                // check if there are tables with last_modified column
-                let isLastModified: Bool = try UtilsJson.isLastModified(mDB: self)
-                let isSqlDeleted: Bool = try UtilsJson.isSqlDeleted(mDB: self)
-                if isLastModified && isSqlDeleted {
-                    let date = Date()
-                    let syncTime: Int = Int(date.timeIntervalSince1970)
-                    var stmt: String = "CREATE TABLE IF NOT EXISTS "
-                    stmt.append("sync_table (")
-                    stmt.append("id INTEGER PRIMARY KEY NOT NULL,")
-                    stmt.append("sync_date INTEGER);")
-                    stmt.append("INSERT INTO sync_table (sync_date) ")
-                    stmt.append("VALUES ('\(syncTime)');")
-                    retObj = try executeSQL(sql: stmt)
-                } else {
-                    let msg = "No last_modified column in tables"
-                    throw DatabaseError.createSyncTable(message: msg)
-                }
-            } else {
-                retObj = 0
-            }
-        } catch UtilsJsonError.isLastModified(let message) {
-            throw DatabaseError.createSyncTable(message: message)
-        } catch UtilsJsonError.isSqlDeleted(let message) {
-            throw DatabaseError.createSyncTable(message: message)
-        } catch UtilsJsonError.tableNotExists(let message) {
-            throw DatabaseError.createSyncTable(message: message)
-        } catch DatabaseError.executeSQL(let message) {
-            throw DatabaseError.createSyncTable(message: message)
-        }
-        return retObj
-    }
-
-    // MARK: - SetSyncDate
-
-    func setSyncDate(syncDate: String ) throws -> Bool {
-        var retBool: Bool = false
-        var lastId: Int64 = -1
-        var resp: [String: Any] = [:]
-        do {
-            let isExists: Bool = try UtilsJson.isTableExists(
-                mDB: self, tableName: "sync_table")
-            if !isExists {
-                throw DatabaseError.createSyncDate(message: "No sync_table available")
-            }
-            let dateFormatter = DateFormatter()
-            dateFormatter.locale = Locale(identifier: "en_US_POSIX")
-            dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-            if let date = dateFormatter.date(from: syncDate) {
-                let syncTime: Int = Int(date.timeIntervalSince1970)
-                var stmt: String = "UPDATE sync_table SET sync_date = "
-                stmt.append("\(syncTime) WHERE id = 1;")
-                resp = try runSQL(sql: stmt, values: [])
-                if let mLastId: Int64 = resp["lastId"] as? Int64 {
-                    lastId = mLastId
-                    if lastId != -1 {
-                        retBool = true
-                    }
-                }
-            } else {
-                throw DatabaseError.createSyncDate(message: "wrong syncDate")
-            }
-        } catch UtilsJsonError.tableNotExists(let message) {
-            throw DatabaseError.createSyncDate(message: message)
-        } catch DatabaseError.runSQL(let message) {
-            throw DatabaseError.createSyncDate(message: message)
-        }
-        return retBool
-    }
-
-    // MARK: - GetSyncDate
-
-    func getSyncDate( ) throws -> Int64 {
-        var syncDate: Int64 = 0
-        do {
-            let isExists: Bool = try UtilsJson.isTableExists(
-                mDB: self, tableName: "sync_table")
-            if !isExists {
-                throw DatabaseError.getSyncDate(message: "No sync_table available")
-            }
-            syncDate = try ExportToJson.getSyncDate(mDB: self)
-        } catch UtilsJsonError.tableNotExists(let message) {
-            throw DatabaseError.getSyncDate(message: message)
-        } catch ExportToJsonError.getSyncDate(let message) {
-            throw DatabaseError.getSyncDate(message: message)
-        }
-        return syncDate
-    }
-
     // MARK: - ExportToJson
 
-    func exportToJson(expMode: String, isEncrypted: Bool)
-    throws -> [String: Any] {
-        var retObj: [String: Any] = [:]
-
+    func exportToJson() throws -> [String: Any] {
         do {
-            let date = Date()
-            let syncTime: Int = Int(date.timeIntervalSince1970)
-            let isExists: Bool = try UtilsJson.isTableExists(
-                mDB: self, tableName: "sync_table")
-            if isExists {
-                // Set the last exported date
-                try ExportToJson.setLastExportDate(mDB: self, sTime: syncTime)
-            } else {
-                if expMode == "partial" {
-                    throw DatabaseError.exportToJson(message: "No sync_table available")
-                }
-            }
-            // Launch the export process
-            let data: [String: Any] = [
-                "dbName": dbName, "encrypted": self.encrypted,
-                "expMode": expMode, "version": dbVersion]
-            retObj = try ExportToJson
-                .createExportObject(mDB: self, data: data)
-            if isEncryption && encrypted && isEncrypted {
-                retObj["overwrite"] = true
-                let base64Str = try UtilsJson.encryptDictionaryToBase64(
-                    retObj,
-                    forAccount: account)
-                retObj = [:]
-                retObj["expData"] = base64Str
-            }
-
-        } catch UtilsJsonError.tableNotExists(let message) {
-            throw DatabaseError.exportToJson(message: message)
-        } catch ExportToJsonError.setLastExportDate(let message) {
-            throw DatabaseError.exportToJson(message: message)
+            return try ExportToJson.createExportObject(mDB: self, dbName: dbName,
+                                                       version: dbVersion)
         } catch ExportToJsonError.createExportObject(let message) {
-            throw DatabaseError.exportToJson(message: message)
-        }
-        return retObj
-    }
-
-    // MARK: - DeleteExportedRows()
-
-    func deleteExportedRows() throws {
-
-        do {
-            try ExportToJson.delExportedRows(mDB: self)
-        } catch ExportToJsonError.delExportedRows(let message) {
             throw DatabaseError.exportToJson(message: message)
         }
     }
 
     // MARK: - ImportFromJson
 
-    func importFromJson(importData: ImportData)
+    func importFromJson(jsonSQLite: JsonSQLite)
     throws -> [String: Int] {
         var changes: Int = 0
 
@@ -688,25 +333,21 @@ class Database {
             try UtilsSQLCipher
                 .setForeignKeyConstraintsEnabled(mDB: self,
                                                  toggle: false)
-            if importData.tables.count > 0 {
+            if jsonSQLite.tables.count > 0 {
                 changes = try ImportFromJson
                     .createDatabaseSchema(mDB: self,
-                                          tables: importData.tables,
-                                          mode: importData.mode,
-                                          version: importData.version)
+                                          tables: jsonSQLite.tables,
+                                          version: jsonSQLite.version)
                 if changes != -1 {
                     // Create the Database Data
                     changes += try ImportFromJson
                         .createDatabaseData(mDB: self,
-                                            tables: importData.tables,
-                                            mode: importData.mode)
+                                            tables: jsonSQLite.tables)
                 }
             }
-            if let mViews = importData.views {
-                if mViews.count > 0 {
-                    changes += try ImportFromJson
-                        .createViews(mDB: self, views: mViews)
-                }
+            if let mViews = jsonSQLite.views, mViews.count > 0 {
+                changes += try ImportFromJson
+                    .createViews(mDB: self, views: mViews)
             }
             // PRAGMA foreign_keys = ON;
             try UtilsSQLCipher
@@ -742,16 +383,13 @@ enum UtilsSQLCipherError: Error {
     case setForeignKeyConstraintsEnabled(message: String)
     case setVersion(message: String)
     case getVersion(message: String)
-    case restoreDB(message: String)
-    case deleteBackupDB(message: String)
-    case deleteDB(message: String)
     case executeSet(message: String)
     case bindFailed
 }
 
 class UtilsSQLCipher {
-    class func openOrCreateDatabase(filename: String, password: String = "", readonly: Bool = false) throws -> OpaquePointer? {
-        let flags = readonly ? SQLITE_OPEN_READONLY : (SQLITE_OPEN_CREATE | SQLITE_OPEN_READWRITE)
+    class func openOrCreateDatabase(filename: String) throws -> OpaquePointer? {
+        let flags = SQLITE_OPEN_CREATE | SQLITE_OPEN_READWRITE
         var mDB: OpaquePointer?
         if sqlite3_open_v2(filename, &mDB, flags | SQLITE_OPEN_FULLMUTEX, nil) == SQLITE_OK {
             // simple sanity check
@@ -787,12 +425,6 @@ class UtilsSQLCipher {
         }
     }
 
-    class func getForeignKeysState(mDB: Database) throws -> Int {
-        let sql = "PRAGMA foreign_keys;"
-        let res = try querySQL(mDB: mDB, sql: sql, values: [])
-        if res.count > 1, let val = res[1]["foreign_keys"] as? Int64 { return Int(val) }
-        return 0
-    }
 
     class func getVersion(mDB: Database) throws -> Int {
         let sql = "PRAGMA user_version;"
@@ -836,7 +468,7 @@ class UtilsSQLCipher {
         }
     }
 
-    class func prepareSQL(mDB: Database, sql: String, values: [Any], fromJson: Bool, returnMode: String) throws -> (Int64, [[String: Any]]) {
+    class func prepareSQL(mDB: Database, sql: String, values: [Any]) throws -> (Int64, [[String: Any]]) {
         var stmt: OpaquePointer?
         var results: [[String: Any]] = []
         var lastId: Int64 = -1
@@ -934,14 +566,14 @@ class UtilsSQLCipher {
         return result
     }
 
-    class func executeSet(mDB: Database, set: [[String: Any]], returnMode: String) throws -> (Int64, [[String: Any]]) {
+    class func executeSet(mDB: Database, set: [[String: Any]]) throws -> (Int64, [[String: Any]]) {
         var lastId: Int64 = -1
         var response: [[String: Any]] = []
         for dict in set {
             guard let sql = dict["statement"] as? String, let values = dict["values"] as? [Any] else {
                 throw UtilsSQLCipherError.prepareSQL(message: "No statement/values")
             }
-            let resp = try prepareSQL(mDB: mDB, sql: sql, values: values, fromJson: false, returnMode: returnMode)
+            let resp = try prepareSQL(mDB: mDB, sql: sql, values: values)
             lastId = resp.0
             response = addToResponse(response: response, respSet: resp.1)
         }
@@ -958,63 +590,4 @@ class UtilsSQLCipher {
         return ret
     }
 
-    class func restoreDB(databaseLocation: String, databaseName: String) throws {
-        // no-op shim
-    }
-    class func deleteBackupDB(databaseLocation: String, databaseName: String) throws { /* no-op */ }
-    class func parse(mVar: Any) -> Bool { return mVar is NSArray }
-
-    // Minimal state to satisfy callers expecting encryption state
-}
-
-// Minimal upgrade helper to satisfy calls formerly in UtilsUpgrade.swift
-enum UtilsUpgradeError: Error {
-    case onUpgradeFailed(message: String)
-}
-
-class UtilsUpgrade {
-    @discardableResult
-    func onUpgrade(
-        mDB: Database,
-        upgDict: [Int: [String: Any]],
-        currentVersion: Int,
-        targetVersion: Int,
-        databaseLocation: String
-    ) throws -> Int {
-        do {
-            try UtilsSQLCipher.setVersion(mDB: mDB, version: targetVersion)
-            return 0
-        } catch UtilsSQLCipherError.setVersion(let message) {
-            throw UtilsUpgradeError.onUpgradeFailed(message: message)
-        } catch {
-            throw UtilsUpgradeError.onUpgradeFailed(message: "Unknown error")
-        }
-    }
-}
-
-// Provide a minimal State enum for getDatabaseState compatibility
-enum State: String {
-    case ENCRYPTEDGLOBALSECRET
-    case ENCRYPTEDSECRET
-    case UNENCRYPTED
-}
-
-extension UtilsSQLCipher {
-    class func deleteDB(databaseLocation: String, databaseName: String) throws {
-        do {
-            let dbPath = try UtilsFile.getFilePath(databaseLocation: databaseLocation, fileName: databaseName)
-            if UtilsFile.isFileExist(filePath: dbPath) {
-                _ = try UtilsFile.deleteFile(filePath: dbPath)
-            }
-        } catch UtilsFileError.getFilePathFailed {
-            throw UtilsSQLCipherError.deleteDB(message: "getFilePath failed")
-        } catch UtilsFileError.deleteFileFailed {
-            throw UtilsSQLCipherError.deleteDB(message: "deleteFile failed")
-        }
-    }
-
-    // Always report unencrypted in the non-encrypted shim
-    class func getDatabaseState(databaseLocation: String, databaseName: String, account: String) -> State {
-        return .UNENCRYPTED
-    }
 }

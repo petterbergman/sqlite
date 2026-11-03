@@ -55,18 +55,6 @@ class ReturnHandler {
         }
     }
 
-    // MARK: - rVersion
-
-    func rVersion(call: CAPPluginCall, ret: NSNumber? = nil,
-                  message: String? = nil) {
-        if let intMessage = message {
-            call.reject(intMessage)
-            return
-        } else {
-            call.resolve(["version": ret as Any])
-            return
-        }
-    }
 
     // MARK: - rJsonSQLite
 
@@ -77,44 +65,6 @@ class ReturnHandler {
             return
         } else {
             call.resolve(["export": ret])
-            return
-        }
-    }
-
-    // MARK: - rSyncDate
-
-    func rSyncDate(call: CAPPluginCall, ret: Int64,
-                   message: String? = nil) {
-        if let intMessage = message {
-            call.reject(intMessage)
-            return
-        } else {
-            call.resolve(["syncDate": ret])
-            return
-        }
-    }
-
-    // MARK: - rPath
-
-    func rPath(call: CAPPluginCall, ret: String,
-               message: String? = nil) {
-        if let intMessage = message {
-            call.reject(intMessage)
-            return
-        } else {
-            call.resolve(["path": ret])
-            return
-        }
-    }
-    // MARK: - rUrl
-
-    func rUrl(call: CAPPluginCall, ret: String,
-              message: String? = nil) {
-        if let intMessage = message {
-            call.reject(intMessage)
-            return
-        } else {
-            call.resolve(["url": ret])
             return
         }
     }

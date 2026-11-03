@@ -1,18 +1,15 @@
 package com.getcapacitor.community.database.sqlite.SQLite.ImportExportJson;
 
-import android.util.Log;
 import com.getcapacitor.JSObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class JsonIndex {
 
-    private static final String TAG = "JsonIndex";
     private static final List<String> keyIndexesLevel = new ArrayList<String>(Arrays.asList("name", "value", "mode"));
     private String name = "";
     private String value = "";
@@ -89,12 +86,6 @@ public class JsonIndex {
             }
         }
         return true;
-    }
-
-    public void print() {
-        String toPrint = "name: " + this.getName() + " value: " + this.getValue();
-        if (this.getMode().length() > 0) toPrint += " mode: " + this.getMode();
-        Log.d(TAG, toPrint);
     }
 
     public JSObject getIndexAsJSObject() {

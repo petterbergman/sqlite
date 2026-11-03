@@ -9,29 +9,14 @@
 <docgen-index>
 
 * [`getConnectionDBName()`](#getconnectiondbname)
-* [`getConnectionReadOnly()`](#getconnectionreadonly)
 * [`open()`](#open)
 * [`close()`](#close)
-* [`beginTransaction()`](#begintransaction)
-* [`commitTransaction()`](#committransaction)
-* [`rollbackTransaction()`](#rollbacktransaction)
-* [`isTransactionActive()`](#istransactionactive)
-* [`getUrl()`](#geturl)
-* [`getVersion()`](#getversion)
-* [`loadExtension(...)`](#loadextension)
-* [`enableLoadExtension(...)`](#enableloadextension)
 * [`execute(...)`](#execute)
 * [`query(...)`](#query)
 * [`run(...)`](#run)
 * [`executeSet(...)`](#executeset)
-* [`isExists()`](#isexists)
 * [`isDBOpen()`](#isdbopen)
-* [`isTable(...)`](#istable)
-* [`getTableList()`](#gettablelist)
-* [`delete()`](#delete)
 * [`exportToJson()`](#exporttojson)
-* [`deleteExportedRows()`](#deleteexportedrows)
-* [`executeTransaction(...)`](#executetransaction)
 * [Interfaces](#interfaces)
 
 </docgen-index>
@@ -58,21 +43,6 @@ Get SQLite DB Connection DB name
 --------------------
 
 
-### getConnectionReadOnly()
-
-```typescript
-getConnectionReadOnly() => boolean
-```
-
-Get SQLite DB Connection read-only mode
-
-**Returns:** <code>boolean</code>
-
-**Since:** 4.1.0
-
---------------------
-
-
 ### open()
 
 ```typescript
@@ -95,130 +65,6 @@ close() => Promise<void>
 Close a SQLite DB Connection
 
 **Since:** 2.9.0 refactor
-
---------------------
-
-
-### beginTransaction()
-
-```typescript
-beginTransaction() => Promise<capSQLiteChanges>
-```
-
-Begin Database Transaction
-
-**Returns:** <code>Promise&lt;<a href="#capsqlitechanges">capSQLiteChanges</a>&gt;</code>
-
-**Since:** 5.0.7
-
---------------------
-
-
-### commitTransaction()
-
-```typescript
-commitTransaction() => Promise<capSQLiteChanges>
-```
-
-Commit Database Transaction
-
-**Returns:** <code>Promise&lt;<a href="#capsqlitechanges">capSQLiteChanges</a>&gt;</code>
-
-**Since:** 5.0.7
-
---------------------
-
-
-### rollbackTransaction()
-
-```typescript
-rollbackTransaction() => Promise<capSQLiteChanges>
-```
-
-Rollback Database Transaction
-
-**Returns:** <code>Promise&lt;<a href="#capsqlitechanges">capSQLiteChanges</a>&gt;</code>
-
-**Since:** 5.0.7
-
---------------------
-
-
-### isTransactionActive()
-
-```typescript
-isTransactionActive() => Promise<capSQLiteResult>
-```
-
-Is Database Transaction Active
-
-**Returns:** <code>Promise&lt;<a href="#capsqliteresult">capSQLiteResult</a>&gt;</code>
-
-**Since:** 5.0.7
-
---------------------
-
-
-### getUrl()
-
-```typescript
-getUrl() => Promise<capSQLiteUrl>
-```
-
-Get Database Url
-
-**Returns:** <code>Promise&lt;<a href="#capsqliteurl">capSQLiteUrl</a>&gt;</code>
-
-**Since:** 3.3.3-4
-
---------------------
-
-
-### getVersion()
-
-```typescript
-getVersion() => Promise<capVersionResult>
-```
-
-Get the a SQLite DB Version
-
-**Returns:** <code>Promise&lt;<a href="#capversionresult">capVersionResult</a>&gt;</code>
-
-**Since:** 3.2.0
-
---------------------
-
-
-### loadExtension(...)
-
-```typescript
-loadExtension(path: string) => Promise<void>
-```
-
-Load a SQlite extension
-
-| Param      | Type                | Description            |
-| ---------- | ------------------- | ---------------------- |
-| **`path`** | <code>string</code> | :SQlite extension path |
-
-**Since:** 5.0.6
-
---------------------
-
-
-### enableLoadExtension(...)
-
-```typescript
-enableLoadExtension(toggle: boolean) => Promise<void>
-```
-
-Enable Or Disable Extension Loading
-
-| Param        | Type                 | Description       |
-| ------------ | -------------------- | ----------------- |
-| **`toggle`** | <code>boolean</code> | true:on false:off |
-
-**Since:** 5.0.6
 
 --------------------
 
@@ -266,7 +112,7 @@ Execute SQLite DB Connection Query
 ### run(...)
 
 ```typescript
-run(statement: string, values?: any[] | undefined, transaction?: boolean | undefined, returnMode?: string | undefined) => Promise<capSQLiteChanges>
+run(statement: string, values?: any[] | undefined, transaction?: boolean | undefined) => Promise<capSQLiteChanges>
 ```
 
 Execute SQLite DB Connection Raw Statement
@@ -276,7 +122,6 @@ Execute SQLite DB Connection Raw Statement
 | **`statement`**   | <code>string</code>  |             |
 | **`values`**      | <code>any[]</code>   | (optional)  |
 | **`transaction`** | <code>boolean</code> | (optional)  |
-| **`returnMode`**  | <code>string</code>  | (optional)  |
 
 **Returns:** <code>Promise&lt;<a href="#capsqlitechanges">capSQLiteChanges</a>&gt;</code>
 
@@ -288,7 +133,7 @@ Execute SQLite DB Connection Raw Statement
 ### executeSet(...)
 
 ```typescript
-executeSet(set: capSQLiteSet[], transaction?: boolean | undefined, returnMode?: string | undefined) => Promise<capSQLiteChanges>
+executeSet(set: capSQLiteSet[], transaction?: boolean | undefined) => Promise<capSQLiteChanges>
 ```
 
 Execute SQLite DB Connection Set
@@ -297,24 +142,8 @@ Execute SQLite DB Connection Set
 | ----------------- | --------------------------- | ----------- |
 | **`set`**         | <code>capSQLiteSet[]</code> |             |
 | **`transaction`** | <code>boolean</code>        | (optional)  |
-| **`returnMode`**  | <code>string</code>         | (optional)  |
 
 **Returns:** <code>Promise&lt;<a href="#capsqlitechanges">capSQLiteChanges</a>&gt;</code>
-
-**Since:** 2.9.0 refactor
-
---------------------
-
-
-### isExists()
-
-```typescript
-isExists() => Promise<capSQLiteResult>
-```
-
-Check if a SQLite DB Connection exists
-
-**Returns:** <code>Promise&lt;<a href="#capsqliteresult">capSQLiteResult</a>&gt;</code>
 
 **Since:** 2.9.0 refactor
 
@@ -336,53 +165,6 @@ Check if a SQLite database is opened
 --------------------
 
 
-### isTable(...)
-
-```typescript
-isTable(table: string) => Promise<capSQLiteResult>
-```
-
-Check if a table exists
-
-| Param       | Type                |
-| ----------- | ------------------- |
-| **`table`** | <code>string</code> |
-
-**Returns:** <code>Promise&lt;<a href="#capsqliteresult">capSQLiteResult</a>&gt;</code>
-
-**Since:** 3.0.0-beta.5
-
---------------------
-
-
-### getTableList()
-
-```typescript
-getTableList() => Promise<DBSQLiteValues>
-```
-
-Get database's table list
-
-**Returns:** <code>Promise&lt;<a href="#dbsqlitevalues">DBSQLiteValues</a>&gt;</code>
-
-**Since:** 3.4.2-3
-
---------------------
-
-
-### delete()
-
-```typescript
-delete() => Promise<void>
-```
-
-Delete a SQLite DB Connection
-
-**Since:** 2.9.0 refactor
-
---------------------
-
-
 ### exportToJson()
 
 ```typescript
@@ -394,36 +176,6 @@ Export the given database to a JSON Object
 **Returns:** <code>Promise&lt;<a href="#capsqlitejson">capSQLiteJson</a>&gt;</code>
 
 **Since:** 2.9.0 refactor
-
---------------------
-
-
-### deleteExportedRows()
-
-```typescript
-deleteExportedRows() => Promise<void>
-```
-
-Remove rows with sql_deleted = 1 after an export
-
-**Since:** 3.4.3-2
-
---------------------
-
-
-### executeTransaction(...)
-
-```typescript
-executeTransaction(txn: capTask[]) => Promise<capSQLiteChanges>
-```
-
-| Param     | Type                   |
-| --------- | ---------------------- |
-| **`txn`** | <code>capTask[]</code> |
-
-**Returns:** <code>Promise&lt;<a href="#capsqlitechanges">capSQLiteChanges</a>&gt;</code>
-
-**Since:** 3.4.0
 
 --------------------
 
@@ -447,27 +199,6 @@ executeTransaction(txn: capTask[]) => Promise<capSQLiteChanges>
 | **`values`**  | <code>any[]</code>  | values when RETURNING                                |
 
 
-#### capSQLiteResult
-
-| Prop         | Type                 | Description                                   |
-| ------------ | -------------------- | --------------------------------------------- |
-| **`result`** | <code>boolean</code> | result set to true when successful else false |
-
-
-#### capSQLiteUrl
-
-| Prop      | Type                | Description    |
-| --------- | ------------------- | -------------- |
-| **`url`** | <code>string</code> | a returned url |
-
-
-#### capVersionResult
-
-| Prop          | Type                | Description     |
-| ------------- | ------------------- | --------------- |
-| **`version`** | <code>number</code> | Number returned |
-
-
 #### DBSQLiteValues
 
 | Prop         | Type               | Description                      |
@@ -481,6 +212,13 @@ executeTransaction(txn: capTask[]) => Promise<capSQLiteChanges>
 | --------------- | ------------------- | -------------------------------- |
 | **`statement`** | <code>string</code> | A statement                      |
 | **`values`**    | <code>any[]</code>  | the data values list as an Array |
+
+
+#### capSQLiteResult
+
+| Prop         | Type                 | Description                                   |
+| ------------ | -------------------- | --------------------------------------------- |
+| **`result`** | <code>boolean</code> | result set to true when successful else false |
 
 
 #### capSQLiteJson
@@ -547,13 +285,5 @@ executeTransaction(txn: capTask[]) => Promise<capSQLiteChanges>
 | ----------- | ------------------- | ------------------------- |
 | **`name`**  | <code>string</code> | The view name             |
 | **`value`** | <code>string</code> | The view create statement |
-
-
-#### capTask
-
-| Prop            | Type                | Description                                         |
-| --------------- | ------------------- | --------------------------------------------------- |
-| **`statement`** | <code>string</code> | A SQLite statement                                  |
-| **`values`**    | <code>any[]</code>  | A set of values to bind to the statement (optional) |
 
 </docgen-api>

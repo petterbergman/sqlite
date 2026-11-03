@@ -19,7 +19,6 @@ enum UtilsDropError: Error {
     case dropIndexesFailed(message: String)
     case dropTriggersFailed(message: String)
     case dropAllFailed(message: String)
-    case dropTempTablesFailed(message: String)
 }
 class UtilsDrop {
 
@@ -233,8 +232,7 @@ class UtilsDrop {
             retChanges = try self.dropViews(mDB: mDB)
             if changes >= 0 {
                 _ = try UtilsSQLCipher.prepareSQL(mDB: mDB, sql: "VACUUM;",
-                                                  values: [], fromJson: false,
-                                                  returnMode: "no")
+                                                  values: [])
                 changes = UtilsSQLCipher.dbChanges(mDB: mDB.mDb) -
                     initChanges
             }
@@ -251,32 +249,5 @@ class UtilsDrop {
             throw UtilsDropError.dropAllFailed(message: message)
         }
         return changes
-    }
-
-    // MARK: - dropTempTables
-
-    class func dropTempTables(mDB: Database,
-                              alterTables: [String: [String]])
-    throws {
-        var changes: Int = -1
-        var joined: String = ""
-        do {
-            let tables: [String] = Array(alterTables.keys)
-            var statements: [String] = []
-            for table in tables {
-                let stmt = "DROP TABLE IF EXISTS _temp_\(table);"
-                statements.append(stmt)
-            }
-            if statements.count > 0 {
-                joined = statements.joined(separator: "\n")
-                changes = try mDB.executeSQL(sql: joined)
-            }
-            if changes < 0 {
-                print("No _temp_ Tables dropped")
-            }
-        } catch DatabaseError.executeSQL(let message) {
-            throw UtilsDropError.dropTempTablesFailed(
-                message: message)
-        }
     }
 }
