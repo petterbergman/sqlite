@@ -1,201 +1,58 @@
-<p align="center"><br><img src="https://user-images.githubusercontent.com/236501/85893648-1c92e880-b7a8-11ea-926d-95355b8175c7.png" width="128" height="128" /></p>
 <h2 align="center">API PLUGIN DOCUMENTATION</h2>
-<p align="center"><strong><code>@capacitor-community/sqlite</code></strong></p>
-<p align="center">
-  Capacitor community plugin for Native and Electron SQLite Databases. For <strong>Native</strong> and <strong>Electron</strong> platforms, databases could be encrypted with SQLCipher</p>
+<p align="center"><strong><code>@capacitor-community/sqlite</code></strong> (minimal fork)</p>
 
 ## Plugin Wrappers
 
-To easy the way to use the `@capacitor-community/sqlite` plugin and its ability to be used in conjunction with other plugins (`typeorm`, `spatialite`, ...), two connection wrappers have been associated.
+Most apps should use the two connection wrappers rather than calling the plugin directly:
 
-- [API_Connection_Wrapper_Documentation](https://github.com/capacitor-community/sqlite/blob/master/docs/APIConnection.md)
-
-- [API_DB_Connection_Wrapper_Documentation](https://github.com/capacitor-community/sqlite/blob/master/docs/APIDBConnection.md)
+- [Connection wrapper](APIConnection.md)
+- [DB connection wrapper](APIDBConnection.md)
 
 ## SQLite Commands Within the Plugin
 
- - SQLite Data Definition Language commands (such as CREATE, ALTER, DROP) should be executed using the `execute` plugin method.
+- Data Definition Language (`CREATE`, `ALTER`, `DROP`): `execute`
+- Transaction control (`BEGIN TRANSACTION`, `COMMIT`, `ROLLBACK`): `execute`, with its own `transaction` flag set to `false`
+- Data Manipulation Language (`INSERT`, `UPDATE`, `DELETE`, `REPLACE`): `run` when there are bind values, `executeSet` for a batch, either `execute` or `run` otherwise
+- Queries (`SELECT`): `query`
+- `PRAGMA`: `execute`
 
- - SQLite Transaction Control commands (including BEGIN TRANSACTION, COMMIT, ROLLBACK) should also be executed using the `execute` plugin method.
+`execute`, `run` and `executeSet` wrap their statements in a transaction unless `transaction: false` is passed.
 
- - SQLite Data Manipulation Language commands (like INSERT, UPDATE, DELETE, REPLACE) should use the `run` plugin method if they involve bind values. They can utilize either the `execute` or `run` plugin methods if no bind values are involved.
-
- - SQLite Data Query Language commands (SELECT) should be executed using the `query` plugin method.
-
- - SQLite Special commands (PRAGMA) should be executed using the `execute` plugin method.
- 
 ## Databases Location
 
-The plugin add a suffix "SQLite" and an extension ".db" to the database name given as options in the `capConnectionOptions` or `capSQLiteOptions` ie (fooDB -> fooDBSQLite.db). If the name given contains the extension `.db` it will be removed ie (foo.db) will become internally (fooSQLite.db) after adding the suffix. 
+The plugin adds the suffix `SQLite` and the extension `.db` to the database name (`fooDB` → `fooDBSQLite.db`). A trailing `.db` in the given name is removed first (`foo.db` → `fooSQLite.db`).
 
 ### Android
 
-- **in data/data/YOUR_PACKAGE/databases**
+- `data/data/YOUR_PACKAGE/databases`
 
-### IOS
+### iOS
 
-- **in the Documents folder of YOUR_APPLICATION**
-- **or in the folder specified by the capacitor.config.ts file of YOUR_APPLICATION since 3.3.3-2**
-  In that case the databases will not be not visible to iTunes and not backed up to iCloud.
+- the `Documents` folder of your application, or
+- the folder set by `iosDatabaseLocation` in `capacitor.config.ts`. Databases there are not visible in Files/iTunes and not backed up to iCloud.
+
   ```ts
   const config: CapacitorConfig = {
-    appId: 'io.ionic.starter',
-    appName: 'testreact',
-    webDir: 'build',
-    bundledWebRuntime: false,
     plugins: {
       CapacitorSQLite: {
-        "iosDatabaseLocation": "Library/CapacitorDatabase"
-      }
-    }
+        iosDatabaseLocation: 'Library/CapacitorDatabase',
+      },
+    },
   };
   ```
 
-### Electron
-
-- since **2.4.2-1** the databases location is : **User/Databases/APP_NAME/**
-
-- since **3.4.1** the databases location can be set in `the config.config.ts` as followed:
-
-  - for sharing databases between users:
-
-    ```ts 
-    plugins: {
-      CapacitorSQLite: {
-        electronMacLocation: "/YOUR_DATABASES_PATH",
-        electronWindowsLocation: "C:\\ProgramData\\CapacitorDatabases",
-        electronLinuxLocation: "/home/CapacitorDatabases"
-      }
-    }
-    ``` 
-
-  - for only the user in its Home folder: **User/Databases/APP_NAME/**
-
-    ``` 
-    Plugins: {
-      CapacitorSQLite: {
-        electronMacLocation: "Databases",
-        electronWindowsLocation: "Databases",
-        electronLinuxLocation: "Databases"
-      }
-    }
-    ``` 
-    You can replace "Databases" by your "YOUR_DATABASES_LOCATION", but it MUST not have any "/" or "\\" characters.
-
-  For existing databases, YOU MUST COPY old databases to the new location
-  You MUST remove the Electron folder and add it again. 
-
 ### Web
 
-- the database is stored in Web browser INDEXEDDB storage as a `localforage` store under the `jeepSqliteStore` name and `databases` table name.
+- IndexedDB, in a `localforage` store named `jeepSqliteStore` with a `databases` table. The in-memory database is written to the store on `saveToStore`, `close` and `closeConnection`.
 
-## Comments within SQL statements
+## Running multiple statements
 
- - see [Comments within SQL](https://www.techonthenet.com/sqlite/comments.php)
-
- - Some examples 
-
- ```ts
-  const setContacts: Array<capSQLiteSet>  = [
-    { statement:"INSERT INTO contacts /* Contact Simpson */ (name,FirstName,email,company,age,MobileNumber) VALUES (?,?,?,?,?,?);",
-      values:["Simpson","Tom","Simpson@example.com",,69,"4405060708"]
-    },
-    { statement:"INSERT INTO contacts /* three more contacts */ (name,FirstName,email,company,age,MobileNumber) VALUES (?,?,?,?,?,?) -- Add Jones, Whiteley and Brown;",
-      values:[
-        ["Jones","David","Jones@example.com",,42.1,"4404030201"],
-        ["Whiteley","Dave","Whiteley@example.com",,45.3,"4405162732"],
-        ["Brown","John","Brown@example.com",,35,"4405243853"]
-      ]
-    },
-    { statement:"UPDATE contacts SET age = ? , MobileNumber = ? WHERE id = ? -- Update Jones Contact;",
-      values:[51.4,"4404030202",6]
-    }
-  ];
-  const setMessages: Array<capSQLiteSet>  = [
-    { statement:`
-    /* Define the messages table */
-    CREATE TABLE IF NOT EXISTS messages (
-      id INTEGER PRIMARY KEY NOT NULL,
-      contactid INTEGER, -- key to contacts(id)
-      title TEXT NOT NULL,
-      body TEXT NOT NULL,
-      last_modified INTEGER DEFAULT (strftime('%s', 'now')),
-      FOREIGN KEY (contactid) REFERENCES contacts(id) ON DELETE SET DEFAULT
-    );`,
-      values:[]
-    },
-  ];
-
-  let insertQuery = 'INSERT INTO contacts (name,FirstName,email,company,age,MobileNumber) VALUES (?, ?, ?, ?, ?, ?) -- Add Sue Hellen;';
-  let bindValues = ["Hellen","Sue","sue.hellen@example.com",,42,"4406050807"];
-  let ret = await db.run(insertQuery, bindValues);
-  console.log(`>>> run ret 1: ${JSON.stringify(ret)}`)
-  insertQuery = `INSERT INTO contacts /* some contacts */ (name,FirstName,email,company,age,MobileNumber) VALUES 
-      ('Doe','John','john.doe@example.com', 'IBM', 30, '4403050926'), -- add Doe
-      ('Watson','Dave','dave.watson@example.com','Apple', 30, '4407050932') /* add Watson */,
-      ('Smith', 'Jane', 'jane.smith@example.com', 'IBM', 27, '33607556142') /* Add Smith */-- End of add contact;`;
-  bindValues = [];
-  ret = await db.run(insertQuery, bindValues);
-  console.log(`>>> run ret 2: ${JSON.stringify(ret)}`)
-
-  let selectQuery = "SELECT * /* all columns */ FROM contacts WHERE company = 'IBM' -- for company IBM;";
-
-  ret = await db.query(selectQuery);
-  console.log(`>>> query "IBM" ret: ${JSON.stringify(ret)}`)
-
-  ret = await db.executeSet(setContacts);
-  console.log(`>>> executeSet 1 ret: ${JSON.stringify(ret)}`)
-
-  selectQuery = "SELECT email /* only email */ FROM contacts WHERE company ISNULL -- for company not given;";
-
-
-  ret = await db.executeSet(setMessages);
-  console.log(`>>> executeSet 2 ret: ${JSON.stringify(ret)}`)
-```
-
-## Unexpected behaviours
-
-Unexpected or erroneous behaviour users of this library have encountered.
-
-### 1. Running multiple update statements in one statement
-
-<ins>The Problem:</ins>
-
-In https://github.com/capacitor-community/sqlite/issues/393 a user of this library
-experienced bugs when running a statement that itself contained multiple update statements.
-
-The statement executed fine on the web version of this library (sql-wasm.wasm).
-
-But on android and IOS only some updates took place, some updates were ignored and did not take effect in the database.
-
-<ins>The Solution:</ins>
-
-When running multiple update statements and experiencing such errors, try running them in separate single statements and await (Promise) each statement to finish running before running the next statement.
-
-Note that in general in SQLite this is not recommended, since it makes your queries take a bit longer.
-
-## Write-Ahead Logging (WAL)
-
- - Electron, Web platforms only WAL journal_mode is implemented
-
- - Both WAL and WAL2 journal_mode are implemented
-
- - Android WAL2 is set by default, so you do not need to set it up
+Some users have seen a single `execute` call containing several `UPDATE` statements apply only part of them on Android and iOS, while the web build applied all of them ([upstream #393](https://github.com/capacitor-community/sqlite/issues/393)). If that happens, run the statements one at a time, awaiting each, or use `executeSet`.
 
 ## Error Return values
 
-- For all methods, a message containing the error message will be returned
+- Every method rejects with an error message on failure.
 
-- For execute and run commands, {changes:{changes: -1}} will be returned in changes
-
-- For query command, an empty array will be returned in values
-
-## Defining your own secret and newsecret keys (encryption only)
-
-- in Android, go to capacitor-sqlite/java/com.jeep.plugin.capacitor/cdssUtils/GlobalSQLite.java
-  and update the default values before building your app.
-
-- in Electron, go to YOUR_APP/electron/plugins/plugin.js-xxxx.js and search for `class GlobalSQLite` and modify the `this.secret`and `this.newsecret` parameters.
 
 ## Methods Index
 
@@ -220,7 +77,6 @@ Note that in general in SQLite this is not recommended, since it makes your quer
 * [Interfaces](#interfaces)
 
 </docgen-index>
-* [Listeners](#listeners)
 
 ## API Plugin
 
@@ -693,72 +549,3 @@ return false : no consistency, connections are closed
 | **`dbNames`** | <code>string[]</code> | the dbName of all connections | 3.0.0-beta.10 |
 
 </docgen-api>
-
-### Listeners (NOT AVAILABLE FOR ELECTRON PLATFORM)
-
-`Available since 3.0.0-beta.12`
-
-The listeners are attached to the plugin.
-
-| Listener                      | Type                                                |  Description                                     |
-| ----------------------------- | --------------------------------------------------- | ----------------------------------------------- |
-| **sqliteImportProgressEvent** | [capJsonProgressListener](#capJsonProgressListener) | Emitted at different steps of the `importFromJson` process |
-| **sqliteExportProgressEvent** | [capJsonProgressListener](#capJsonProgressListener) | Emitted at different steps of the `exportToJson` process   |
-
-#### capJsonProgressListener 
-
-| Prop           | Type                |Description       |
-| -------------- | ------------------- | ---------------- |
-| **`progress`** | <code>string</code> | progress message |
-
-
-## Remote Server databases Synchronization Process
-
-The `@capacitor-community/sqlite` plugin provides a toolbox to help developpers to create a synchronization process in their applications.
-
-- [importFromJson()](#importfromjson)
-- [exportToJson()](#exporttojson)
-- [createSyncTable()](#createsynctable)
-- [setSyncDate()](#setsyncdate)
-
-It is **Mandatory** for this process to happen, that each table contains in their schema:
-
-- a first column with an **id** defined as:
-
-- a last column with a name **last_modified**
-
-- a trigger to update the **last_modified** field
-
-as below:
-
-```js
-CREATE TABLE IF NOT EXISTS [tableName] (
-id INTEGER PRIMARY KEY NOT NULL,
-...
-last_modified INTEGER DEFAULT (strftime('%s', 'now'))
-);
-
-...
-...
-CREATE TRIGGER users_trigger_last_modified AFTER UPDATE ON [tableName]
-FOR EACH ROW WHEN NEW.last_modified < OLD.last_modified
-BEGIN
-   UPDATE [tableName] SET last_modified= (strftime('%s', 'now')) WHERE id=OLD.id;
-END;
-```
-
-Your Application has to manage the synchronization process:
-
-- transfer of the whole databases when Online for the first time using `http requests` and convert the response to Json Object as described in [ImportExportJson_Documentation](https://github.com/capacitor-community/sqlite/blob/master/docs/ImportExportJson.md)
-
-- use the `ìmportFromJson method` with a mode **full**
-
-- work Offline and add tables and/or data to tables
-
-- use the `exportToJson method` with a mode **partial** (meaning exporting everything since the last sync date)
-
-- manage the transfer back to the server
-
-- update the synchronization date locally when the transfer has been completed
-
-- and so on with **partial** `importFromJson` and `exportToJson`

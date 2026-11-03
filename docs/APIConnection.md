@@ -1,8 +1,5 @@
-<p align="center"><br><img src="https://user-images.githubusercontent.com/236501/85893648-1c92e880-b7a8-11ea-926d-95355b8175c7.png" width="128" height="128" /></p>
 <h2 align="center">API CONNECTION DOCUMENTATION</h2>
-<p align="center"><strong><code>@capacitor-community/sqlite</code></strong></p>
-<p align="center">
-  SQLite Connection Wrapper</p>
+<p align="center"><strong><code>@capacitor-community/sqlite</code></strong> (minimal fork)</p>
 
 ## Methods Index
 
