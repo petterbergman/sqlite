@@ -43,7 +43,7 @@ The plugin adds the suffix `SQLite` and the extension `.db` to the database name
 
 ### Web
 
-- IndexedDB, in a `localforage` store named `jeepSqliteStore` with a `databases` table. The in-memory database is written to the store on `saveToStore`, `close` and `closeConnection`.
+- IndexedDB, in the `databases` object store of the `jeepSqliteStore` database. The in-memory sql.js database is written to the store after every write, on `open`, `saveToStore`, `close` and `closeConnection`.
 
 ## Running multiple statements
 

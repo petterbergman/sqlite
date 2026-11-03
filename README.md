@@ -3,7 +3,7 @@
 
 <p align="center">
   A minimalist fork of <a href="https://github.com/capacitor-community/sqlite">capacitor-community/sqlite</a>:
-  native SQLite for Capacitor on iOS and Android, plus a <code>jeep-sqlite</code> web store, with everything else stripped out.
+  native SQLite for Capacitor on iOS and Android, plus a sql.js web implementation for development and tests, with everything else stripped out.
 </p>
 
 ## Why this fork
@@ -66,7 +66,7 @@ npm install
 npx cap sync
 ```
 
-For the web platform, also install `jeep-sqlite` and copy `sql-wasm.wasm` from `node_modules/sql.js/dist/` into your app's assets folder (`src/assets` for Angular, `public/assets` for Vue/React).
+For the web platform, copy `sql-wasm.wasm` from `node_modules/sql.js/dist/` into your app's assets folder so it is served at `/assets/sql-wasm.wasm` (`src/assets` for Angular, `public/assets` for Vue/React), and call `initWebStore()` once before creating connections. No custom element is needed.
 
 ## Requirements
 
@@ -97,7 +97,7 @@ The plugin appends `SQLite.db` to the name you pass (`fooDB` → `fooDBSQLite.db
 
 - **Android:** `data/data/YOUR_PACKAGE/databases`
 - **iOS:** `Documents`, or `iosDatabaseLocation` if set
-- **Web:** IndexedDB, in the `jeepSqliteStore` localforage store. Call `saveToStore` to persist changes.
+- **Web:** IndexedDB, in the `databases` object store of the `jeepSqliteStore` database (the layout jeep-sqlite used, so its databases still open). Every write is saved to the store as it happens.
 
 ## Usage
 

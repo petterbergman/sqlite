@@ -1,6 +1,6 @@
 {
   "name": "@petterbergman/capacitor-sqlite",
-  "version": "8.1.0-qm.1",
+  "version": "8.1.0-qm.2",
   "description": "Trimmed fork of @capacitor-community/sqlite used by QuarterMaster",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -38,7 +38,7 @@
     "verify": "npm run verify:ios && npm run verify:android && npm run verify:web",
     "verify:ios": "xcodebuild -scheme CapacitorCommunitySqlite -destination generic/platform=iOS OTHER_CFLAGS='-DHAVE_GETHOSTUUID=0'",
     "verify:android": "cd android && ./gradlew clean build test && cd ..",
-    "verify:web": "npm run build",
+    "verify:web": "npm run build && npm run test:web",
     "lint": "npm run eslint && npm run prettier -- --check && npm run swiftlint -- lint",
     "fmt": "npm run eslint -- --fix && npm run prettier -- --write && npm run swiftlint -- --fix --format",
     "eslint": "eslint . --ext ts",
@@ -51,7 +51,8 @@
     "build": "npm run clean && npm run docgen && tsc && rollup -c rollup.config.mjs",
     "clean": "rimraf ./dist",
     "watch": "tsc --watch",
-    "test": "npm run test:ios && npm run test:android",
+    "test": "npm run test:web && npm run test:ios && npm run test:android",
+    "test:web": "vitest run",
     "test:ios": "xcodebuild -scheme CapacitorCommunitySqlite -destination 'platform=iOS Simulator,name=iPhone 17' OTHER_CFLAGS='-DHAVE_GETHOSTUUID=0' test",
     "test:android": "cd android && ./gradlew connectedDebugAndroidTest -x lint -Pandroid.testInstrumentationRunnerArguments.class=com.getcapacitor.community.database.sqlite.ImportFromJsonBasicInstrumentedTest",
     "prepublishOnly": "npm run build && npm run docgen",
@@ -69,14 +70,17 @@
     "@rollup/plugin-commonjs": "28.0.2",
     "@rollup/plugin-node-resolve": "16.0.0",
     "@types/node": "24.19.2",
+    "@types/sql.js": "1.4.9",
     "eslint": "8.57.1",
+    "fake-indexeddb": "6.2.7",
     "prettier": "3.8.3",
     "prettier-plugin-java": "2.8.1",
     "rimraf": "6.1.3",
     "rollup": "4.60.2",
     "standard-version": "9.5.0",
     "swiftlint": "2.0.0",
-    "typescript": "6.0.3"
+    "typescript": "6.0.3",
+    "vitest": "5.1.0"
   },
   "peerDependencies": {
     "@capacitor/core": ">=8.0.0"
@@ -95,7 +99,7 @@
     }
   },
   "dependencies": {
-    "jeep-sqlite": "^2.8.0"
+    "sql.js": "^1.11.0"
   },
   "publishConfig": {
     "access": "public",
