@@ -1,7 +1,7 @@
 {
-  "name": "@capacitor-community/sqlite",
-  "version": "8.1.0",
-  "description": "Community plugin for native SQLite databases",
+  "name": "@petterbergman/capacitor-sqlite",
+  "version": "8.1.0-qm.1",
+  "description": "Trimmed fork of @capacitor-community/sqlite used by QuarterMaster",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
@@ -21,10 +21,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/capacitor-community/sqlite.git"
+    "url": "git+https://github.com/petterbergman/sqlite.git"
   },
   "bugs": {
-    "url": "https://github.com/capacitor-community/sqlite/issues"
+    "url": "https://github.com/petterbergman/sqlite/issues"
   },
   "keywords": [
     "capacitor",
@@ -96,5 +96,9 @@
   },
   "dependencies": {
     "jeep-sqlite": "^2.8.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "tag": "qm"
   }
 }
