@@ -3,6 +3,13 @@ import XCTest
 
 class CapacitorSQLiteTests: XCTestCase {
 
+    override func setUpWithError() throws {
+        // Hostless tests use the simulator's home dir, which lacks Documents on a fresh simulator
+        let docs = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask,
+                                               appropriateFor: nil, create: true)
+        try FileManager.default.createDirectory(at: docs, withIntermediateDirectories: true)
+    }
+
     func testEcho() {
         // This is an example of a functional test case for a plugin.
         // Use XCTAssert and related functions to verify your tests produce the correct results.

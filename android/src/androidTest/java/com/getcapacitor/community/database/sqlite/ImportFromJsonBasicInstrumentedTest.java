@@ -69,7 +69,7 @@ public class ImportFromJsonBasicInstrumentedTest {
         long totalElapsedMs = android.os.SystemClock.elapsedRealtime() - totalStartMs;
         System.out.println("[TEST] importFromJson_basic total elapsed " + totalElapsedMs + "ms");
         Log.i(TAG, "importFromJson_basic total elapsed " + totalElapsedMs + "ms");
-        assertTrue("importFromJson_basic exceeded 500ms, elapsed=" + totalElapsedMs + "ms", totalElapsedMs <= 200);
+        assertTrue("importFromJson_basic exceeded 500ms, elapsed=" + totalElapsedMs + "ms", totalElapsedMs <= 500);
     }
 
     @Test
