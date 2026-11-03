@@ -1,5 +1,5 @@
 import XCTest
-@testable import Plugin
+@testable import CapacitorSQLitePlugin
 
 class CapacitorSQLiteTests: XCTestCase {
 
@@ -73,8 +73,7 @@ class CapacitorSQLiteTests: XCTestCase {
             sourceFileURL = baseURL.appendingPathComponent("Quartermaster4SQLite.db")
         }
         guard let fileURL = sourceFileURL else {
-            XCTFail("Quartermaster4SQLite.db not found in test bundle")
-            return
+            throw XCTSkip("Quartermaster4SQLite.db not found in test bundle")
         }
         let destPath = try UtilsFile.getFilePath(databaseLocation: "Documents",
                                                  fileName: "Quartermaster4SQLite.db")

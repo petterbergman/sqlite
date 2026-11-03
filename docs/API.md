@@ -192,8 +192,6 @@ Note that in general in SQLite this is not recommended, since it makes your quer
 
 ## Defining your own secret and newsecret keys (encryption only)
 
-- in IOS, go to the Pod/Development Pods/capacitor-sqlite/GlobalSQLite.swift file
-
 - in Android, go to capacitor-sqlite/java/com.jeep.plugin.capacitor/cdssUtils/GlobalSQLite.java
   and update the default values before building your app.
 
