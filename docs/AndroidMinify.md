@@ -13,7 +13,7 @@ android {
     release {
       minifyEnabled true // <- enable it here
       shrinkResources true // <- optional
-      proguardFiles getDefaultProguardFile('proguard-android.txt'), 
+      proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 
       'proguard-rules.pro' // <- configuration file
     }
   }
