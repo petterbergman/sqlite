@@ -12,7 +12,8 @@
     "dist/",
     "src/",
     "ios/Plugin/",
-    "CapacitorCommunitySqlite.podspec"
+    "CapacitorCommunitySqlite.podspec",
+    "Package.swift"
   ],
   "author": "Robin Genz <mail@robingenz.dev>",
   "license": "MIT",
