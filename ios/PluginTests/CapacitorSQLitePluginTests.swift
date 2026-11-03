@@ -61,6 +61,20 @@ class CapacitorSQLiteTests: XCTestCase {
         XCTAssertThrowsError(try implementation.importFromJson(json))
     }
 
+    func testCreateSchemaSplitsOnAnyWhitespace() throws {
+        // Column definitions separated by tabs or CRLF used to fail the schema export
+        let stmt = "CREATE TABLE tabbed (id\tINTEGER PRIMARY KEY NOT NULL,\r\n  name\t\tTEXT,"
+            + "\r\n  CONSTRAINT\tuq_name UNIQUE (name))"
+        let schema = try ExportToJson.createSchema(stmt: stmt)
+        XCTAssertEqual(schema.count, 3)
+        XCTAssertEqual(schema[0]["column"], "id")
+        XCTAssertEqual(schema[0]["value"], "INTEGER PRIMARY KEY NOT NULL")
+        XCTAssertEqual(schema[1]["column"], "name")
+        XCTAssertEqual(schema[1]["value"], "TEXT")
+        XCTAssertEqual(schema[2]["constraint"], "uq_name")
+        XCTAssertEqual(schema[2]["value"], "UNIQUE (name)")
+    }
+
     func testQueryAllTablesWithTiming() throws {
 
         let implementation = CapacitorSQLite(config: SqliteConfig())

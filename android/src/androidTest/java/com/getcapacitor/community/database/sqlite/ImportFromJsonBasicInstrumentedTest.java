@@ -93,6 +93,36 @@ public class ImportFromJsonBasicInstrumentedTest {
     }
 
     @Test
+    public void exportToJson_schema_with_tabs_and_crlf() throws Exception {
+        // Column definitions separated by tabs or CRLF used to crash the schema export
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        String dbName = "testjson_whitespace";
+        context.deleteDatabase(dbName + "SQLite.db");
+        CapacitorSQLite cap = new CapacitorSQLite(context);
+        cap.createConnection(dbName, 1);
+        cap.open(dbName);
+        cap.execute(
+            dbName,
+            "CREATE TABLE tabbed (id\tINTEGER PRIMARY KEY NOT NULL,\r\n  name\t\tTEXT,\r\n  CONSTRAINT\tuq_name UNIQUE (name));" +
+                "INSERT INTO tabbed (id, name) VALUES (1, 'first');",
+            true
+        );
+        JSObject export = cap.exportToJson(dbName);
+        cap.close(dbName);
+        cap.closeConnection(dbName);
+        context.deleteDatabase(dbName + "SQLite.db");
+
+        JSONArray schema = export.getJSONArray("tables").getJSONObject(0).getJSONArray("schema");
+        assertEquals(3, schema.length());
+        assertEquals("id", schema.getJSONObject(0).getString("column"));
+        assertEquals("INTEGER PRIMARY KEY NOT NULL", schema.getJSONObject(0).getString("value"));
+        assertEquals("name", schema.getJSONObject(1).getString("column"));
+        assertEquals("TEXT", schema.getJSONObject(1).getString("value"));
+        assertEquals("uq_name", schema.getJSONObject(2).getString("constraint"));
+        assertEquals("UNIQUE (name)", schema.getJSONObject(2).getString("value"));
+    }
+
+    @Test
     public void query_all_tables_with_timing() throws Exception {
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         // Copy a fresh Quartermaster4SQLite.db into the databases dir when the fixture is present

@@ -350,6 +350,14 @@ class ExportToJson {
 
     // swiftlint:enable function_body_length
 
+    // MARK: - ExportToJson - SplitFirstWord
+
+    // split on the first run of any whitespace (spaces, tabs, \r)
+    class func splitFirstWord<S: StringProtocol>(_ str: S) -> [Substring] {
+        return str.split(maxSplits: 1, whereSeparator: { $0.isWhitespace })
+            .map { Substring($0.trimmingCharacters(in: .whitespacesAndNewlines)) }
+    }
+
     // MARK: - ExportToJson - CreateSchema
 
     // swiftlint:disable function_body_length
@@ -368,7 +376,7 @@ class ExportToJson {
                     for ipos in 0..<sch.count {
                         let rstr: String = sch[ipos]
                             .trimmingCharacters(in: .whitespacesAndNewlines)
-                        var row = rstr.split(separator: " ", maxSplits: 1)
+                        var row = ExportToJson.splitFirstWord(rstr)
                         if  row.count == 2 {
                             var columns: [String: String] = [:]
                             switch String(row[0]).uppercased() {
@@ -423,8 +431,7 @@ class ExportToJson {
                                     .replacingOccurrences(of: "_ ",
                                                           with: "_")
                             case "CONSTRAINT":
-                                let tRow = row[1].split(separator: " ",
-                                                        maxSplits: 1)
+                                let tRow = ExportToJson.splitFirstWord(row[1])
                                 row[0] = tRow[0]
                                 columns["constraint"] = String(row[0])
                                 row[1] = tRow[1]

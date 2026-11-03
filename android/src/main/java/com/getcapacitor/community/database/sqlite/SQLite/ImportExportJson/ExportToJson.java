@@ -209,7 +209,7 @@ public class ExportToJson {
             // first word as key
             for (String s : sch) {
                 String sc = s.replaceAll("\n", "").trim();
-                String[] row = sc.trim().split(" ", 2);
+                String[] row = sc.trim().split("\\s+", 2);
                 JsonColumn jsonRow = new JsonColumn();
                 String uppercasedValue = row[0].toUpperCase(); // Define uppercasedValue
                 int oPar;
@@ -234,7 +234,7 @@ public class ExportToJson {
                         jsonRow.setConstraint(row[0]);
                     }
                     case "CONSTRAINT" -> {
-                        String[] tRow = row[1].trim().split(" ", 2);
+                        String[] tRow = row[1].trim().split("\\s+", 2);
                         row[0] = tRow[0];
                         jsonRow.setConstraint(row[0]);
                         row[1] = tRow[1];
