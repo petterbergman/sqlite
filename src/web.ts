@@ -200,7 +200,7 @@ export class CapacitorSQLiteWeb extends WebPlugin implements CapacitorSQLitePlug
     try {
       return await fn();
     } catch (err: any) {
-      throw new Error(`${method}: ${err?.message ?? err}`);
+      throw new Error(`${method}: ${err?.message ?? err}`, { cause: err });
     }
   }
 }
